@@ -52,11 +52,12 @@ public class AnnealStep extends Step<Thought> {
     public void process() {
         Thought t = getElement();
 
-        nextStep = t.getConfig().getAnnealStepSize() / ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT.outerGrad(t.getAnnealing().getValue());
-        double nextAnnealValue = nextStep + t.getAnnealing().getValue();
+        double av = t.getAnnealing().getValue(0);
+        nextStep = t.getConfig().getAnnealStepSize() / ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT.outerGrad(av);
+        double nextAnnealValue = nextStep + av;
         nextAnnealValue = Math.min(nextAnnealValue, 1.0);
 
-        t.getAnnealing().setValue(nextAnnealValue);
+        t.getAnnealing().setValue(0, nextAnnealValue);
 
         if (nextAnnealValue < 1.0)
             AnnealStep.add(t);
@@ -71,6 +72,6 @@ public class AnnealStep extends Step<Thought> {
     public String toString() {
         return "docId:" + getElement().getId() +
                 " NextStep:" + doubleToString(nextStep, "#.######") +
-                " NextAnnealValue:" + doubleToString(getElement().getAnnealing().getValue(), "#.######");
+                " NextAnnealValue:" + doubleToString(getElement().getAnnealing().getValue(0), "#.######");
     }
 }

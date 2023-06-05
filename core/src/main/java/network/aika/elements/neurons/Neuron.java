@@ -216,7 +216,7 @@ public abstract class Neuron<A extends Activation> implements Element, Writable 
         addProvider(templateN.getModel());
 
         bias.setInitialValue(
-                templateN.getBias().getUpdatedValue()
+                templateN.getBias().getUpdatedValue(0)
         );
 
         CategoryInputSynapse cis = templateN.getCategoryInputSynapse();
@@ -243,7 +243,7 @@ public abstract class Neuron<A extends Activation> implements Element, Writable 
 
     public abstract A createActivation(Thought t);
 
-    public abstract void addInactiveLinks(Activation bs);
+    public abstract void addInactiveLinks(Activation act);
 
     public abstract ActivationFunction getActivationFunction();
 
@@ -410,7 +410,7 @@ public abstract class Neuron<A extends Activation> implements Element, Writable 
     }
 
     public double getCurrentCompleteBias() {
-        return getBias().getUpdatedValue();
+        return getBias().getUpdatedValue(0);
     }
 
     public void suspend() {
@@ -524,7 +524,7 @@ public abstract class Neuron<A extends Activation> implements Element, Writable 
     }
 
     public <N extends Neuron> N setBias(double bias) {
-        getBias().setValue(bias);
+        getBias().setValue(0, bias);
         return (N) this;
     }
 

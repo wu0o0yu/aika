@@ -118,14 +118,14 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
         }
 
         return getOutput().getCurrentCompleteBias() +
-                getWeight().getUpdatedValue();
+                getWeight().getUpdatedValue(0);
     }
 
     public static double getLatentLinkingPreNet(Synapse synA, Synapse synB) {
-        double preUB = synA.getWeight().getUpdatedValue();
+        double preUB = synA.getWeight().getUpdatedValue(0);
 
         if(synB != null) {
-            preUB += synB.getWeight().getUpdatedValue() +
+            preUB += synB.getWeight().getUpdatedValue(0) +
                     Math.min(
                             synA.getSumOfLowerWeights(),
                             synB.getSumOfLowerWeights()
@@ -235,7 +235,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
 
     protected void setInitialWeight(Synapse templateSyn) {
         weight.setInitialValue(
-                templateSyn.weight.getUpdatedValue()
+                templateSyn.weight.getUpdatedValue(0)
         );
     }
 
@@ -265,6 +265,10 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
         return l;
     }
 
+    public L checkExistingLink(IA iAct, OA oAct) {
+        return (L) oAct.getInputLink(iAct.getNeuron());
+    }
+
     public L createLinkFromTemplate(IA input, OA output, Link template) {
         L l = createLink(input, output);
         l.initFromTemplate(template);
@@ -272,7 +276,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
     }
 
     public S setWeight(double w) {
-        weight.setValue(w);
+        weight.setValue(0, w);
 
         return (S) this;
     }
@@ -304,7 +308,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
     }
 
     public double getSortingWeight() {
-        return getWeight().getUpdatedValue();
+        return getWeight().getUpdatedValue(0);
     }
 
     public Direction getStoredAt() {
@@ -340,11 +344,11 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
     }
 
     public boolean isZero() {
-        return Utils.belowTolerance(TOLERANCE, weight.getValue());
+        return Utils.belowTolerance(TOLERANCE, weight.getValue(0));
     }
 
     public boolean isNegative() {
-        return weight.getUpdatedValue() < 0.0;
+        return weight.getUpdatedValue(0) < 0.0;
     }
 
     @Override

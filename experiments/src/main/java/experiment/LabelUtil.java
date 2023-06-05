@@ -28,6 +28,7 @@ import network.aika.elements.synapses.Synapse;
 
 import java.util.function.Predicate;
 
+import static java.lang.Integer.MAX_VALUE;
 import static network.aika.direction.Direction.INPUT;
 import static network.aika.direction.Direction.OUTPUT;
 
@@ -48,14 +49,14 @@ public class LabelUtil {
             BindingActivation act = (BindingActivation) l.getInput();
             return act != null &&
                     (!fired || act.isFired()) &&
-                    (!netPreAnneal || act.getNetPreAnneal().getValue() > 0.0);
+                    (!netPreAnneal || act.getNetPreAnneal().getValue(MAX_VALUE) > 0.0);
         });
     }
 
     public static String generateLabel(PatternNeuron pn) {
         return generateLabel(pn, bn -> {
             PatternSynapse s = (PatternSynapse) bn.getOutputSynapse(pn.getProvider());
-            return (-s.getSynapseBias().getValue() > pn.getBias().getValue());
+            return (-s.getSynapseBias().getValue(MAX_VALUE) > pn.getBias().getValue(MAX_VALUE));
         });
     }
 

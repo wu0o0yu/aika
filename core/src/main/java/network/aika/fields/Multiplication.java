@@ -31,7 +31,7 @@ public class Multiplication extends AbstractFunction {
     }
 
     @Override
-    protected double computeUpdate(AbstractFieldLink fl, double u) {
-        return u * getInputValueByArg(fl.getArgument() == 0 ? 1 : 0);
+    protected double computeUpdate(AbstractFieldLink fl, int r, double u) {
+        return u * getInputValueByArg(fl.getArgument() == 0 ? 1 : 0, r);
     }
 }

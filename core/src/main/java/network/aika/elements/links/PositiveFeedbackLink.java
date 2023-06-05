@@ -19,9 +19,14 @@ package network.aika.elements.links;
 import network.aika.elements.activations.BindingActivation;
 import network.aika.elements.activations.PatternActivation;
 import network.aika.elements.synapses.PositiveFeedbackSynapse;
+import network.aika.fields.FieldLink;
+import network.aika.fields.FieldOutput;
 import network.aika.fields.Multiplication;
 import network.aika.visitor.Visitor;
 
+import static network.aika.callbacks.EventType.CREATE;
+import static network.aika.fields.ConstantField.ONE;
+import static network.aika.fields.ConstantField.ZERO;
 import static network.aika.fields.Fields.mul;
 import static network.aika.fields.Fields.scale;
 
@@ -33,6 +38,22 @@ public class PositiveFeedbackLink extends FeedbackLink<PositiveFeedbackSynapse, 
 
     public PositiveFeedbackLink(PositiveFeedbackSynapse s, PatternActivation input, BindingActivation output) {
         super(s, input, output);
+    }
+
+    public void relinkInput(PatternActivation in) {
+        if(input != null) {
+            assert input == in;
+            return;
+        }
+
+        input = in;
+
+        linkInput();
+
+        FieldLink il = inputValue.getInputLinkByArg(0);
+        il.relinkInput(getInputValue());
+
+        getThought().onElementEvent(CREATE, this);
     }
 
     @Override
@@ -64,17 +85,23 @@ public class PositiveFeedbackLink extends FeedbackLink<PositiveFeedbackSynapse, 
     }
 
     @Override
-    public void addInputLinkingStep() {
+    public FieldOutput getInputIsFired() {
+        if(input == null)
+            return ONE;
+
+        return input.getIsFired();
     }
 
     @Override
-    protected Multiplication initWeightedInput() {
-        return mul(
-                this,
-                "isClosed * iAct(" + getInputKeyString() + ").value * weight",
-                getThought().getIsClosed(),
-                super.initWeightedInput()
-        );
+    public FieldOutput getNegInputValue() {
+        if(input == null)
+            return ZERO;
+
+        return input.getNegValue();
+    }
+
+    @Override
+    public void addInputLinkingStep() {
     }
 
     @Override

@@ -23,6 +23,8 @@ import network.aika.steps.FieldStep;
 import network.aika.steps.Step;
 import network.aika.steps.thought.AnnealStep;
 
+import static java.lang.Integer.MAX_VALUE;
+
 /**
  * @author Lukas Molzberger
  */
@@ -47,7 +49,7 @@ public class LoggingListener implements EventListener {
     }
 
     private static void log(AnnealStep as) {
-        System.out.println("" + as.getElement().getAnnealing().getValue());
+        System.out.println("" + as.getElement().getAnnealing().getValue(MAX_VALUE));
 
         as.getElement().getAnnealing().getReceivers().forEach(fl ->
                 System.out.println("     " + fl)

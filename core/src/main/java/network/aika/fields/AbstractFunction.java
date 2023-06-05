@@ -66,19 +66,19 @@ public abstract class AbstractFunction extends Field implements FieldInput {
         return Arrays.asList(inputs);
     }
 
-    public double getInputValueByArg(int arg) {
-        return getInputLinkByArg(arg).getInputValue();
+    public double getInputValueByArg(int arg, int r) {
+        return getInputLinkByArg(arg).getInputValue(r);
     }
 
     public FieldLink getInputLinkByArg(int arg) {
         return inputs[arg];
     }
 
-    protected abstract double computeUpdate(AbstractFieldLink fl, double u);
+    protected abstract double computeUpdate(AbstractFieldLink fl, int r, double u);
 
     @Override
     public void receiveUpdate(AbstractFieldLink fl, int r, double u) {
-        double update = computeUpdate(fl, u);
+        double update = computeUpdate(fl, r, u);
         if(update == 0.0)
             return;
 

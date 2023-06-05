@@ -30,6 +30,7 @@ import network.aika.steps.link.LinkingIn;
 import static network.aika.callbacks.EventType.CREATE;
 import static network.aika.fields.ConstantField.ONE;
 import static network.aika.fields.ConstantField.ZERO;
+import static network.aika.fields.FieldLink.link;
 import static network.aika.fields.FieldLink.linkAndConnect;
 import static network.aika.fields.Fields.*;
 import static network.aika.elements.activations.Timestamp.FIRED_COMPARATOR;
@@ -42,10 +43,11 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
 
     protected S synapse;
 
-    protected final I input;
+    protected I input;
     protected O output;
 
-    protected Field weightedInput;
+    protected AbstractFunction inputValue;
+    protected Multiplication weightedInput;
 
     protected SumField gradient;
 
@@ -123,26 +125,25 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
     public abstract void connectWeightUpdate();
 
     protected void initWeightInput() {
+        inputValue = new IdentityFunction(this, "input value");
         weightedInput = initWeightedInput();
-        FieldLink fl = linkAndConnect(weightedInput, getOutput().getNet());
-        fl.setIncrementRound(incrementRound());
+        linkAndConnect(weightedInput, getOutput().getNet());
     }
 
     protected boolean incrementRound() {
         return false;
     }
 
-    protected Field initWeightedInput() {
-        Multiplication weightedInput = mul(
-                this,
-                "iAct(" + getInputKeyString() + ").value * s.weight",
-                getInputValue(),
-                synapse.getWeight()
-        );
+    protected Multiplication initWeightedInput() {
+        weightedInput = new Multiplication(this, "iAct(" + getInputKeyString() + ").value * s.weight");
 
-        weightedInput.getInputLinkByArg(1)
+        FieldLink.link(inputValue, 0, weightedInput)
+                .setIncrementRound(incrementRound());
+
+        FieldLink.link(synapse.getWeight(), 1, weightedInput)
                 .setPropagateUpdates(false);
 
+        weightedInput.connectInputs(true);
         return weightedInput;
     }
 
@@ -180,25 +181,22 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
         return input != null && isCausal() ? input.getCreated() : output.getCreated();
     }
 
-    public FieldOutput getInputValue() {
-        if(input == null)
-            return ZERO;
-
-        return input.getValue();
+    public Field getInputValue() {
+        return inputValue;
     }
 
     public FieldOutput getInputIsFired() {
         if(input == null)
             return ZERO;
 
-        return input.getIsFired();
+        return input.getIsFired(); // TODO
     }
 
     public FieldOutput getNegInputValue() {
         if(input == null)
             return ONE;
 
-        return input.getNegValue();
+        return input.getNegValue(); // TODO
     }
 
     public S getSynapse() {

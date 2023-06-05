@@ -173,7 +173,7 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
     }
 
     public void setNet(double v) {
-        net.setValue(v);
+        net.setValue(0, v);
     }
 
     public boolean isSelfRef(BindingActivation oAct) {
@@ -297,7 +297,7 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
     }
 
     public boolean isFired() {
-        return isTrue(net, 0.0);
+        return isTrue(net, MAX_VALUE, 0.0);
     }
 
     public Thought getThought() {
@@ -487,7 +487,7 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
     }
 
     public boolean isActiveTemplateInstance() {
-        return isNewInstance || isTrue(net, 0.5);
+        return isNewInstance || isTrue(net, MAX_VALUE, 0.5);
     }
 
     public CategoryInputLink getCategoryInputLink() {
@@ -564,7 +564,6 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
 
         getConfig().updateLabel(this, instanceAct);
 
-        instanceAct.initDummyLinks();
         instanceAct.initFromTemplate();
 
         getOutputLinks()

@@ -23,13 +23,12 @@ import network.aika.elements.synapses.NegativeFeedbackSynapse;
 import network.aika.visitor.Visitor;
 
 import static network.aika.fields.FieldLink.linkAndConnect;
+import static network.aika.fields.Fields.mul;
 
 /**
  * @author Lukas Molzberger
  */
 public class NegativeFeedbackLink extends FeedbackLink<NegativeFeedbackSynapse, InhibitoryActivation> {
-
-    MaxField maxInput;
 
     Field weightUpdate;
 
@@ -44,24 +43,19 @@ public class NegativeFeedbackLink extends FeedbackLink<NegativeFeedbackSynapse, 
 
     @Override
     protected void initWeightInput() {
-        maxInput = new MaxField(this, "max-input-value");
+        inputValue = new MaxField(this, "max-input-value");
 
         super.initWeightInput();
     }
 
     @Override
-    protected Field initWeightedInput() {
-        return Fields.mul(
+    protected Multiplication initWeightedInput() {
+        return mul(
                 this,
                 "annealing * iAct(" + getInputKeyString() + ").value * weight",
                 getThought().getAnnealing(),
                 super.initWeightedInput()
         );
-    }
-
-    @Override
-    public Field getInputValue() {
-        return maxInput;
     }
 
     @Override
@@ -71,7 +65,7 @@ public class NegativeFeedbackLink extends FeedbackLink<NegativeFeedbackSynapse, 
 
     @Override
     public void connectWeightUpdate() {
-        weightUpdate = Fields.mul(
+        weightUpdate = mul(
                 this,
                 "weight update",
                 getInputIsFired(),
@@ -88,9 +82,5 @@ public class NegativeFeedbackLink extends FeedbackLink<NegativeFeedbackSynapse, 
     public void disconnect() {
         super.disconnect();
         weightUpdate.disconnectOutputs(false);
-    }
-
-    public MaxField getMaxInput() {
-        return maxInput;
     }
 }

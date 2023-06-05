@@ -37,6 +37,7 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.lang.Integer.MAX_VALUE;
 import static network.aika.utils.Utils.doubleToString;
 
 
@@ -147,7 +148,7 @@ public class SyllablesExperiment {
 
             AIKADebugger debugger = null;
             System.out.println(counter[0] + " " + w);
-            if(counter[0] >= 49) {// 3, 6, 11, 18, 100, 39, 49
+            if(counter[0] >= 0) {// 3, 6, 11, 18, 100, 39, 49
                 debugger = AIKADebugger.createAndShowGUI(doc);
             }
 
@@ -173,8 +174,6 @@ public class SyllablesExperiment {
                 doc.addEventListener(logger);
             }
 
-            doc.close();
-
 //            el.annealingLogInit(doc);
 
             doc.anneal();
@@ -184,8 +183,6 @@ public class SyllablesExperiment {
             doc.instantiateTemplates();
 
             waitForClick(debugger);
-
-            doc.close();
 
             doc.train();
 
@@ -219,7 +216,7 @@ public class SyllablesExperiment {
     }
 
     private static void logPatternMatch(PatternActivation act) {
-        if(act.getNetPreAnneal().getValue() <= 0.0 || act.isAbstract())
+        if(act.getNetPreAnneal().getValue(MAX_VALUE) <= 0.0 || act.isAbstract())
             return;
 
         System.out.println("   " +
@@ -230,7 +227,7 @@ public class SyllablesExperiment {
                 (!act.isAbstract() ? " '" + LabelUtil.generateLabel(act.getNeuron()) + "'" : "") +
                 " nId:" + act.getNeuron().getId() +
                 " r:" + act.getRange() +
-                " grad:" + doubleToString(act.getGradient().getValue(), "#.######")
+                " grad:" + doubleToString(act.getGradient().getValue(MAX_VALUE), "#.######")
         );
     }
 

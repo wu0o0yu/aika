@@ -54,22 +54,24 @@ public abstract class LinkingOperator {
                 );
     }
 
-    public Link link(Activation bsA, Synapse synA, Link linkA, Activation bsB, Synapse synB) {
+    public Link link(Activation actA, Synapse synA, Link linkA, Activation actB, Synapse synB) {
         Activation oAct;
         if (linkA == null) {
-            if(latentActivationExists(synA, synB, bsA, bsB))
+            if(latentActivationExists(synA, synB, actA, actB))
                 return null;
 
-            Thought t = bsA.getThought();
+            Thought t = actA.getThought();
             oAct = synA.getOutput().createActivation(t);
 
-            synA.createAndInitLink(bsA, oAct);
+            synA.createAndInitLink(actA, oAct);
         } else {
             oAct = linkA.getOutput();
-            if(synB.linkExists(bsB, oAct))
-                return null;
+
+            Link l = synB.checkExistingLink(actB, oAct);
+            if(l != null)
+                return l;
         }
 
-        return synB.createAndInitLink(bsB, oAct);
+        return synB.createAndInitLink(actB, oAct);
     }
 }

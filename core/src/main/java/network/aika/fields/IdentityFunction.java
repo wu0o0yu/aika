@@ -16,22 +16,17 @@
  */
 package network.aika.fields;
 
-import java.util.function.DoubleFunction;
-
 /**
  * @author Lukas Molzberger
  */
-public class FieldFunction extends AbstractFunction {
+public class IdentityFunction extends AbstractFunction {
 
-    private DoubleFunction<Double> function;
-
-    public FieldFunction(FieldObject ref, String label, Double tolerance, DoubleFunction<Double> f) {
-        super(ref, label, tolerance);
-        this.function = f;
+    public IdentityFunction(FieldObject ref, String label) {
+        super(ref, label);
     }
 
     @Override
     protected double computeUpdate(AbstractFieldLink fl, int r, double u) {
-        return function.apply(fl.getUpdatedInputValue(r)) - value[r];
+        return u;
     }
 }

@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static experiment.logger.ExperimentLogger.CSV_FORMAT;
+import static java.lang.Integer.MAX_VALUE;
 import static network.aika.utils.Utils.doubleToString;
 
 /**
@@ -213,6 +214,6 @@ public class PatternLogger {
         if(f == null)
             return "--";
 
-        return doubleToString(f.getValue(), "#.#######");
+        return doubleToString(f.getValue(MAX_VALUE), "#.#######");
     }
 }

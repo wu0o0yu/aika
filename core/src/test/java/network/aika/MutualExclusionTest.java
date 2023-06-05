@@ -47,6 +47,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.SortedSet;
 
+import static java.lang.Integer.MAX_VALUE;
 import static network.aika.TestUtils.*;
 import static network.aika.elements.synapses.Scope.INPUT;
 import static network.aika.steps.Phase.INFERENCE;
@@ -131,7 +132,7 @@ public class MutualExclusionTest {
         SortedSet<BindingActivation> nbActs = nb.getActivations(doc);
         Activation nbAct = nbActs.iterator().next();
 
-        assertTrue(nbAct.getValue().getValue() > 0.38);
+        assertTrue(nbAct.getValue().getValue(MAX_VALUE) > 0.38);
     }
 
 

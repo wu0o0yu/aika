@@ -28,6 +28,7 @@ import java.util.*;
 
 import static experiment.logger.ExperimentLogger.CSV_FORMAT;
 import static experiment.logger.StatisticLogger.Key.*;
+import static java.lang.Integer.MAX_VALUE;
 
 /**
  * @author Lukas Molzberger
@@ -86,22 +87,22 @@ public class StatisticLogger  {
 
     private void count(Activation act) {
         count(ACTS);
-        if(act.getNet().getValue() > 0.0)
+        if(act.getNet().getValue(MAX_VALUE) > 0.0)
             count(FIRED_ACTS);
         else
             count(INACTIVE_ACTS);
 
-        if(act.getNet().getValue() > 0.9)
+        if(act.getNet().getValue(MAX_VALUE) > 0.9)
             count(STRONG_ACTS);
 
-        if(act.getNetPreAnneal().getValue() > 0.0 && act.getNet().getValue() <= 0.0)
+        if(act.getNetPreAnneal().getValue(MAX_VALUE) > 0.0 && act.getNet().getValue(MAX_VALUE) <= 0.0)
             count(SUPPRESSED_ACTS);
 
         Activation tAct = act.getTemplate();
         if(tAct != null) {
             if (tAct.getLabel().equalsIgnoreCase("Abstract (S) Pos:0"))
                 count(PRIMARY_BINDING_ACTS);
-            else if(act.getNet().getValue() <= 0.0)
+            else if(act.getNet().getValue(MAX_VALUE) <= 0.0)
                 count(INACTIVE_SECONDARY_BINDING_ACTS);
         }
 

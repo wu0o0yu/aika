@@ -44,11 +44,11 @@ public class  ThresholdOperator extends AbstractFunction {
     }
 
     @Override
-    protected double computeUpdate(AbstractFieldLink fl, double u) {
-        if(isFinal && value > 0.5)
+    protected double computeUpdate(AbstractFieldLink fl, int r, double u) {
+        if(isFinal && value[r] > 0.5)
             return 0.0;
 
-        return threshold(fl.getInput().getUpdatedValue()) - value;
+        return threshold(fl.getUpdatedInputValue(r)) - value[r];
     }
 
     protected double threshold(double x) {

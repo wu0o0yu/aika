@@ -19,6 +19,7 @@ package network.aika.elements.links;
 import network.aika.elements.activations.BindingActivation;
 import network.aika.elements.activations.PatternActivation;
 import network.aika.elements.neurons.Range;
+import network.aika.elements.synapses.Synapse;
 import network.aika.fields.AbstractFunction;
 import network.aika.elements.synapses.PatternSynapse;
 import network.aika.elements.synapses.PositiveFeedbackSynapse;
@@ -54,9 +55,9 @@ public class PatternLink extends ConjunctiveLink<PatternSynapse, BindingActivati
     public void addInputLinkingStep() {
         super.addInputLinkingStep();
 
-        PositiveFeedbackSynapse posFeedbackSyn = (PositiveFeedbackSynapse) input.getNeuron().getInputSynapse(output.getNeuronProvider());
-        if(posFeedbackSyn != null && !posFeedbackSyn.linkExists(input))
-            posFeedbackSyn.createAndInitLink(output, input);
+        Synapse posFeedbackSyn = input.getNeuron().getInputSynapse(output.getNeuronProvider());
+        if(posFeedbackSyn != null)
+            posFeedbackSyn.checkExistingLink(output, input);
     }
 
     @Override

@@ -24,6 +24,8 @@ import network.aika.elements.neurons.CategoryNeuron;
 import java.util.Comparator;
 import java.util.stream.Stream;
 
+import static java.lang.Integer.MAX_VALUE;
+
 /**
  * @author Lukas Molzberger
  */
@@ -47,7 +49,7 @@ public class CategoryActivation extends DisjunctiveActivation<CategoryNeuron> {
                 .filter(Activation::isActiveTemplateInstance)
                 .max(
                         Comparator.comparingDouble(act ->
-                                act.getNet().getValue()
+                                act.getNet().getValue(MAX_VALUE)
                         )
                 )
                 .orElse(null);

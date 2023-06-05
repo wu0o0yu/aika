@@ -40,7 +40,7 @@ public class QueueFieldProperty extends FieldOutputProperty<IQueueField> impleme
             if(v == null)
                 return;
 
-            field.setValue(v.doubleValue());
+            field.setValue(0, v.doubleValue());
         });
 
         currentValueField.setEnabled(true);

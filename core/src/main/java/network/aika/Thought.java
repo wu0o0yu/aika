@@ -34,7 +34,6 @@ import network.aika.steps.Step;
 import network.aika.steps.activation.InactiveLinks;
 import network.aika.steps.activation.Instantiation;
 import network.aika.steps.thought.AnnealStep;
-import network.aika.steps.thought.CloseStep;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -50,11 +49,6 @@ import static network.aika.steps.Phase.*;
 public abstract class Thought implements Element {
 
     private Field annealing;
-
-    private int currentIsOpen = 0;
-    private Field[] isOpen;
-
-    private Field[] isClosed;
 
     protected final Model model;
 
@@ -86,14 +80,6 @@ public abstract class Thought implements Element {
         id = model.createThoughtId();
         absoluteBegin = m.getN();
 
-        isOpen = new Field[2];
-        isOpen[0] = new ConstantField(this, "isOpen (infer)", 1.0);
-        isOpen[1] = new ConstantField(this, "isOpen (instantiate)", 1.0);
-
-        isClosed = new Field[2];
-        isClosed[0] = invert(this, "isClosed (infer)", isOpen[0]);
-        isClosed[1] = invert(this, "isClosed (instantiate)", isOpen[1]);
-
         annealing = new ConstantField(this, "anneal", 0.0);
 
         assert m.getCurrentThought() == null;
@@ -114,18 +100,6 @@ public abstract class Thought implements Element {
 
     public Model getModel() {
         return model;
-    }
-
-    public Field getIsOpen() {
-        return isOpen[currentIsOpen];
-    }
-
-    public Field getIsClosed() {
-        return isClosed[currentIsOpen];
-    }
-
-    public void setIsOpen(double isOpen) {
-        this.isOpen[currentIsOpen].setValue(isOpen);
     }
 
     public Field getAnnealing() {
@@ -294,10 +268,6 @@ public abstract class Thought implements Element {
                 );
     }
 
-    public void close() {
-        CloseStep.add(this);
-    }
-
     public void anneal() {
         AnnealStep.add(this);
         process(ANNEAL); // Anneal needs to be finished before instantiation can start.
@@ -313,9 +283,7 @@ public abstract class Thought implements Element {
     public void instantiateTemplates() {
         if (!getConfig().isMetaInstantiationEnabled())
             return;
-
-        currentIsOpen++;
-
+        
         activationsById.values().stream()
                 .filter(act -> act.getNeuron().isAbstract())
                 .filter(act -> act.isFired())

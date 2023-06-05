@@ -32,9 +32,7 @@ public class BindingActivationPropertyPanel extends ConjunctiveActivationPropert
 
     @Override
     public void initInferenceSection(BindingActivation act) {
-        addField(act.getThought().getIsOpen());
         addField(act.getThought().getAnnealing());
-        addField(act.getPosFeedbackDummy());
         super.initInferenceSection(act);
     }
 }

@@ -49,7 +49,7 @@ public class QueueSumField extends SumField implements IQueueField {
         phase = p;
     }
 
-    public FieldStep getStep() {
+    public FieldStep getOrCreateStep() {
         return step;
     }
 
@@ -70,7 +70,7 @@ public class QueueSumField extends SumField implements IQueueField {
     public void receiveUpdate(int r, double u) {
         updateObservers();
 
-        FieldStep s = getStep(r);
+        FieldStep s = getOrCreateStep(r);
         s.updateDelta(u);
 
         if(!s.isQueued()) {
@@ -80,13 +80,12 @@ public class QueueSumField extends SumField implements IQueueField {
         }
     }
 
-    private FieldStep getStep(int r) {
+    private FieldStep getOrCreateStep(int r) {
         if(step == null || step.getRound() < r)
             step = new FieldStep<>((Element) getReference(), phase, r, this);
 
         return step;
     }
-
 
     public void process(FieldStep s) {
         triggerUpdate(s.getRound(), s.getDelta());
@@ -97,7 +96,7 @@ public class QueueSumField extends SumField implements IQueueField {
 
     private void updateObservers() {
         observers.forEach(o ->
-                o.receiveUpdate(value)
+                o.receiveUpdate(value[lastRound])
         );
     }
 }

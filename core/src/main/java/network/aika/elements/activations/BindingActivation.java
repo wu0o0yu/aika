@@ -29,6 +29,7 @@ import network.aika.visitor.linking.pattern.PatternCategoryUpVisitor;
 
 import java.util.stream.Stream;
 
+import static java.lang.Integer.MAX_VALUE;
 import static network.aika.fields.Fields.isTrue;
 import static network.aika.utils.Utils.TOLERANCE;
 
@@ -39,8 +40,6 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
 
     private boolean isInput;
 
-    private Multiplication posFeedbackDummy;
-
     public BindingActivation(int id, Thought t, BindingNeuron n) {
         super(id, t, n);
     }
@@ -48,7 +47,7 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
     @Override
     public boolean isActiveTemplateInstance() {
         return isNewInstance || (
-                isTrue(net, 0.0) &&
+                isTrue(net, MAX_VALUE, 0.0) &&
                         getOutputPatternActivations()
                                 .anyMatch(Activation::isFired)
         );
@@ -113,14 +112,6 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
 
     public void setInput(boolean input) {
         isInput = input;
-    }
-
-    public Multiplication getPosFeedbackDummy() {
-        return posFeedbackDummy;
-    }
-
-    public void setPosFeedbackDummy(Multiplication posFeedbackDummy) {
-        this.posFeedbackDummy = posFeedbackDummy;
     }
 
     public void updateBias(double u) {

@@ -21,12 +21,9 @@ import network.aika.elements.activations.Activation;
 import network.aika.elements.activations.BindingActivation;
 import network.aika.elements.activations.PatternActivation;
 import network.aika.elements.links.PositiveFeedbackLink;
-import network.aika.fields.Multiplication;
 import network.aika.elements.neurons.PatternNeuron;
 
 import static network.aika.direction.Direction.OUTPUT;
-import static network.aika.fields.FieldLink.linkAndConnect;
-import static network.aika.fields.Fields.mul;
 
 /**
  *
@@ -48,21 +45,15 @@ public class PositiveFeedbackSynapse extends FeedbackSynapse<
     }
 
     public void initDummyLink(BindingActivation oAct) {
-        if(oAct.getPosFeedbackDummy() != null)
-            return;
+        createAndInitLink(null, oAct);
+    }
 
-        Multiplication dummyWeight = mul(
-                this,
-                "pos-feedback-dummy",
-                oAct.getThought().getIsOpen(),
-                getWeight()
-        );
+    public PositiveFeedbackLink checkExistingLink(PatternActivation iAct, BindingActivation oAct) {
+        PositiveFeedbackLink l = super.checkExistingLink(iAct, oAct);
+        if(l != null)
+            l.relinkInput(iAct);
 
-        dummyWeight.getInputLinkByArg(1)
-                .setPropagateUpdates(false);
-
-        oAct.setPosFeedbackDummy(dummyWeight);
-        linkAndConnect(dummyWeight, -1, oAct.getNet());
+        return l;
     }
 
     public Direction getStoredAt() {
@@ -75,7 +66,7 @@ public class PositiveFeedbackSynapse extends FeedbackSynapse<
 
     @Override
     public double getPreNetDummyWeight() {
-        return weight.getValue();
+        return weight.getValue(0);
     }
 
     @Override

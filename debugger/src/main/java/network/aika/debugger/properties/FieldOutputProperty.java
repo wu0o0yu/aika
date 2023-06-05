@@ -29,6 +29,8 @@ import java.awt.event.MouseListener;
 import java.text.Format;
 import java.text.NumberFormat;
 
+import static java.lang.Integer.MAX_VALUE;
+
 
 /**
  * @author Lukas Molzberger
@@ -105,7 +107,7 @@ public class FieldOutputProperty<F extends FieldOutput> extends AbstractProperty
     @Override
     public void receiveUpdate(AbstractFieldLink fl, int r, double u) {
         withinUpdate = true;
-        currentValueField.setValue(Double.valueOf(field.getValue()));
+        currentValueField.setValue(Double.valueOf(field.getValue(MAX_VALUE)));
         withinUpdate = false;
     }
 
@@ -134,13 +136,13 @@ public class FieldOutputProperty<F extends FieldOutput> extends AbstractProperty
         String label = "";
 
         if(isIncrementRound != null)
-            label += isIncrementRound ? "incrRound" : "";
+            label += isIncrementRound ? "incrRound " : "";
 
         if(isConnected != null)
-            label += isConnected ? "connected" : "unconnected";
+            label += isConnected ? "connected " : "unconnected ";
 
         if(isPropagateUpdate != null)
-            label += isPropagateUpdate ? " prop" : " no prop";
+            label += isPropagateUpdate ? "prop" : "no prop";
 
         JLabel jOutRef = new JLabel(label);
         addGridEntry(jOutRef, xPos, yPos, 1, insets);
@@ -172,7 +174,7 @@ public class FieldOutputProperty<F extends FieldOutput> extends AbstractProperty
     }
 
     private void setCurrentValue(F f) {
-        currentValueField.setValue(Double.valueOf(f.getValue()));
+        currentValueField.setValue(Double.valueOf(f.getValue(MAX_VALUE)));
     }
 
     public JLabel getLabel() {

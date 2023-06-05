@@ -21,7 +21,7 @@ import java.util.Comparator;
 /**
  * @author Lukas Molzberger
  */
-public class MaxField extends SumField {
+public class MaxField extends AbstractFunction {
 
     private AbstractFieldLink selectedInput;
 
@@ -34,33 +34,26 @@ public class MaxField extends SumField {
     }
 
     @Override
-    public void receiveUpdate(AbstractFieldLink fl, int r, double u) {
-        triggerUpdate(
-                r,
-                computeUpdate(fl)
-        );
-    }
-
-    private double computeUpdate(AbstractFieldLink fl) {
+    protected double computeUpdate(AbstractFieldLink fl, int r, double u) {
         if(selectedInput == null) {
             selectedInput = fl;
-            return fl.getUpdatedInputValue() - value;
+            return fl.getUpdatedInputValue(r) - value[r];
         }
 
         selectedInput = getInputs().stream()
-                .max(getComparator(fl))
+                .max(getComparator(fl, r))
                 .orElse(null);
 
-        return getInput(selectedInput, fl) - value;
+        return getInput(selectedInput, fl, r) - value[r];
     }
 
-    private Comparator<FieldLink> getComparator(AbstractFieldLink fl) {
-        return Comparator.comparingDouble(in -> getInput(in, fl));
+    private Comparator<FieldLink> getComparator(AbstractFieldLink fl, int r) {
+        return Comparator.comparingDouble(in -> getInput(in, fl, r));
     }
 
-    private double getInput(AbstractFieldLink fl, AbstractFieldLink updateFL) {
+    private double getInput(AbstractFieldLink fl, AbstractFieldLink updateFL, int r) {
         return fl == updateFL ?
-                fl.getUpdatedInputValue() :
-                fl.getInputValue();
+                fl.getUpdatedInputValue(r) :
+                fl.getInputValue(r);
     }
 }

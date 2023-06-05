@@ -91,7 +91,7 @@ public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends
     }
 
     public S setSynapseBias(double b) {
-        synapseBias.setValue(b);
+        synapseBias.setValue(0, b);
 
         return (S) this;
     }
@@ -115,7 +115,7 @@ public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends
         super.initFromTemplate(input, output, templateSyn);
 
         synapseBias.setInitialValue(
-                ((ConjunctiveSynapse)templateSyn).synapseBias.getUpdatedValue()
+                ((ConjunctiveSynapse)templateSyn).synapseBias.getUpdatedValue(0)
         );
     }
 
@@ -160,16 +160,14 @@ public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends
         this.sumOfLowerWeights = sumOfLowerWeights;
     }
 
-    public void initDummyLink(BindingActivation bindingActivation) {
-    }
 
     public S adjustBias() {
         return adjustBias(1.0);
     }
 
     public S adjustBias(double x) {
-        if(weight.getValue() > 0.0)
-            synapseBias.receiveUpdate(0, -weight.getValue() * x);
+        if(weight.getValue(0) > 0.0)
+            synapseBias.receiveUpdate(0, -weight.getValue(0) * x);
 
         return (S) this;
     }
