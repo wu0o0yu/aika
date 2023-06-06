@@ -147,7 +147,7 @@ public abstract class AbstractTemplateModel {
                 .setWeight(PASSIVE_SYNAPSE_WEIGHT)
                 .init(patternCategory.getNeuron(), patternN.getNeuron());
 
-        patternN.getNeuron().setBias(patternNetTarget);
+        patternN.getNeuron().setBias(patternNetTarget + 2.5);
 
         new InhibitoryCategoryInputSynapse()
                 .setWeight(1.0)

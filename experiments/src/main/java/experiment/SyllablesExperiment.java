@@ -95,7 +95,7 @@ public class SyllablesExperiment {
 
     public void testTraining() throws IOException {
         List<String> inputs = new ArrayList<>();
-        inputs.add("der");
+        inputs.add("d");
         inputs.add("der");
 
         inputs.addAll(getInputs());
