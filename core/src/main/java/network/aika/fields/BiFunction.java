@@ -36,7 +36,9 @@ public class BiFunction extends AbstractFunction {
     }
 
     @Override
-    protected double computeUpdate(AbstractFieldLink fl, int r, double u) {
+    protected Double computeUpdate(AbstractFieldLink fl, int r, double u) {
+
+
         return switch (fl.getArgument()) {
             case 0 -> function.applyAsDouble(
                     fl.getUpdatedInputValue(r),
@@ -47,6 +49,6 @@ public class BiFunction extends AbstractFunction {
                     fl.getUpdatedInputValue(r)
                 );
             default -> throw new IllegalArgumentException();
-        } - value[r];
+        } - getValue(r, 0.0);
     }
 }

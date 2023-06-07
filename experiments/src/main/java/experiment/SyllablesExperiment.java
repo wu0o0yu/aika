@@ -95,7 +95,7 @@ public class SyllablesExperiment {
 
     public void testTraining() throws IOException {
         List<String> inputs = new ArrayList<>();
-        inputs.add("d");
+        inputs.add("der");
         inputs.add("der");
 
         inputs.addAll(getInputs());
@@ -216,7 +216,7 @@ public class SyllablesExperiment {
     }
 
     private static void logPatternMatch(PatternActivation act) {
-        if(act.getNetPreAnneal().getValue(MAX_VALUE) <= 0.0 || act.isAbstract())
+        if(act.getNetPreAnneal().getLastValue() <= 0.0 || act.isAbstract())
             return;
 
         System.out.println("   " +
@@ -227,7 +227,7 @@ public class SyllablesExperiment {
                 (!act.isAbstract() ? " '" + LabelUtil.generateLabel(act.getNeuron()) + "'" : "") +
                 " nId:" + act.getNeuron().getId() +
                 " r:" + act.getRange() +
-                " grad:" + doubleToString(act.getGradient().getValue(MAX_VALUE), "#.######")
+                " grad:" + doubleToString(act.getGradient().getLastValue(), "#.######")
         );
     }
 

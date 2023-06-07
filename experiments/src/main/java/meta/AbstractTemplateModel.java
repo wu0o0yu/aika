@@ -92,7 +92,7 @@ public abstract class AbstractTemplateModel {
 
         log.info("Input Token: netTarget:" + inputPatternNetTarget + " valueTarget:" + inputPatternValueTarget);
 
-        inputToken.getNeuron().setBias(inputPatternNetTarget - pCatInputSyn.getWeight().getValue(FIRST_ROUND));
+        inputToken.getNeuron().setBias(inputPatternNetTarget - pCatInputSyn.getWeight().getLastValue());
     }
 
     protected void initInputCategoryNeuron() {
@@ -149,7 +149,7 @@ public abstract class AbstractTemplateModel {
                 .setWeight(PASSIVE_SYNAPSE_WEIGHT)
                 .init(patternCategory.getNeuron(), patternN.getNeuron());
 
-        patternN.getNeuron().setBias(patternNetTarget + 2.5);
+        patternN.getNeuron().setBias(patternNetTarget);
 
         new InhibitoryCategoryInputSynapse()
                 .setWeight(1.0)
@@ -223,7 +223,7 @@ public abstract class AbstractTemplateModel {
         if(lastPos == null || lastBN == null) {
             bn.setCallActivationCheckCallback(true);
         } else {
-            double prevNetTarget = lastBN.getBias().getValue(FIRST_ROUND);
+            double prevNetTarget = lastBN.getBias().getLastValue();
             double prevValueTarget = ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT
                     .f(prevNetTarget);
 
@@ -244,7 +244,7 @@ public abstract class AbstractTemplateModel {
                     .init(lastBN, bn)
                     .adjustBias(prevValueTarget);
 
-            System.out.println("  " + spSyn + " targetNetContr:" + -spSyn.getSynapseBias().getValue(FIRST_ROUND));
+            System.out.println("  " + spSyn + " targetNetContr:" + -spSyn.getSynapseBias().getLastValue());
         }
 
         PatternSynapse pSyn = new PatternSynapse()
@@ -253,7 +253,7 @@ public abstract class AbstractTemplateModel {
                 .init(bn, patternN.getNeuron())
                 .adjustBias(valueTarget);
 
-        System.out.println("  " + pSyn + " targetNetContr:" + -pSyn.getSynapseBias().getValue(FIRST_ROUND));
+        System.out.println("  " + pSyn + " targetNetContr:" + -pSyn.getSynapseBias().getLastValue());
 
 
         PositiveFeedbackSynapse posFeedSyn = new PositiveFeedbackSynapse()
@@ -261,7 +261,7 @@ public abstract class AbstractTemplateModel {
                 .init(patternN.getNeuron(), bn)
                 .adjustBias(patternValueTarget);
 
-        System.out.println("  " + posFeedSyn + " targetNetContr:" + -posFeedSyn.getSynapseBias().getValue(FIRST_ROUND));
+        System.out.println("  " + posFeedSyn + " targetNetContr:" + -posFeedSyn.getSynapseBias().getLastValue());
 
 
         new InputPatternSynapse()
@@ -328,7 +328,7 @@ public abstract class AbstractTemplateModel {
                     .adjustBias();
         }
 
-        double prevNetTarget = lastBN.getBias().getValue(FIRST_ROUND);
+        double prevNetTarget = lastBN.getBias().getLastValue();
         double prevValueTarget = ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT
                 .f(prevNetTarget);
 
@@ -337,7 +337,7 @@ public abstract class AbstractTemplateModel {
                 .init(lastBN, bn)
                 .adjustBias(prevValueTarget);
 
-        log.info("  " + spSyn + " targetNetContr:" + -spSyn.getSynapseBias().getValue(FIRST_ROUND));
+        log.info("  " + spSyn + " targetNetContr:" + -spSyn.getSynapseBias().getLastValue());
 
         new PatternSynapse()
                 .setWeight(0.5)

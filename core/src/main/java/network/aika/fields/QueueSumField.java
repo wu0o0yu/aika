@@ -44,8 +44,8 @@ public class QueueSumField extends SumField implements IQueueField {
         phase = p;
     }
 
-    public QueueSumField(FieldObject e, Phase p, String label, Double tolerance, boolean weakRefs) {
-        super(e, label, tolerance, weakRefs);
+    public QueueSumField(FieldObject e, Phase p, String label, int maxRounds, Double tolerance, boolean weakRefs) {
+        super(e, label, maxRounds, tolerance, weakRefs);
         phase = p;
     }
 
@@ -96,7 +96,7 @@ public class QueueSumField extends SumField implements IQueueField {
 
     private void updateObservers() {
         observers.forEach(o ->
-                o.receiveUpdate(value[lastRound])
+                o.receiveUpdate(getLastValue())
         );
     }
 }

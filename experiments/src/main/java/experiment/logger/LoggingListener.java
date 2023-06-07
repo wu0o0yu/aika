@@ -49,7 +49,7 @@ public class LoggingListener implements EventListener {
     }
 
     private static void log(AnnealStep as) {
-        System.out.println("" + as.getElement().getAnnealing().getValue(MAX_VALUE));
+        System.out.println("" + as.getElement().getAnnealing().getLastValue());
 
         as.getElement().getAnnealing().getReceivers().forEach(fl ->
                 System.out.println("     " + fl)

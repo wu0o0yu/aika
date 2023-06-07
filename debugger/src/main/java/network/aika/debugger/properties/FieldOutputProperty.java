@@ -107,7 +107,7 @@ public class FieldOutputProperty<F extends FieldOutput> extends AbstractProperty
     @Override
     public void receiveUpdate(AbstractFieldLink fl, int r, double u) {
         withinUpdate = true;
-        currentValueField.setValue(Double.valueOf(field.getValue(MAX_VALUE)));
+        currentValueField.setValue(field.getLastValue());
         withinUpdate = false;
     }
 
@@ -172,7 +172,7 @@ public class FieldOutputProperty<F extends FieldOutput> extends AbstractProperty
     }
 
     private void setCurrentValue(F f) {
-        currentValueField.setValue(Double.valueOf(f.getValue(MAX_VALUE)));
+        currentValueField.setValue(f.getLastValue());
     }
 
     public JLabel getLabel() {

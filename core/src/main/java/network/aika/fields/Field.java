@@ -44,8 +44,8 @@ public abstract class Field implements FieldInput, FieldOutput, Writable {
     private String label;
     private FieldObject reference;
 
-    protected int lastRound = 0;
-    protected double[] value = new double[MAX_ROUNDS];
+    protected int lastRound = -1;
+    protected Double[] value;
 
     private boolean withinUpdate;
     private double updatedValue;
@@ -55,13 +55,15 @@ public abstract class Field implements FieldInput, FieldOutput, Writable {
     protected Double tolerance;
 
     public Field(FieldObject reference, String label, Double tolerance) {
-        this(reference, label, tolerance, false);
+        this(reference, label, MAX_ROUNDS, tolerance, false);
     }
 
-    public Field(FieldObject reference, String label, Double tolerance, boolean weakRefs) {
+    public Field(FieldObject reference, String label, int maxRounds, Double tolerance, boolean weakRefs) {
         this.reference = reference;
         this.label = label;
         this.tolerance = tolerance;
+
+        value = new Double[maxRounds];
 
         initIO(weakRefs);
     }
@@ -80,11 +82,13 @@ public abstract class Field implements FieldInput, FieldOutput, Writable {
 
     public Field setInitialValue(int r, double initialValue) {
         value[r] = initialValue;
+        lastRound = Math.max(r, lastRound);
         return this;
     }
 
     public void setValue(int r, double v) {
-        triggerUpdate(r, v - value[r]);
+        Double ov = value[r];
+        triggerUpdate(r, ov != null ? v - value[r] : v);
     }
 
     @Override
@@ -107,17 +111,45 @@ public abstract class Field implements FieldInput, FieldOutput, Writable {
     }
 
     @Override
-    public double getValue(int r) {
+    public Double getLastValue() {
+        return getValue(lastRound);
+    }
+
+    @Override
+    public Double getValue(int r) {
         r = checkRound(r);
+
+        if(r < 0 || r > lastRound)
+            return null;
+
         return value[r];
     }
 
     @Override
-    public double getUpdatedValue(int r) {
+    public double getValue(int r, double defaultValue) {
         r = checkRound(r);
+
+        if(r < 0 || r > lastRound || value[r] == null)
+            return defaultValue;
+
+        return value[r];
+    }
+
+    @Override
+    public Double getUpdatedValue(int r) {
+        r = checkRound(r);
+
+        if(r > lastRound)
+            return null;
+
         return withinUpdate ?
                 updatedValue :
                 value[r];
+    }
+
+    @Override
+    public Double getUpdatedLastValue() {
+        return getUpdatedValue(lastRound);
     }
 
     private int checkRound(int r) {
@@ -174,15 +206,13 @@ public abstract class Field implements FieldInput, FieldOutput, Writable {
     }
 
     public void triggerUpdate(int r, double u) {
-        if(Utils.belowTolerance(tolerance, u))
+        if(r > 0 && Utils.belowTolerance(tolerance, u))
             return;
-
-        assert r >= lastRound;
-        lastRound = r;
 
         withinUpdate = true;
 
-        updatedValue = value[r] + u;
+        updatedValue = getValue(r, 0.0) + u;
+        lastRound = r;
         if(updatedValue > -MIN_TOLERANCE && updatedValue < MIN_TOLERANCE) {
             updatedValue = 0.0; // TODO: Find a better solution to this hack
         }
@@ -221,6 +251,6 @@ public abstract class Field implements FieldInput, FieldOutput, Writable {
     }
 
     public String getValueString() {
-        return doubleToString(getValue(MAX_VALUE));
+        return doubleToString(getLastValue());
     }
 }

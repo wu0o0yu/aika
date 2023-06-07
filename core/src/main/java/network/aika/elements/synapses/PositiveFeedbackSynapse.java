@@ -67,7 +67,7 @@ public class PositiveFeedbackSynapse extends FeedbackSynapse<
 
     @Override
     public double getPreNetDummyWeight() {
-        return weight.getValue(FIRST_ROUND);
+        return weight.getLastValue();
     }
 
     @Override

@@ -30,9 +30,15 @@ public interface FieldOutput {
 
     String getValueString();
 
-    double getValue(int r);
+    Double getLastValue();
 
-    double getUpdatedValue(int r);
+    Double getValue(int r);
+
+    double getValue(int r, double defaultValue);
+
+    Double getUpdatedLastValue();
+
+    Double getUpdatedValue(int r);
 
     void addOutput(AbstractFieldLink fl);
 

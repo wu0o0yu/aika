@@ -31,7 +31,7 @@ public class FieldFunction extends AbstractFunction {
     }
 
     @Override
-    protected double computeUpdate(AbstractFieldLink fl, int r, double u) {
-        return function.apply(fl.getUpdatedInputValue(r)) - value[r];
+    protected Double computeUpdate(AbstractFieldLink fl, int r, double u) {
+        return function.apply(fl.getUpdatedInputValue(r)) - getValue(r, 0.0);
     }
 }

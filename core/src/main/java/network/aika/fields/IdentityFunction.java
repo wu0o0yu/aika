@@ -26,7 +26,7 @@ public class IdentityFunction extends AbstractFunction {
     }
 
     @Override
-    protected double computeUpdate(AbstractFieldLink fl, int r, double u) {
+    protected Double computeUpdate(AbstractFieldLink fl, int r, double u) {
         return u;
     }
 }

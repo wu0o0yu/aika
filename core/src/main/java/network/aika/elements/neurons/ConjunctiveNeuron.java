@@ -64,10 +64,12 @@ public abstract class ConjunctiveNeuron<A extends ConjunctiveActivation> extends
     }
 
     protected SumField initSynapseBiasSum() {
-        return (SumField) new QueueSumField(this, TRAINING, "synapseBiasSum", TOLERANCE)
+        QueueSumField synBiasSum = (QueueSumField) new QueueSumField(this, TRAINING, "synapseBiasSum", 1, TOLERANCE, true)
                 .addListener("onSynapseBiasSumModified", () ->
                         setModified()
                 );
+        synBiasSum.setInitialValue(FIRST_ROUND, 0.0);
+        return synBiasSum;
     }
 
     public SumField getSynapseBiasSum() {

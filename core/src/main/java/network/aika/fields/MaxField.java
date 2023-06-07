@@ -34,7 +34,7 @@ public class MaxField extends AbstractFunction {
     }
 
     @Override
-    protected double computeUpdate(AbstractFieldLink fl, int r, double u) {
+    protected Double computeUpdate(AbstractFieldLink fl, int r, double u) {
         if(selectedInput == null) {
             selectedInput = fl;
             return fl.getUpdatedInputValue(r) - value[r];

@@ -85,9 +85,9 @@ public class AnnealingLogger {
         return getNegativeFeedbackLinks(doc)
                 .flatMap(l ->
                         Stream.of(
-                                doubleToString(l.getInputValue().getValue(MAX_VALUE)),
-                                doubleToString(l.getSynapse().getWeight().getValue(MAX_VALUE)),
-                                doubleToString(l.getOutput().getNet().getValue(MAX_VALUE))
+                                doubleToString(l.getInputValue().getLastValue()),
+                                doubleToString(l.getSynapse().getWeight().getLastValue()),
+                                doubleToString(l.getOutput().getNet().getLastValue())
                         )
                 )
                 .toList();
@@ -114,7 +114,7 @@ public class AnnealingLogger {
     public void log(Document doc) {
         try {
             List<String> entry = new ArrayList<>();
-            entry.add("" + doubleToString(doc.getAnnealing().getValue(MAX_VALUE)));
+            entry.add("" + doubleToString(doc.getAnnealing().getLastValue()));
             entry.addAll(createEntry(doc));
 
             printer.printRecord(entry.toArray());

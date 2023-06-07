@@ -53,7 +53,7 @@ public class AnnealStep extends Step<Thought> {
     public void process() {
         Thought t = getElement();
 
-        double av = t.getAnnealing().getValue(FIRST_ROUND);
+        double av = t.getAnnealing().getLastValue();
         nextStep = t.getConfig().getAnnealStepSize() / ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT.outerGrad(av);
         double nextAnnealValue = nextStep + av;
         nextAnnealValue = Math.min(nextAnnealValue, 1.0);

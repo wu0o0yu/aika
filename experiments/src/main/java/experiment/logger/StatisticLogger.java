@@ -87,22 +87,22 @@ public class StatisticLogger  {
 
     private void count(Activation act) {
         count(ACTS);
-        if(act.getNet().getValue(MAX_VALUE) > 0.0)
+        if(act.getNet().getLastValue() > 0.0)
             count(FIRED_ACTS);
         else
             count(INACTIVE_ACTS);
 
-        if(act.getNet().getValue(MAX_VALUE) > 0.9)
+        if(act.getNet().getLastValue() > 0.9)
             count(STRONG_ACTS);
 
-        if(act.getNetPreAnneal().getValue(MAX_VALUE) > 0.0 && act.getNet().getValue(MAX_VALUE) <= 0.0)
+        if(act.getNetPreAnneal().getLastValue() > 0.0 && act.getNet().getLastValue() <= 0.0)
             count(SUPPRESSED_ACTS);
 
         Activation tAct = act.getTemplate();
         if(tAct != null) {
             if (tAct.getLabel().equalsIgnoreCase("Abstract (S) Pos:0"))
                 count(PRIMARY_BINDING_ACTS);
-            else if(act.getNet().getValue(MAX_VALUE) <= 0.0)
+            else if(act.getNet().getLastValue() <= 0.0)
                 count(INACTIVE_SECONDARY_BINDING_ACTS);
         }
 

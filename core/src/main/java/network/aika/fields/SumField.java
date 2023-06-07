@@ -11,8 +11,8 @@ public class SumField extends Field {
         super(reference, label, tolerance);
     }
 
-    public SumField(FieldObject reference, String label, Double tolerance, boolean weakRefs) {
-        super(reference, label, tolerance, weakRefs);
+    public SumField(FieldObject reference, String label, int maxRounds, Double tolerance, boolean weakRefs) {
+        super(reference, label, maxRounds, tolerance, weakRefs);
     }
 
     @Override

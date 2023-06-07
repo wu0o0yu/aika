@@ -31,7 +31,7 @@ public class Division extends AbstractFunction {
     }
 
     @Override
-    protected double computeUpdate(AbstractFieldLink fl, int r, double u) {
+    protected Double computeUpdate(AbstractFieldLink fl, int r, double u) {
         return switch (fl.getArgument()) {
             case 0 -> updateDiv1(r, u);
             case 1 -> -(u * getInputValueByArg(0, r)) / Math.pow(fl.getInputValue(r), 2.0);

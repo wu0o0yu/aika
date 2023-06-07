@@ -132,7 +132,7 @@ public class MutualExclusionTest {
         SortedSet<BindingActivation> nbActs = nb.getActivations(doc);
         Activation nbAct = nbActs.iterator().next();
 
-        assertTrue(nbAct.getValue().getValue(MAX_VALUE) > 0.38);
+        assertTrue(nbAct.getValue().getLastValue() > 0.38);
     }
 
 

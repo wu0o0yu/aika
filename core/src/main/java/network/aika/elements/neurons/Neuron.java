@@ -252,7 +252,7 @@ public abstract class Neuron<A extends Activation> implements Element, Writable 
     }
 
     protected SumField initBias() {
-        return (SumField) new QueueSumField(this, TRAINING, "bias", TOLERANCE)
+        return (SumField) new QueueSumField(this, TRAINING, "bias", 1, TOLERANCE, true)
                 .addListener("onBiasModified", () ->
                         setModified()
                 );
@@ -411,7 +411,7 @@ public abstract class Neuron<A extends Activation> implements Element, Writable 
     }
 
     public double getCurrentCompleteBias() {
-        return getBias().getUpdatedValue(FIRST_ROUND);
+        return getBias().getUpdatedLastValue();
     }
 
     public void suspend() {
@@ -520,6 +520,7 @@ public abstract class Neuron<A extends Activation> implements Element, Writable 
     public <N extends Neuron> N init(Model m, String label) {
         addProvider(m);
         setLabel(label);
+        setBias(0.0);
 //        connect(INPUT, true, false);
         return (N) this;
     }

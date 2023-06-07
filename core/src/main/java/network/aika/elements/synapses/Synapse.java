@@ -60,7 +60,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
 
     protected S template;
 
-    protected SumField weight = (SumField) new QueueSumField(this, TRAINING, "weight", TOLERANCE, true)
+    protected SumField weight = (SumField) new QueueSumField(this, TRAINING, "weight", 1, TOLERANCE, true)
             .addListener("onWeightModified", () -> {
                 checkWeight();
                 setModified();
@@ -346,7 +346,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
     }
 
     public boolean isZero() {
-        return Utils.belowTolerance(TOLERANCE, weight.getValue(FIRST_ROUND));
+        return Utils.belowTolerance(TOLERANCE, weight.getLastValue());
     }
 
     public boolean isNegative() {

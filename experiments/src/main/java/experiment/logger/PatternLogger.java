@@ -214,6 +214,6 @@ public class PatternLogger {
         if(f == null)
             return "--";
 
-        return doubleToString(f.getValue(MAX_VALUE), "#.#######");
+        return doubleToString(f.getLastValue(), "#.#######");
     }
 }

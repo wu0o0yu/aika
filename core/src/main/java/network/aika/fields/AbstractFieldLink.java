@@ -70,8 +70,8 @@ public abstract class AbstractFieldLink<O extends UpdateListener> {
         if(connected)
             return;
 
-        if(initialize) {
-            int r = FIRST_ROUND;
+        int r = input.getLastRound();
+        if(initialize && r >= FIRST_ROUND) {
             double cv = input.getValue(r);
             output.receiveUpdate(this, r, cv);
         }
@@ -83,8 +83,8 @@ public abstract class AbstractFieldLink<O extends UpdateListener> {
         if(!connected)
             return;
 
-        if(deinitialize) {
-            int r = FIRST_ROUND;
+        int r = input.getLastRound();
+        if(deinitialize && r >= FIRST_ROUND) {
             double cv = input.getValue(r);
             output.receiveUpdate(this, r, -cv);
         }
@@ -94,16 +94,16 @@ public abstract class AbstractFieldLink<O extends UpdateListener> {
 
     public abstract void unlink();
 
-    public double getInputValue(int r) {
+    public Double getInputValue(int r) {
         return connected ?
                 input.getValue(r) :
-                0.0;
+                (Double) 0.0;
     }
 
-    public double getUpdatedInputValue(int r) {
+    public Double getUpdatedInputValue(int r) {
         return connected ?
                 input.getUpdatedValue(r) :
-                0.0;
+                (Double) 0.0;
     }
 
     public int getArgument() {

@@ -26,7 +26,10 @@ public class DelayedIdentityFunction extends IdentityFunction {
     }
 
     @Override
-    protected double computeUpdate(AbstractFieldLink fl, int r, double u) {
+    protected Double computeUpdate(AbstractFieldLink fl, int r, double u) {
+        if(r == 1)
+            return u - getValue(0);
+
         return u;
     }
 
