@@ -128,6 +128,8 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
 
     protected void initWeightInput() {
         inputValue = new IdentityFunction(this, "input value");
+        inputValue.setInitialValue(0, getInitialInputValue());
+
         inputIsFired = threshold(this, "inputIsFired", 0.0, ABOVE, inputValue);
         negInputIsFired = invert(this,"!inputIsFired", inputIsFired);
 
@@ -136,6 +138,10 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
 
         if(input != null)
             linkAndConnect(input.getValue(), 0, inputValue);
+    }
+
+    protected double getInitialInputValue() {
+        return 0.0;
     }
 
     protected boolean incrementRound() {

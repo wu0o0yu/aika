@@ -36,6 +36,7 @@ import static network.aika.utils.Utils.doubleToString;
  */
 public abstract class Field implements FieldInput, FieldOutput, Writable {
 
+    public static int FIRST_ROUND = 1;
     public static int MAX_ROUNDS = 20;
 
     private static double MIN_TOLERANCE = 0.0000000001;
@@ -77,8 +78,8 @@ public abstract class Field implements FieldInput, FieldOutput, Writable {
         receivers = new ArrayList<>();
     }
 
-    public Field setInitialValue(double initialValue) {
-        value[0] = initialValue;
+    public Field setInitialValue(int r, double initialValue) {
+        value[r] = initialValue;
         return this;
     }
 
@@ -107,21 +108,13 @@ public abstract class Field implements FieldInput, FieldOutput, Writable {
 
     @Override
     public double getValue(int r) {
-        if(r < 0)
-            return 1.0;
-
         r = checkRound(r);
-
         return value[r];
     }
 
     @Override
     public double getUpdatedValue(int r) {
-        if (r < 0)
-            return 1.0;
-
         r = checkRound(r);
-
         return withinUpdate ?
                 updatedValue :
                 value[r];

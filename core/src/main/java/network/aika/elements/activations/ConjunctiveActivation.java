@@ -21,6 +21,7 @@ import network.aika.elements.links.ConjunctiveLink;
 import network.aika.elements.neurons.ConjunctiveNeuron;
 import network.aika.elements.synapses.ConjunctiveSynapse;
 
+import static network.aika.fields.Field.FIRST_ROUND;
 import static network.aika.fields.FieldLink.linkAndConnect;
 import static network.aika.fields.Fields.scale;
 
@@ -40,9 +41,9 @@ public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?>> exte
         double optionalSynBiasSum = getInputLinksByType(ConjunctiveLink.class)
                 .map(l -> (ConjunctiveSynapse) l.getSynapse())
                 .filter(ConjunctiveSynapse::isOptional)
-                .mapToDouble(s -> s.getSynapseBias().getUpdatedValue(0))
+                .mapToDouble(s -> s.getSynapseBias().getUpdatedValue(FIRST_ROUND))
                 .sum();
-        ti.getNeuron().getSynapseBiasSum().receiveUpdate(0, optionalSynBiasSum);
+        ti.getNeuron().getSynapseBiasSum().receiveUpdate(FIRST_ROUND, optionalSynBiasSum);
     }
 
     @Override

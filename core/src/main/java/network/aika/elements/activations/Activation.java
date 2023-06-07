@@ -47,6 +47,7 @@ import static network.aika.callbacks.EventType.CREATE;
 import static network.aika.callbacks.EventType.UPDATE;
 import static network.aika.elements.neurons.Range.joinTokenPosition;
 import static network.aika.elements.neurons.Range.tokenPositionEquals;
+import static network.aika.fields.Field.FIRST_ROUND;
 import static network.aika.fields.FieldLink.linkAndConnect;
 import static network.aika.fields.Fields.*;
 import static network.aika.fields.ThresholdOperator.Type.*;
@@ -164,7 +165,7 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
     }
 
     public void setNet(double v) {
-        net.setValue(0, v);
+        net.setValue(FIRST_ROUND, v);
     }
 
     public boolean isSelfRef(BindingActivation oAct) {

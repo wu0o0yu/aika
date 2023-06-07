@@ -43,6 +43,7 @@ import java.util.stream.Stream;
 import static network.aika.direction.Direction.INPUT;
 import static network.aika.elements.activations.Timestamp.MAX;
 import static network.aika.elements.activations.Timestamp.MIN;
+import static network.aika.fields.Field.FIRST_ROUND;
 import static network.aika.steps.Phase.TRAINING;
 import static network.aika.utils.Utils.TOLERANCE;
 
@@ -118,14 +119,14 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
         }
 
         return getOutput().getCurrentCompleteBias() +
-                getWeight().getUpdatedValue(0);
+                getWeight().getUpdatedValue(FIRST_ROUND);
     }
 
     public static double getLatentLinkingPreNet(Synapse synA, Synapse synB) {
-        double preUB = synA.getWeight().getUpdatedValue(0);
+        double preUB = synA.getWeight().getUpdatedValue(FIRST_ROUND);
 
         if(synB != null) {
-            preUB += synB.getWeight().getUpdatedValue(0) +
+            preUB += synB.getWeight().getUpdatedValue(FIRST_ROUND) +
                     Math.min(
                             synA.getSumOfLowerWeights(),
                             synB.getSumOfLowerWeights()
@@ -235,7 +236,8 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
 
     protected void setInitialWeight(Synapse templateSyn) {
         weight.setInitialValue(
-                templateSyn.weight.getUpdatedValue(0)
+                FIRST_ROUND,
+                templateSyn.weight.getUpdatedValue(FIRST_ROUND)
         );
     }
 
@@ -276,7 +278,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
     }
 
     public S setWeight(double w) {
-        weight.setValue(0, w);
+        weight.setValue(FIRST_ROUND, w);
 
         return (S) this;
     }
@@ -308,7 +310,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
     }
 
     public double getSortingWeight() {
-        return getWeight().getUpdatedValue(0);
+        return getWeight().getUpdatedValue(FIRST_ROUND);
     }
 
     public Direction getStoredAt() {
@@ -344,11 +346,11 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
     }
 
     public boolean isZero() {
-        return Utils.belowTolerance(TOLERANCE, weight.getValue(0));
+        return Utils.belowTolerance(TOLERANCE, weight.getValue(FIRST_ROUND));
     }
 
     public boolean isNegative() {
-        return weight.getUpdatedValue(0) < 0.0;
+        return weight.getUpdatedValue(FIRST_ROUND) < 0.0;
     }
 
     @Override

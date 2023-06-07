@@ -41,6 +41,11 @@ public class PositiveFeedbackLink extends FeedbackLink<PositiveFeedbackSynapse, 
         super(s, input, output);
     }
 
+    @Override
+    protected double getInitialInputValue() {
+        return 1.0;
+    }
+
     public void relinkInput(PatternActivation in) {
         if(input != null) {
             assert input == in;

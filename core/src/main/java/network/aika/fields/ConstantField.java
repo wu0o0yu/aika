@@ -29,7 +29,7 @@ public class ConstantField extends Field implements FieldOutput {
 
     public ConstantField(FieldObject ref, String label, double value) {
         super(ref, label, null);
-        setInitialValue(value);
+        setInitialValue(FIRST_ROUND, value);
     }
 
     @Override

@@ -22,6 +22,8 @@ import network.aika.elements.activations.InhibitoryActivation;
 import network.aika.elements.links.NegativeFeedbackLink;
 import network.aika.elements.neurons.InhibitoryNeuron;
 
+import static network.aika.fields.Field.FIRST_ROUND;
+
 /**
  *
  * @author Lukas Molzberger
@@ -55,7 +57,7 @@ public class NegativeFeedbackSynapse extends FeedbackSynapse<
 
     @Override
     public NegativeFeedbackSynapse setWeight(double w) {
-        weight.receiveUpdate(0, w);
+        weight.receiveUpdate(FIRST_ROUND, w);
         return this;
     }
 
@@ -66,6 +68,6 @@ public class NegativeFeedbackSynapse extends FeedbackSynapse<
 
     @Override
     public double getPropagatePreNet(InhibitoryActivation iAct) {
-        return weight.getValue(0);
+        return weight.getValue(FIRST_ROUND);
     }
 }

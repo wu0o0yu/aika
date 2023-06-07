@@ -16,7 +16,6 @@
  */
 package network.aika.elements.neurons;
 
-import network.aika.fields.FieldObject;
 import network.aika.Model;
 import network.aika.Thought;
 import network.aika.elements.synapses.CategoryInputSynapse;
@@ -47,6 +46,7 @@ import static network.aika.direction.Direction.OUTPUT;
 import static network.aika.elements.synapses.Synapse.getLatentLinkingPreNet;
 import static network.aika.elements.activations.Timestamp.MAX;
 import static network.aika.elements.activations.Timestamp.MIN;
+import static network.aika.fields.Field.FIRST_ROUND;
 import static network.aika.steps.Phase.TRAINING;
 import static network.aika.utils.Utils.TOLERANCE;
 
@@ -216,7 +216,8 @@ public abstract class Neuron<A extends Activation> implements Element, Writable 
         addProvider(templateN.getModel());
 
         bias.setInitialValue(
-                templateN.getBias().getUpdatedValue(0)
+                FIRST_ROUND,
+                templateN.getBias().getUpdatedValue(FIRST_ROUND)
         );
 
         CategoryInputSynapse cis = templateN.getCategoryInputSynapse();
@@ -410,7 +411,7 @@ public abstract class Neuron<A extends Activation> implements Element, Writable 
     }
 
     public double getCurrentCompleteBias() {
-        return getBias().getUpdatedValue(0);
+        return getBias().getUpdatedValue(FIRST_ROUND);
     }
 
     public void suspend() {
@@ -524,7 +525,7 @@ public abstract class Neuron<A extends Activation> implements Element, Writable 
     }
 
     public <N extends Neuron> N setBias(double bias) {
-        getBias().setValue(0, bias);
+        getBias().setValue(FIRST_ROUND, bias);
         return (N) this;
     }
 

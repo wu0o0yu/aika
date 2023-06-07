@@ -18,6 +18,8 @@ package network.aika.fields;
 
 import network.aika.callbacks.UpdateListener;
 
+import static network.aika.fields.Field.FIRST_ROUND;
+
 /**
  * @author Lukas Molzberger
  */
@@ -71,7 +73,7 @@ public abstract class AbstractFieldLink<O extends UpdateListener> {
 
     public void receiveUpdate(int r, double u) {
         if(connected && propagateUpdates)
-            output.receiveUpdate(this, incrementRound ? r + 1 : r, u);
+            output.receiveUpdate(this, updateRound(r, 1), u);
     }
 
     public void connect(boolean initialize) {
@@ -79,8 +81,9 @@ public abstract class AbstractFieldLink<O extends UpdateListener> {
             return;
 
         if(initialize) {
-            double cv = input.getValue(0);
-            output.receiveUpdate(this, 0, cv);
+            int r = updateRound(FIRST_ROUND, -1);
+            double cv = input.getValue(r);
+            output.receiveUpdate(this, r, cv);
         }
 
         connected = true;
@@ -91,8 +94,9 @@ public abstract class AbstractFieldLink<O extends UpdateListener> {
             return;
 
         if(deinitialize) {
-            double cv = input.getValue(0);
-            output.receiveUpdate(this, 0, -cv);
+            int r = updateRound(FIRST_ROUND, -1);
+            double cv = input.getValue(r);
+            output.receiveUpdate(this, r, -cv);
         }
 
         connected = false;
@@ -102,14 +106,18 @@ public abstract class AbstractFieldLink<O extends UpdateListener> {
 
     public double getInputValue(int r) {
         return connected ?
-                input.getValue(incrementRound ? r - 1 : r) :
+                input.getValue(updateRound(r, -1)) :
                 0.0;
     }
 
     public double getUpdatedInputValue(int r) {
         return connected ?
-                input.getUpdatedValue(incrementRound ? r - 1 : r) :
+                input.getUpdatedValue(updateRound(r, -1)) :
                 0.0;
+    }
+
+    private int updateRound(int r, int dir) {
+        return incrementRound ? r + dir : r;
     }
 
     public int getArgument() {

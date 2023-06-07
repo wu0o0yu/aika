@@ -23,7 +23,7 @@ public class InvertFunction extends AbstractFunction {
 
     public InvertFunction(FieldObject ref, String label) {
         super(ref, label);
-        setInitialValue(1.0);
+        setInitialValue(FIRST_ROUND, 1.0);
     }
 
     @Override

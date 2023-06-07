@@ -36,6 +36,7 @@ import java.util.Comparator;
 
 import static network.aika.direction.Direction.INPUT;
 import static network.aika.direction.Direction.OUTPUT;
+import static network.aika.fields.Field.FIRST_ROUND;
 import static network.aika.steps.Phase.TRAINING;
 import static network.aika.utils.Utils.TOLERANCE;
 
@@ -83,8 +84,8 @@ public abstract class ConjunctiveNeuron<A extends ConjunctiveActivation> extends
 
     @Override
     public double getCurrentCompleteBias() {
-        return getBias().getUpdatedValue(0) +
-                synapseBiasSum.getUpdatedValue(0);
+        return getBias().getUpdatedValue(FIRST_ROUND) +
+                synapseBiasSum.getUpdatedValue(FIRST_ROUND);
     }
 
     @Override
@@ -92,7 +93,8 @@ public abstract class ConjunctiveNeuron<A extends ConjunctiveActivation> extends
         super.initFromTemplate(templateN);
 
         synapseBiasSum.setInitialValue(
-                ((ConjunctiveNeuron)templateN).getSynapseBiasSum().getUpdatedValue(0)
+                FIRST_ROUND,
+                ((ConjunctiveNeuron)templateN).getSynapseBiasSum().getUpdatedValue(FIRST_ROUND)
         );
     }
 
@@ -124,9 +126,9 @@ public abstract class ConjunctiveNeuron<A extends ConjunctiveActivation> extends
     protected void updateSumOfLowerWeights() {
         ConjunctiveSynapse[] inputSynapses = sortInputSynapses();
 
-        double sum = bias.getUpdatedValue(0);
+        double sum = bias.getUpdatedValue(FIRST_ROUND);
         for(ConjunctiveSynapse s: inputSynapses) {
-            double w = s.getWeight().getUpdatedValue(0);
+            double w = s.getWeight().getUpdatedValue(FIRST_ROUND);
             if(w <= 0.0)
                 continue;
 
