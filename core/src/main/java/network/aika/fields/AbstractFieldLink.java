@@ -33,8 +33,6 @@ public abstract class AbstractFieldLink<O extends UpdateListener> {
 
     protected boolean propagateUpdates = true;
 
-    private boolean incrementRound;
-
     public AbstractFieldLink(FieldOutput input, int arg, O output) {
         this.input = input;
         this.arg = arg;
@@ -53,14 +51,6 @@ public abstract class AbstractFieldLink<O extends UpdateListener> {
         return connected;
     }
 
-    public void setIncrementRound(boolean incrementRound) {
-        this.incrementRound = incrementRound;
-    }
-
-    public boolean isIncrementRound() {
-        return incrementRound;
-    }
-
     public void setInput(FieldOutput input) {
         this.input = input;
     }
@@ -73,7 +63,7 @@ public abstract class AbstractFieldLink<O extends UpdateListener> {
 
     public void receiveUpdate(int r, double u) {
         if(connected && propagateUpdates)
-            output.receiveUpdate(this, updateRound(r, 1), u);
+            output.receiveUpdate(this, r, u);
     }
 
     public void connect(boolean initialize) {
@@ -81,7 +71,7 @@ public abstract class AbstractFieldLink<O extends UpdateListener> {
             return;
 
         if(initialize) {
-            int r = updateRound(FIRST_ROUND, -1);
+            int r = FIRST_ROUND;
             double cv = input.getValue(r);
             output.receiveUpdate(this, r, cv);
         }
@@ -94,7 +84,7 @@ public abstract class AbstractFieldLink<O extends UpdateListener> {
             return;
 
         if(deinitialize) {
-            int r = updateRound(FIRST_ROUND, -1);
+            int r = FIRST_ROUND;
             double cv = input.getValue(r);
             output.receiveUpdate(this, r, -cv);
         }
@@ -106,18 +96,14 @@ public abstract class AbstractFieldLink<O extends UpdateListener> {
 
     public double getInputValue(int r) {
         return connected ?
-                input.getValue(updateRound(r, -1)) :
+                input.getValue(r) :
                 0.0;
     }
 
     public double getUpdatedInputValue(int r) {
         return connected ?
-                input.getUpdatedValue(updateRound(r, -1)) :
+                input.getUpdatedValue(r) :
                 0.0;
-    }
-
-    private int updateRound(int r, int dir) {
-        return incrementRound ? r + dir : r;
     }
 
     public int getArgument() {

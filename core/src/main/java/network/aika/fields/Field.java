@@ -36,7 +36,7 @@ import static network.aika.utils.Utils.doubleToString;
  */
 public abstract class Field implements FieldInput, FieldOutput, Writable {
 
-    public static int FIRST_ROUND = 1;
+    public static int FIRST_ROUND = 0;
     public static int MAX_ROUNDS = 20;
 
     private static double MIN_TOLERANCE = 0.0000000001;

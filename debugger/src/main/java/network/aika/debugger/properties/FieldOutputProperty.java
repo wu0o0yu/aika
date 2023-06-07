@@ -45,28 +45,25 @@ public class FieldOutputProperty<F extends FieldOutput> extends AbstractProperty
     protected Boolean isConnected;
     protected Boolean isPropagateUpdate;
 
-    protected Boolean isIncrementRound;
-
     protected boolean withinUpdate;
 
     protected JLabel fieldLabel;
     protected JFormattedTextField currentValueField;
     protected JLabel lastRoundLabel;
 
-    public static FieldOutputProperty createFieldProperty(Container parent, FieldOutput f, boolean showReference, Boolean isIncrementRound, Boolean isConnected, Boolean isPropagateUpdates) {
+    public static FieldOutputProperty createFieldProperty(Container parent, FieldOutput f, boolean showReference, Boolean isConnected, Boolean isPropagateUpdates) {
         if(f instanceof IQueueField) {
-            return new QueueFieldProperty(parent, (IQueueField) f, showReference, isIncrementRound, isConnected, isPropagateUpdates);
+            return new QueueFieldProperty(parent, (IQueueField) f, showReference, isConnected, isPropagateUpdates);
         } else {
-            return new FieldOutputProperty(parent, f, showReference, isIncrementRound, isConnected, isPropagateUpdates);
+            return new FieldOutputProperty(parent, f, showReference, isConnected, isPropagateUpdates);
         }
     }
 
-    public FieldOutputProperty(Container parent, F f, boolean showReference, Boolean isIncrementRound, Boolean isConnected, Boolean isPropagateUpdate) {
+    public FieldOutputProperty(Container parent, F f, boolean showReference, Boolean isConnected, Boolean isPropagateUpdate) {
         super(parent);
         this.showReference = showReference;
         this.isConnected = isConnected;
         this.isPropagateUpdate = isPropagateUpdate;
-        this.isIncrementRound = isIncrementRound;
 
         Frame frame = (Frame) SwingUtilities.getWindowAncestor(parent);
         field = f;
@@ -120,7 +117,7 @@ public class FieldOutputProperty<F extends FieldOutput> extends AbstractProperty
         addGridEntry(lastRoundLabel, 2, pos, 1, insets);
 
         showReference(3, pos, insets);
-        if((isIncrementRound != null && isIncrementRound) || isConnected != null || isPropagateUpdate != null)
+        if(isConnected != null || isPropagateUpdate != null)
             showConnected(4, pos, insets);
     }
 
@@ -138,9 +135,6 @@ public class FieldOutputProperty<F extends FieldOutput> extends AbstractProperty
 
     protected void showConnected(int xPos, int yPos, Insets insets) {
         String label = "";
-
-        if(isIncrementRound != null)
-            label += isIncrementRound ? "incrRound " : "";
 
         if(isConnected != null)
             label += isConnected ? "connected " : "unconnected ";

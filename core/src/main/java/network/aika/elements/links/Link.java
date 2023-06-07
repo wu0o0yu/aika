@@ -127,8 +127,7 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
     public abstract void connectWeightUpdate();
 
     protected void initWeightInput() {
-        inputValue = new IdentityFunction(this, "input value");
-        inputValue.setInitialValue(0, getInitialInputValue());
+        initInputValue();
 
         inputIsFired = threshold(this, "inputIsFired", 0.0, ABOVE, inputValue);
         negInputIsFired = invert(this,"!inputIsFired", inputIsFired);
@@ -140,19 +139,14 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
             linkAndConnect(input.getValue(), 0, inputValue);
     }
 
-    protected double getInitialInputValue() {
-        return 0.0;
-    }
-
-    protected boolean incrementRound() {
-        return false;
+    protected void initInputValue() {
+        inputValue = new IdentityFunction(this, "input value");
     }
 
     protected Multiplication initWeightedInput() {
         weightedInput = new Multiplication(this, "iAct(" + getInputKeyString() + ").value * s.weight");
 
-        FieldLink.link(inputValue, 0, weightedInput)
-                .setIncrementRound(incrementRound());
+        FieldLink.link(inputValue, 0, weightedInput);
 
         FieldLink.link(synapse.getWeight(), 1, weightedInput)
                 .setPropagateUpdates(false);

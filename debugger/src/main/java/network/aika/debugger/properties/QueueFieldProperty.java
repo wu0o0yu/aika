@@ -31,8 +31,8 @@ import static network.aika.fields.Field.FIRST_ROUND;
 public class QueueFieldProperty extends FieldOutputProperty<IQueueField> implements FieldObserver {
 
 
-    public QueueFieldProperty(Container parent, IQueueField field, boolean showReference, Boolean isIncrementRound, Boolean isConnected, Boolean isPropagateUpdates) {
-        super(parent, field, showReference, isIncrementRound, isConnected, isPropagateUpdates);
+    public QueueFieldProperty(Container parent, IQueueField field, boolean showReference, Boolean isConnected, Boolean isPropagateUpdates) {
+        super(parent, field, showReference, isConnected, isPropagateUpdates);
 
         currentValueField.addPropertyChangeListener("value", e -> {
             if(withinUpdate)
