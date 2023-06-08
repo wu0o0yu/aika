@@ -16,7 +16,6 @@
  */
 package network.aika.elements.synapses;
 
-import network.aika.fields.FieldObject;
 import network.aika.Model;
 import network.aika.Thought;
 import network.aika.callbacks.ActivationCheckCallback;
@@ -26,7 +25,7 @@ import network.aika.elements.links.Link;
 import network.aika.elements.activations.Timestamp;
 import network.aika.direction.Direction;
 import network.aika.fields.QueueSumField;
-import network.aika.fields.SumField;
+import network.aika.fields.MultiInputField;
 import network.aika.elements.neurons.Neuron;
 import network.aika.elements.neurons.NeuronProvider;
 import network.aika.utils.Utils;
@@ -60,7 +59,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
 
     protected S template;
 
-    protected SumField weight = (SumField) new QueueSumField(this, TRAINING, "weight", 1, TOLERANCE, true)
+    protected MultiInputField weight = (MultiInputField) new QueueSumField(this, TRAINING, "weight", 1, TOLERANCE, true)
             .addListener("onWeightModified", () -> {
                 checkWeight();
                 setModified();
@@ -283,7 +282,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
         return (S) this;
     }
 
-    public SumField getWeight() {
+    public MultiInputField getWeight() {
         return weight;
     }
 

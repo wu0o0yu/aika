@@ -19,7 +19,7 @@ package network.aika.elements.neurons;
 import network.aika.Thought;
 import network.aika.direction.Direction;
 import network.aika.fields.QueueSumField;
-import network.aika.fields.SumField;
+import network.aika.fields.MultiInputField;
 import network.aika.elements.activations.LatentRelationActivation;
 import network.aika.elements.activations.TokenActivation;
 
@@ -60,8 +60,8 @@ public abstract class LatentRelationNeuron extends BindingNeuron {
     public abstract Stream<TokenActivation> evaluateLatentRelation(TokenActivation fromOriginAct, Direction dir);
 
     @Override
-    protected SumField initBias() {
-        return (SumField) new QueueSumField(this, TRAINING, "bias", TOLERANCE)
+    protected MultiInputField initBias() {
+        return (MultiInputField) new QueueSumField(this, TRAINING, "bias", TOLERANCE)
                 .setInitialValue(FIRST_ROUND, 10.0);
     }
 

@@ -31,7 +31,7 @@ import java.util.List;
 /**
  * @author Lukas Molzberger
  */
-public class QueueSumField extends SumField implements IQueueField {
+public class QueueSumField extends MultiInputField implements IQueueField {
 
     private Phase phase;
 

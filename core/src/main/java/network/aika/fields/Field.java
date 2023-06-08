@@ -139,7 +139,7 @@ public abstract class Field implements FieldInput, FieldOutput, Writable {
     public Double getUpdatedValue(int r) {
         r = checkRound(r);
 
-        if(r > lastRound)
+        if(r < 0 || r > lastRound)
             return null;
 
         return withinUpdate ?

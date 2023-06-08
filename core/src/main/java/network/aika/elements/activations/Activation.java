@@ -16,7 +16,6 @@
  */
 package network.aika.elements.activations;
 
-import network.aika.fields.FieldObject;
 import network.aika.Model;
 import network.aika.Thought;
 import network.aika.elements.Element;
@@ -70,13 +69,13 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
 
     protected FieldOutput value;
 
-    protected SumField net;
-    protected SumField netPreAnneal;
+    protected MultiInputField net;
+    protected MultiInputField netPreAnneal;
 
     protected FieldOutput isFired;
 
     protected FieldFunction netOuterGradient;
-    protected SumField gradient;
+    protected MultiInputField gradient;
 
     protected Field updateValue;
 
@@ -240,7 +239,7 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
         return netOuterGradient;
     }
 
-    public SumField getGradient() {
+    public MultiInputField getGradient() {
         return gradient;
     }
 
@@ -264,11 +263,11 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
         return false;
     }
 
-    public SumField getNet() {
+    public MultiInputField getNet() {
         return net;
     }
 
-    public SumField getNetPreAnneal() {
+    public MultiInputField getNetPreAnneal() {
         return netPreAnneal;
     }
 

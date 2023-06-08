@@ -27,13 +27,11 @@ import network.aika.visitor.selfref.SelfRefDownVisitor;
 import network.aika.steps.link.LinkingIn;
 
 import static network.aika.callbacks.EventType.CREATE;
-import static network.aika.fields.ConstantField.ONE;
 import static network.aika.fields.FieldLink.link;
 import static network.aika.fields.FieldLink.linkAndConnect;
 import static network.aika.fields.Fields.*;
 import static network.aika.elements.activations.Timestamp.FIRED_COMPARATOR;
 import static network.aika.fields.ThresholdOperator.Type.ABOVE;
-import static network.aika.fields.ThresholdOperator.Type.BELOW_OR_EQUAL;
 
 /**
  *
@@ -46,12 +44,12 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
     protected I input;
     protected O output;
 
-    protected AbstractFunction inputValue;
+    protected Field inputValue;
     protected AbstractFunction inputIsFired;
     protected AbstractFunction negInputIsFired;
     protected Multiplication weightedInput;
 
-    protected SumField gradient;
+    protected MultiInputField gradient;
 
     public Link(S s, I input, O output) {
         this.synapse = s;
@@ -136,11 +134,15 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
         linkAndConnect(weightedInput, getOutput().getNet());
 
         if(input != null)
-            linkAndConnect(input.getValue(), 0, inputValue);
+            connectInputValue();
     }
 
     protected void initInputValue() {
         inputValue = new IdentityFunction(this, "input value");
+    }
+
+    protected void connectInputValue() {
+        linkAndConnect(input.getValue(), 0, inputValue);
     }
 
     protected Multiplication initWeightedInput() {

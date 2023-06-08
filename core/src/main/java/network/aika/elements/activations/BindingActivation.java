@@ -68,7 +68,7 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
 
     @Override
     protected void connectWeightUpdate() {
-        updateValue = new SumField(this, "updateValue", TOLERANCE);
+        updateValue = new MultiInputField(this, "updateValue", TOLERANCE);
 
         super.connectWeightUpdate();
     }

@@ -22,12 +22,11 @@ import network.aika.direction.Direction;
 import network.aika.elements.neurons.Neuron;
 import network.aika.elements.neurons.ConjunctiveNeuron;
 import network.aika.elements.activations.Activation;
-import network.aika.elements.activations.BindingActivation;
 import network.aika.elements.activations.ConjunctiveActivation;
 import network.aika.elements.links.Link;
 import network.aika.fields.FieldLink;
 import network.aika.fields.QueueSumField;
-import network.aika.fields.SumField;
+import network.aika.fields.MultiInputField;
 import network.aika.utils.Utils;
 
 import java.io.DataInput;
@@ -58,7 +57,7 @@ public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends
                 >
 {
 
-    protected SumField synapseBias = (SumField) new QueueSumField(this, TRAINING, "synapseBias", 1, TOLERANCE, true)
+    protected MultiInputField synapseBias = (MultiInputField) new QueueSumField(this, TRAINING, "synapseBias", 1, TOLERANCE, true)
             .addListener("onSynapseBiasModified", () ->
                     setModified()
             );
@@ -74,6 +73,12 @@ public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends
     }
 
     @Override
+    public S init(Neuron input, Neuron output) {
+        synapseBias.setValue(FIRST_ROUND, 0.0);
+        return super.init(input, output);
+    }
+
+    @Override
     public void linkFields() {
         if(!optional && !output.isSuspended()) {
             if(biasLinkExists(synapseBias, getOutput().getSynapseBiasSum()))
@@ -83,7 +88,7 @@ public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends
         }
     }
 
-    private boolean biasLinkExists(SumField synapseBias, SumField synapseBiasSum) {
+    private boolean biasLinkExists(MultiInputField synapseBias, MultiInputField synapseBiasSum) {
         return synapseBias.getReceivers()
                 .stream()
                 .filter(fl -> fl instanceof FieldLink)
@@ -97,7 +102,7 @@ public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends
         return (S) this;
     }
 
-    public SumField getSynapseBias() {
+    public MultiInputField getSynapseBias() {
         return synapseBias;
     }
 

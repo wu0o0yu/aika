@@ -3,15 +3,15 @@ package network.aika.fields;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class SumField extends Field {
+public class MultiInputField extends Field {
 
     private Collection<FieldLink> inputs;
 
-    public SumField(FieldObject reference, String label, Double tolerance) {
+    public MultiInputField(FieldObject reference, String label, Double tolerance) {
         super(reference, label, tolerance);
     }
 
-    public SumField(FieldObject reference, String label, int maxRounds, Double tolerance, boolean weakRefs) {
+    public MultiInputField(FieldObject reference, String label, int maxRounds, Double tolerance, boolean weakRefs) {
         super(reference, label, maxRounds, tolerance, weakRefs);
     }
 

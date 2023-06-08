@@ -24,7 +24,7 @@ import network.aika.elements.synapses.CategoryInputSynapse;
 import network.aika.elements.synapses.ConjunctiveSynapse;
 import network.aika.elements.synapses.Synapse;
 import network.aika.fields.QueueSumField;
-import network.aika.fields.SumField;
+import network.aika.fields.MultiInputField;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,7 +48,7 @@ public abstract class ConjunctiveNeuron<A extends ConjunctiveActivation> extends
 
     private static final Logger log = LoggerFactory.getLogger(ConjunctiveNeuron.class);
 
-    protected SumField synapseBiasSum = initSynapseBiasSum();
+    protected MultiInputField synapseBiasSum = initSynapseBiasSum();
 
     public ConjunctiveNeuron() {
         bias.addEventListener(
@@ -63,7 +63,7 @@ public abstract class ConjunctiveNeuron<A extends ConjunctiveActivation> extends
         );
     }
 
-    protected SumField initSynapseBiasSum() {
+    protected MultiInputField initSynapseBiasSum() {
         QueueSumField synBiasSum = (QueueSumField) new QueueSumField(this, TRAINING, "synapseBiasSum", 1, TOLERANCE, true)
                 .addListener("onSynapseBiasSumModified", () ->
                         setModified()
@@ -72,7 +72,7 @@ public abstract class ConjunctiveNeuron<A extends ConjunctiveActivation> extends
         return synBiasSum;
     }
 
-    public SumField getSynapseBiasSum() {
+    public MultiInputField getSynapseBiasSum() {
         return synapseBiasSum;
     }
 

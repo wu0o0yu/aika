@@ -42,10 +42,12 @@ public class NegativeFeedbackLink extends FeedbackLink<NegativeFeedbackSynapse, 
     }
 
     @Override
-    protected void initWeightInput() {
+    protected void initInputValue() {
         inputValue = new MaxField(this, "max-input-value");
+    }
 
-        super.initWeightInput();
+    @Override
+    protected void connectInputValue() {
     }
 
     @Override

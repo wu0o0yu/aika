@@ -21,7 +21,7 @@ import java.util.Comparator;
 /**
  * @author Lukas Molzberger
  */
-public class MaxField extends AbstractFunction {
+public class MaxField extends MultiInputField {
 
     private AbstractFieldLink selectedInput;
 
@@ -34,17 +34,24 @@ public class MaxField extends AbstractFunction {
     }
 
     @Override
+    public void receiveUpdate(AbstractFieldLink fl, int r, double u) {
+        triggerUpdate(
+                r,
+                computeUpdate(fl, r, u)
+        );
+    }
+
     protected Double computeUpdate(AbstractFieldLink fl, int r, double u) {
         if(selectedInput == null) {
             selectedInput = fl;
-            return fl.getUpdatedInputValue(r) - value[r];
+            return fl.getUpdatedInputValue(r) - getValue(r, 0.0);
         }
 
         selectedInput = getInputs().stream()
                 .max(getComparator(fl, r))
                 .orElse(null);
 
-        return getInput(selectedInput, fl, r) - value[r];
+        return getInput(selectedInput, fl, r) - getValue(r, 0.0);
     }
 
     private Comparator<FieldLink> getComparator(AbstractFieldLink fl, int r) {

@@ -66,7 +66,7 @@ public abstract class Neuron<A extends Activation> implements Element, Writable 
 
     private Writable customData;
 
-    protected SumField bias = initBias();
+    protected MultiInputField bias = initBias();
 
     protected boolean allowTraining = true;
 
@@ -251,8 +251,8 @@ public abstract class Neuron<A extends Activation> implements Element, Writable 
     public void count(A act) {
     }
 
-    protected SumField initBias() {
-        return (SumField) new QueueSumField(this, TRAINING, "bias", 1, TOLERANCE, true)
+    protected MultiInputField initBias() {
+        return (MultiInputField) new QueueSumField(this, TRAINING, "bias", 1, TOLERANCE, true)
                 .addListener("onBiasModified", () ->
                         setModified()
                 );
@@ -406,7 +406,7 @@ public abstract class Neuron<A extends Activation> implements Element, Writable 
         return modified;
     }
 
-    public SumField getBias() {
+    public MultiInputField getBias() {
         return bias;
     }
 
