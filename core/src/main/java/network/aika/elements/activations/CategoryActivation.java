@@ -24,8 +24,6 @@ import network.aika.elements.neurons.CategoryNeuron;
 import java.util.Comparator;
 import java.util.stream.Stream;
 
-import static java.lang.Integer.MAX_VALUE;
-
 /**
  * @author Lukas Molzberger
  */

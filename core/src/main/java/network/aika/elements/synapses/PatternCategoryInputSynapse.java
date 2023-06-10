@@ -22,7 +22,6 @@ import network.aika.elements.links.PatternCategoryInputLink;
 import network.aika.elements.neurons.CategoryNeuron;
 import network.aika.elements.neurons.Neuron;
 
-
 /**
  * The Same Pattern Binding Neuron Synapse is an inner synapse between two binding neurons of the same pattern.
  *

@@ -26,7 +26,7 @@ import static network.aika.fields.FieldLink.*;
  */
 public class Fields {
 
-    public static boolean isTrue(FieldOutput f, int r, double threshold) {
+    public static boolean isTrue(FieldOutput f, double threshold) {
         return f != null && f.getValue() > threshold;
     }
 

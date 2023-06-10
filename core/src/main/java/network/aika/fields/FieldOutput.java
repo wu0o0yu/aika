@@ -28,6 +28,8 @@ public interface FieldOutput {
 
     String getLabel();
 
+    int getRound();
+
     String getValueString();
 
     double getValue();

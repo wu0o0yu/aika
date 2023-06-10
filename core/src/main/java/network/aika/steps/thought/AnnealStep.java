@@ -17,11 +17,8 @@
 package network.aika.steps.thought;
 
 import network.aika.Thought;
-import network.aika.elements.activations.BindingActivation;
 import network.aika.elements.activations.Timestamp;
-import network.aika.elements.links.PositiveFeedbackLink;
 import network.aika.elements.neurons.ActivationFunction;
-import network.aika.elements.synapses.PositiveFeedbackSynapse;
 import network.aika.fields.AbstractFieldLink;
 import network.aika.fields.DelayedIdentityFunction;
 import network.aika.steps.Phase;

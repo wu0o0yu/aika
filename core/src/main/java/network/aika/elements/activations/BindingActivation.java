@@ -29,7 +29,6 @@ import network.aika.visitor.linking.pattern.PatternCategoryUpVisitor;
 
 import java.util.stream.Stream;
 
-import static java.lang.Integer.MAX_VALUE;
 import static network.aika.fields.Fields.isTrue;
 import static network.aika.utils.Utils.TOLERANCE;
 
@@ -47,7 +46,7 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
     @Override
     public boolean isActiveTemplateInstance() {
         return isNewInstance || (
-                isTrue(net, MAX_VALUE, 0.0) &&
+                isTrue(net, 0.0) &&
                         getOutputPatternActivations()
                                 .anyMatch(Activation::isFired)
         );

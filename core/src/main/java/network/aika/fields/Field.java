@@ -17,6 +17,7 @@
 package network.aika.fields;
 
 import network.aika.Model;
+import network.aika.Thought;
 import network.aika.utils.Utils;
 import network.aika.utils.Writable;
 
@@ -67,6 +68,15 @@ public abstract class Field implements FieldInput, FieldOutput, Writable {
         fl.connect(true);
 
         return this;
+    }
+
+    public int getRound() {
+        Thought t = reference.getThought();
+
+        if(t == null)
+            return 0;
+
+        return t.getRound();
     }
 
     protected void initIO(boolean weakRefs) {

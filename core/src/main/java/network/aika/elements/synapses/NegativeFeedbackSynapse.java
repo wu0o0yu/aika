@@ -22,7 +22,6 @@ import network.aika.elements.activations.InhibitoryActivation;
 import network.aika.elements.links.NegativeFeedbackLink;
 import network.aika.elements.neurons.InhibitoryNeuron;
 
-
 /**
  *
  * @author Lukas Molzberger

@@ -35,7 +35,6 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.stream.Collectors;
 
-import static java.lang.Integer.MAX_VALUE;
 import static network.aika.fields.Fields.isTrue;
 import static network.aika.sign.Sign.NEG;
 import static network.aika.sign.Sign.POS;
@@ -151,8 +150,8 @@ public class PatternSynapse extends ConjunctiveSynapse<
         if(l.getInput() == null)
             return; // TODO: fix
 
-        boolean inputActive = isTrue(l.getInputPatternNet(), MAX_VALUE, 0.0);
-        boolean outputActive = isTrue(l.getOutput().getNet(), MAX_VALUE, 0.0);
+        boolean inputActive = isTrue(l.getInputPatternNet(), 0.0);
+        boolean outputActive = isTrue(l.getOutput().getNet(), 0.0);
 
         Range absoluteRange = l.getInput().getAbsoluteRange();
         if(absoluteRange == null)

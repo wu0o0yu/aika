@@ -29,8 +29,6 @@ import java.awt.event.MouseListener;
 import java.text.Format;
 import java.text.NumberFormat;
 
-import static java.lang.Integer.MAX_VALUE;
-
 
 /**
  * @author Lukas Molzberger

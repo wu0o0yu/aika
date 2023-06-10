@@ -57,7 +57,7 @@ public class QueueFieldProperty extends FieldOutputProperty<IQueueField> impleme
     }
 
     @Override
-    public void receiveUpdate(Double v) {
+    public void receiveUpdate(double v) {
         SwingUtilities.invokeLater(() -> {
             withinUpdate = true;
             currentValueField.setValue(v);

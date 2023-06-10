@@ -35,7 +35,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static experiment.logger.ExperimentLogger.CSV_FORMAT;
-import static java.lang.Integer.MAX_VALUE;
 import static network.aika.utils.Utils.doubleToString;
 
 /**

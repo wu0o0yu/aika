@@ -283,7 +283,7 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
     }
 
     public boolean isFired() {
-        return isTrue(net, MAX_VALUE, 0.0);
+        return isTrue(net, 0.0);
     }
 
     public Thought getThought() {
@@ -473,7 +473,7 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
     }
 
     public boolean isActiveTemplateInstance() {
-        return isNewInstance || isTrue(net, MAX_VALUE, 0.5);
+        return isNewInstance || isTrue(net, 0.5);
     }
 
     public CategoryInputLink getCategoryInputLink() {

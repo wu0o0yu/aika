@@ -23,8 +23,6 @@ import network.aika.fields.*;
 import network.aika.visitor.Visitor;
 
 import static network.aika.callbacks.EventType.CREATE;
-import static network.aika.fields.ConstantField.ONE;
-import static network.aika.fields.ConstantField.ZERO;
 import static network.aika.fields.FieldLink.linkAndConnect;
 import static network.aika.fields.Fields.mul;
 import static network.aika.fields.Fields.scale;

@@ -27,7 +27,6 @@ import network.aika.visitor.selfref.SelfRefDownVisitor;
 import network.aika.steps.link.LinkingIn;
 
 import static network.aika.callbacks.EventType.CREATE;
-import static network.aika.fields.FieldLink.link;
 import static network.aika.fields.FieldLink.linkAndConnect;
 import static network.aika.fields.Fields.*;
 import static network.aika.elements.activations.Timestamp.FIRED_COMPARATOR;

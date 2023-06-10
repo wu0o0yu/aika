@@ -37,7 +37,6 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-import static java.lang.Integer.MAX_VALUE;
 import static network.aika.utils.Utils.doubleToString;
 
 

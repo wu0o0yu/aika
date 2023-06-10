@@ -28,7 +28,6 @@ import java.util.*;
 
 import static experiment.logger.ExperimentLogger.CSV_FORMAT;
 import static experiment.logger.StatisticLogger.Key.*;
-import static java.lang.Integer.MAX_VALUE;
 
 /**
  * @author Lukas Molzberger

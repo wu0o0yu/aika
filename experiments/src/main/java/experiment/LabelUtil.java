@@ -28,7 +28,6 @@ import network.aika.elements.synapses.Synapse;
 
 import java.util.function.Predicate;
 
-import static java.lang.Integer.MAX_VALUE;
 import static network.aika.direction.Direction.INPUT;
 import static network.aika.direction.Direction.OUTPUT;
 

@@ -23,8 +23,6 @@ import network.aika.steps.FieldStep;
 import network.aika.steps.Step;
 import network.aika.steps.thought.AnnealStep;
 
-import static java.lang.Integer.MAX_VALUE;
-
 /**
  * @author Lukas Molzberger
  */

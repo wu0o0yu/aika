@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static experiment.logger.ExperimentLogger.CSV_FORMAT;
-import static java.lang.Integer.MAX_VALUE;
 import static network.aika.utils.Utils.doubleToString;
 
 /**

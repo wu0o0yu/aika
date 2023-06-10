@@ -381,6 +381,9 @@ public abstract class Neuron<A extends Activation> implements Element, Writable 
     }
 
     public <M extends Model> M getModel() {
+        if(provider == null)
+            return null;
+
         return (M) provider.getModel();
     }
 
@@ -512,7 +515,11 @@ public abstract class Neuron<A extends Activation> implements Element, Writable 
 
     @Override
     public Thought getThought() {
-        return getModel().getCurrentThought();
+        Model m = getModel();
+        if(m == null)
+            return null;
+
+        return m.getCurrentThought();
     }
 
     public <N extends Neuron> N init(Model m, String label) {

@@ -47,7 +47,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.SortedSet;
 
-import static java.lang.Integer.MAX_VALUE;
 import static network.aika.TestUtils.*;
 import static network.aika.elements.synapses.Scope.INPUT;
 import static network.aika.steps.Phase.INFERENCE;

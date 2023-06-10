@@ -81,14 +81,11 @@ public class Utils {
         return Math.abs(x) < tolerance;
     }
 
-    public static String doubleToString(Double x) {
+    public static String doubleToString(double x) {
         return doubleToString(x, "#.######");
     }
 
-    public static String doubleToString(Double d, String format) {
-        if(d == null)
-            return "--";
-
+    public static String doubleToString(double d, String format) {
         DecimalFormat formatter = new DecimalFormat(format, DecimalFormatSymbols.getInstance(Locale.ENGLISH));
         formatter.setRoundingMode( RoundingMode.DOWN );
         return formatter.format(d);

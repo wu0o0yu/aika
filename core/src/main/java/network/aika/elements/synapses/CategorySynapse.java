@@ -22,7 +22,6 @@ import network.aika.elements.links.CategoryLink;
 import network.aika.elements.neurons.CategoryNeuron;
 import network.aika.elements.neurons.Neuron;
 
-
 /**
  *
  * @author Lukas Molzberger
