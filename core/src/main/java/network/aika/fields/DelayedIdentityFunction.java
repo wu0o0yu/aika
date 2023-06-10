@@ -25,12 +25,25 @@ public class DelayedIdentityFunction extends IdentityFunction {
         super(ref, label);
     }
 
+    int triggerRound = 0;
+
+    @Override
+    protected int getNumberOfFunctionArguments() {
+        return 2;
+    }
+
     @Override
     protected double computeUpdate(AbstractFieldLink fl, int r, double u) {
-        if(r == 1 && value == null)
-            return u - getValue();
+        if(r == triggerRound)
+            return 0.0;
 
         return u;
+    }
+
+    public void updateTriggerRound(int r) {
+        triggerRound = r;
+        triggerUpdate(r, 1.0 - value);
+        triggerUpdate(r + 1, getInputValueByArg(0) - 1.0);
     }
 
     @Override

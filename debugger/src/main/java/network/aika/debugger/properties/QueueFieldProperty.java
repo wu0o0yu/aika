@@ -22,8 +22,6 @@ import network.aika.fields.IQueueField;
 import javax.swing.*;
 import java.awt.*;
 
-import static network.aika.fields.Field.FIRST_ROUND;
-
 
 /**
  * @author Lukas Molzberger
@@ -42,7 +40,7 @@ public class QueueFieldProperty extends FieldOutputProperty<IQueueField> impleme
             if(v == null)
                 return;
 
-            field.setValue(FIRST_ROUND, v.doubleValue());
+            field.setValue(v.doubleValue());
         });
 
         currentValueField.setEnabled(true);

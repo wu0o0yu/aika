@@ -349,7 +349,7 @@ public abstract class AbstractTemplateModel {
                 .init(patternN.getNeuron(), bn)
                 .adjustBias(patternValueTarget);
 
-        log.info("  " + posFeedSyn + " targetNetContr:" + -posFeedSyn.getSynapseBias().getValue(FIRST_ROUND));
+        log.info("  " + posFeedSyn + " targetNetContr:" + -posFeedSyn.getSynapseBias().getValue());
 
         new InputPatternSynapse()
                 .setWeight(10.0)

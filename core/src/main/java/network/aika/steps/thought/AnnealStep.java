@@ -17,8 +17,13 @@
 package network.aika.steps.thought;
 
 import network.aika.Thought;
+import network.aika.elements.activations.BindingActivation;
 import network.aika.elements.activations.Timestamp;
+import network.aika.elements.links.PositiveFeedbackLink;
 import network.aika.elements.neurons.ActivationFunction;
+import network.aika.elements.synapses.PositiveFeedbackSynapse;
+import network.aika.fields.AbstractFieldLink;
+import network.aika.fields.DelayedIdentityFunction;
 import network.aika.steps.Phase;
 import network.aika.steps.Step;
 import network.aika.steps.keys.DocQueueKey;
@@ -58,6 +63,11 @@ public class AnnealStep extends Step<Thought> {
         nextAnnealValue = Math.min(nextAnnealValue, 1.0);
 
         t.getAnnealing().setValue(nextAnnealValue);
+        t.getAnnealing().getReceivers().stream()
+                .map(AbstractFieldLink::getOutput)
+                .filter(ul -> ul instanceof DelayedIdentityFunction)
+                .map(ul -> (DelayedIdentityFunction) ul)
+                .forEach(f -> f.updateTriggerRound(t.getRound()));
 
         if (nextAnnealValue < 1.0)
             AnnealStep.add(t);

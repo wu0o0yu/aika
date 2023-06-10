@@ -58,6 +58,7 @@ public class PositiveFeedbackLink extends FeedbackLink<PositiveFeedbackSynapse, 
         linkInput();
 
         linkAndConnect(input.getValue(), 0, inputValue);
+        linkAndConnect(getThought().getAnnealing(), 1, inputValue);
         linkAndConnect(input.getGradient(), 0, inputGradient);
 
         getThought().onElementEvent(CREATE, this);

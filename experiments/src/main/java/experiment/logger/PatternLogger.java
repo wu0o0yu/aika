@@ -214,6 +214,6 @@ public class PatternLogger {
         if(f == null)
             return "--";
 
-        return doubleToString(f.getLastValue(), "#.#######");
+        return doubleToString(f.getValue(), "#.#######");
     }
 }

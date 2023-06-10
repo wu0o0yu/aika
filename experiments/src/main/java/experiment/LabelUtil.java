@@ -49,14 +49,14 @@ public class LabelUtil {
             BindingActivation act = (BindingActivation) l.getInput();
             return act != null &&
                     (!fired || act.isFired()) &&
-                    (!netPreAnneal || act.getNetPreAnneal().getLastValue() > 0.0);
+                    (!netPreAnneal || act.getNetPreAnneal().getValue() > 0.0);
         });
     }
 
     public static String generateLabel(PatternNeuron pn) {
         return generateLabel(pn, bn -> {
             PatternSynapse s = (PatternSynapse) bn.getOutputSynapse(pn.getProvider());
-            return (-s.getSynapseBias().getLastValue() > pn.getBias().getLastValue());
+            return (-s.getSynapseBias().getValue() > pn.getBias().getValue());
         });
     }
 
