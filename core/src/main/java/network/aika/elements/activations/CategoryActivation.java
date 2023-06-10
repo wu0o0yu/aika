@@ -49,7 +49,7 @@ public class CategoryActivation extends DisjunctiveActivation<CategoryNeuron> {
                 .filter(Activation::isActiveTemplateInstance)
                 .max(
                         Comparator.comparingDouble(act ->
-                                act.getNet().getLastValue()
+                                act.getNet().getValue()
                         )
                 )
                 .orElse(null);

@@ -42,7 +42,6 @@ import java.util.stream.Stream;
 import static network.aika.direction.Direction.INPUT;
 import static network.aika.elements.activations.Timestamp.MAX;
 import static network.aika.elements.activations.Timestamp.MIN;
-import static network.aika.fields.Field.FIRST_ROUND;
 import static network.aika.steps.Phase.TRAINING;
 import static network.aika.utils.Utils.TOLERANCE;
 
@@ -59,7 +58,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
 
     protected S template;
 
-    protected MultiInputField weight = (MultiInputField) new QueueSumField(this, TRAINING, "weight", 1, TOLERANCE, true)
+    protected MultiInputField weight = (MultiInputField) new QueueSumField(this, TRAINING, "weight", TOLERANCE, true)
             .addListener("onWeightModified", () -> {
                 checkWeight();
                 setModified();
@@ -118,14 +117,14 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
         }
 
         return getOutput().getCurrentCompleteBias() +
-                getWeight().getUpdatedValue(FIRST_ROUND);
+                getWeight().getUpdatedValue();
     }
 
     public static double getLatentLinkingPreNet(Synapse synA, Synapse synB) {
-        double preUB = synA.getWeight().getUpdatedValue(FIRST_ROUND);
+        double preUB = synA.getWeight().getUpdatedValue();
 
         if(synB != null) {
-            preUB += synB.getWeight().getUpdatedValue(FIRST_ROUND) +
+            preUB += synB.getWeight().getUpdatedValue() +
                     Math.min(
                             synA.getSumOfLowerWeights(),
                             synB.getSumOfLowerWeights()
@@ -235,8 +234,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
 
     protected void setInitialWeight(Synapse templateSyn) {
         weight.setInitialValue(
-                FIRST_ROUND,
-                templateSyn.weight.getUpdatedValue(FIRST_ROUND)
+                templateSyn.weight.getUpdatedValue()
         );
     }
 
@@ -277,7 +275,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
     }
 
     public S setWeight(double w) {
-        weight.setValue(FIRST_ROUND, w);
+        weight.setValue(w);
 
         return (S) this;
     }
@@ -309,7 +307,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
     }
 
     public double getSortingWeight() {
-        return getWeight().getUpdatedValue(FIRST_ROUND);
+        return getWeight().getUpdatedValue();
     }
 
     public Direction getStoredAt() {
@@ -345,11 +343,11 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
     }
 
     public boolean isZero() {
-        return Utils.belowTolerance(TOLERANCE, weight.getLastValue());
+        return Utils.belowTolerance(TOLERANCE, weight.getValue());
     }
 
     public boolean isNegative() {
-        return weight.getUpdatedValue(FIRST_ROUND) < 0.0;
+        return weight.getUpdatedValue() < 0.0;
     }
 
     @Override

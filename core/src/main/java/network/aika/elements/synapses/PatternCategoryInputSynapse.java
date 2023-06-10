@@ -22,7 +22,6 @@ import network.aika.elements.links.PatternCategoryInputLink;
 import network.aika.elements.neurons.CategoryNeuron;
 import network.aika.elements.neurons.Neuron;
 
-import static network.aika.fields.Field.FIRST_ROUND;
 
 /**
  * The Same Pattern Binding Neuron Synapse is an inner synapse between two binding neurons of the same pattern.
@@ -44,8 +43,8 @@ public class PatternCategoryInputSynapse extends DisjunctiveSynapse<
 
     @Override
     public double getPropagatePreNet(CategoryActivation iAct) {
-        return getOutput().getBias().getLastValue() +
-                weight.getLastValue() +
+        return getOutput().getBias().getValue() +
+                weight.getValue() +
                 getSumOfLowerWeights();
     }
 

@@ -74,7 +74,7 @@ public class FieldOutputProperty<F extends FieldOutput> extends AbstractProperty
         currentValueField = new JFormattedTextField(fieldFormatter);
         fieldLabel.setLabelFor(currentValueField);
 
-        lastRoundLabel = new JLabel("" + f.getLastRound());
+        lastRoundLabel = new JLabel("" + f.getReference().getThought().getRound());
 
         setCurrentValue(f);
 
@@ -107,7 +107,7 @@ public class FieldOutputProperty<F extends FieldOutput> extends AbstractProperty
     @Override
     public void receiveUpdate(AbstractFieldLink fl, int r, double u) {
         withinUpdate = true;
-        currentValueField.setValue(field.getLastValue());
+        currentValueField.setValue(field.getValue());
         withinUpdate = false;
     }
 
@@ -172,7 +172,7 @@ public class FieldOutputProperty<F extends FieldOutput> extends AbstractProperty
     }
 
     private void setCurrentValue(F f) {
-        currentValueField.setValue(f.getLastValue());
+        currentValueField.setValue(f.getValue());
     }
 
     public JLabel getLabel() {

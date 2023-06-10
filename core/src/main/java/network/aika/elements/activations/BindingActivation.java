@@ -30,7 +30,6 @@ import network.aika.visitor.linking.pattern.PatternCategoryUpVisitor;
 import java.util.stream.Stream;
 
 import static java.lang.Integer.MAX_VALUE;
-import static network.aika.fields.Field.FIRST_ROUND;
 import static network.aika.fields.Fields.isTrue;
 import static network.aika.utils.Utils.TOLERANCE;
 
@@ -116,6 +115,6 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
     }
 
     public void updateBias(double u) {
-        getNet().receiveUpdate(FIRST_ROUND, u);
+        getNet().receiveUpdate(0, u);
     }
 }

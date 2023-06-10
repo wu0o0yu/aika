@@ -26,7 +26,6 @@ import network.aika.elements.activations.TokenActivation;
 
 import java.util.stream.Stream;
 
-import static network.aika.fields.Field.FIRST_ROUND;
 import static network.aika.steps.Phase.TRAINING;
 import static network.aika.utils.Utils.TOLERANCE;
 
@@ -62,7 +61,7 @@ public abstract class LatentRelationNeuron extends BindingNeuron {
     @Override
     protected MultiInputField initBias() {
         return (MultiInputField) new QueueSumField(this, TRAINING, "bias", TOLERANCE)
-                .setInitialValue(FIRST_ROUND, 10.0);
+                .setInitialValue(10.0);
     }
 
     @Override

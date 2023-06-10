@@ -36,7 +36,6 @@ import java.util.Comparator;
 
 import static network.aika.direction.Direction.INPUT;
 import static network.aika.direction.Direction.OUTPUT;
-import static network.aika.fields.Field.FIRST_ROUND;
 import static network.aika.steps.Phase.TRAINING;
 import static network.aika.utils.Utils.TOLERANCE;
 
@@ -64,11 +63,11 @@ public abstract class ConjunctiveNeuron<A extends ConjunctiveActivation> extends
     }
 
     protected MultiInputField initSynapseBiasSum() {
-        QueueSumField synBiasSum = (QueueSumField) new QueueSumField(this, TRAINING, "synapseBiasSum", 1, TOLERANCE, true)
+        QueueSumField synBiasSum = (QueueSumField) new QueueSumField(this, TRAINING, "synapseBiasSum", TOLERANCE, true)
                 .addListener("onSynapseBiasSumModified", () ->
                         setModified()
                 );
-        synBiasSum.setInitialValue(FIRST_ROUND, 0.0);
+        synBiasSum.setInitialValue(0.0);
         return synBiasSum;
     }
 
@@ -86,8 +85,8 @@ public abstract class ConjunctiveNeuron<A extends ConjunctiveActivation> extends
 
     @Override
     public double getCurrentCompleteBias() {
-        return getBias().getUpdatedValue(FIRST_ROUND) +
-                synapseBiasSum.getUpdatedValue(FIRST_ROUND);
+        return getBias().getUpdatedValue() +
+                synapseBiasSum.getUpdatedValue();
     }
 
     @Override
@@ -95,8 +94,7 @@ public abstract class ConjunctiveNeuron<A extends ConjunctiveActivation> extends
         super.initFromTemplate(templateN);
 
         synapseBiasSum.setInitialValue(
-                FIRST_ROUND,
-                ((ConjunctiveNeuron)templateN).getSynapseBiasSum().getUpdatedValue(FIRST_ROUND)
+                ((ConjunctiveNeuron)templateN).getSynapseBiasSum().getUpdatedValue()
         );
     }
 
@@ -128,9 +126,9 @@ public abstract class ConjunctiveNeuron<A extends ConjunctiveActivation> extends
     protected void updateSumOfLowerWeights() {
         ConjunctiveSynapse[] inputSynapses = sortInputSynapses();
 
-        double sum = bias.getUpdatedValue(FIRST_ROUND);
+        double sum = bias.getUpdatedValue();
         for(ConjunctiveSynapse s: inputSynapses) {
-            double w = s.getWeight().getUpdatedValue(FIRST_ROUND);
+            double w = s.getWeight().getUpdatedValue();
             if(w <= 0.0)
                 continue;
 

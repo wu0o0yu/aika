@@ -24,7 +24,6 @@ import network.aika.elements.links.PositiveFeedbackLink;
 import network.aika.elements.neurons.PatternNeuron;
 
 import static network.aika.direction.Direction.OUTPUT;
-import static network.aika.fields.Field.FIRST_ROUND;
 
 /**
  *
@@ -68,7 +67,7 @@ public class PositiveFeedbackSynapse extends FeedbackSynapse<
 
     @Override
     public double getPreNetDummyWeight() {
-        return weight.getLastValue();
+        return weight.getValue();
     }
 
     @Override

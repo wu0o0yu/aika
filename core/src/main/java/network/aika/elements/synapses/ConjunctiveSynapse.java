@@ -36,7 +36,6 @@ import java.util.stream.Stream;
 
 import static network.aika.direction.Direction.INPUT;
 import static network.aika.direction.Direction.OUTPUT;
-import static network.aika.fields.Field.FIRST_ROUND;
 import static network.aika.fields.FieldLink.linkAndConnect;
 import static network.aika.steps.Phase.TRAINING;
 import static network.aika.utils.Utils.TOLERANCE;
@@ -57,7 +56,7 @@ public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends
                 >
 {
 
-    protected MultiInputField synapseBias = (MultiInputField) new QueueSumField(this, TRAINING, "synapseBias", 1, TOLERANCE, true)
+    protected MultiInputField synapseBias = (MultiInputField) new QueueSumField(this, TRAINING, "synapseBias", TOLERANCE, true)
             .addListener("onSynapseBiasModified", () ->
                     setModified()
             );
@@ -74,7 +73,7 @@ public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends
 
     @Override
     public S init(Neuron input, Neuron output) {
-        synapseBias.setValue(FIRST_ROUND, 0.0);
+        synapseBias.setValue(0.0);
         return super.init(input, output);
     }
 
@@ -97,7 +96,7 @@ public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends
     }
 
     public S setSynapseBias(double b) {
-        synapseBias.setValue(FIRST_ROUND, b);
+        synapseBias.setValue(b);
 
         return (S) this;
     }
@@ -121,8 +120,7 @@ public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends
         super.initFromTemplate(input, output, templateSyn);
 
         synapseBias.setInitialValue(
-                FIRST_ROUND,
-                ((ConjunctiveSynapse)templateSyn).synapseBias.getUpdatedValue(FIRST_ROUND)
+                ((ConjunctiveSynapse)templateSyn).synapseBias.getUpdatedValue()
         );
     }
 
@@ -173,8 +171,8 @@ public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends
     }
 
     public S adjustBias(double x) {
-        if(weight.getLastValue() > 0.0)
-            synapseBias.receiveUpdate(FIRST_ROUND, -weight.getLastValue() * x);
+        if(weight.getValue() > 0.0)
+            synapseBias.receiveUpdate(0, -weight.getValue() * x);
 
         return (S) this;
     }

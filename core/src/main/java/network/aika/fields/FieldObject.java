@@ -17,6 +17,8 @@
 package network.aika.fields;
 
 
+import network.aika.Thought;
+
 /**
  *
  * @author Lukas Molzberger
@@ -24,4 +26,6 @@ package network.aika.fields;
 public interface FieldObject {
 
     void disconnect();
+
+    Thought getThought();
 }

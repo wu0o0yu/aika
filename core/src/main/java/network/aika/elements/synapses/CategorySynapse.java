@@ -22,7 +22,6 @@ import network.aika.elements.links.CategoryLink;
 import network.aika.elements.neurons.CategoryNeuron;
 import network.aika.elements.neurons.Neuron;
 
-import static network.aika.fields.Field.FIRST_ROUND;
 
 /**
  *
@@ -50,7 +49,6 @@ public abstract class CategorySynapse<S extends CategorySynapse, I extends Neuro
     @Override
     protected void setInitialWeight(Synapse templateSyn) {
         weight.setInitialValue(
-                FIRST_ROUND,
                 getConfig().getInitialCategorySynapseWeight()
         );
     }

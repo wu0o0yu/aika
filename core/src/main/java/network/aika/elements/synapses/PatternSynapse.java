@@ -36,7 +36,6 @@ import java.io.IOException;
 import java.util.stream.Collectors;
 
 import static java.lang.Integer.MAX_VALUE;
-import static network.aika.fields.Field.FIRST_ROUND;
 import static network.aika.fields.Fields.isTrue;
 import static network.aika.sign.Sign.NEG;
 import static network.aika.sign.Sign.POS;
@@ -89,8 +88,8 @@ public class PatternSynapse extends ConjunctiveSynapse<
 
     @Override
     public double getPropagatePreNet(BindingActivation iAct) {
-        return getOutput().getBias().getLastValue() +
-                weight.getLastValue() +
+        return getOutput().getBias().getValue() +
+                weight.getValue() +
                 getSumOfLowerWeights();
     }
 

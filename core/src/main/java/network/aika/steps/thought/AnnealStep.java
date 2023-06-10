@@ -23,7 +23,6 @@ import network.aika.steps.Phase;
 import network.aika.steps.Step;
 import network.aika.steps.keys.DocQueueKey;
 
-import static network.aika.fields.Field.FIRST_ROUND;
 import static network.aika.steps.Phase.*;
 import static network.aika.utils.Utils.doubleToString;
 
@@ -53,12 +52,12 @@ public class AnnealStep extends Step<Thought> {
     public void process() {
         Thought t = getElement();
 
-        double av = t.getAnnealing().getLastValue();
+        double av = t.getAnnealing().getValue();
         nextStep = t.getConfig().getAnnealStepSize() / ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT.outerGrad(av);
         double nextAnnealValue = nextStep + av;
         nextAnnealValue = Math.min(nextAnnealValue, 1.0);
 
-        t.getAnnealing().setValue(FIRST_ROUND, nextAnnealValue);
+        t.getAnnealing().setValue(nextAnnealValue);
 
         if (nextAnnealValue < 1.0)
             AnnealStep.add(t);
@@ -73,6 +72,6 @@ public class AnnealStep extends Step<Thought> {
     public String toString() {
         return "docId:" + getElement().getId() +
                 " NextStep:" + doubleToString(nextStep, "#.######") +
-                " NextAnnealValue:" + doubleToString(getElement().getAnnealing().getValue(FIRST_ROUND), "#.######");
+                " NextAnnealValue:" + doubleToString(getElement().getAnnealing().getValue(), "#.######");
     }
 }

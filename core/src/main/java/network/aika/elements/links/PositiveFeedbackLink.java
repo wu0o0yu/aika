@@ -44,7 +44,7 @@ public class PositiveFeedbackLink extends FeedbackLink<PositiveFeedbackSynapse, 
     @Override
     protected void initInputValue() {
         inputValue = new DelayedIdentityFunction(this, "input value");
-        inputValue.setInitialValue(0, 1.0);
+        inputValue.setInitialValue(1.0);
     }
 
     public void relinkInput(PatternActivation in) {
