@@ -32,6 +32,8 @@ public interface FieldOutput {
 
     Double getLastValue();
 
+    double getLastValue(double defaultValue);
+
     Double getValue(int r);
 
     double getValue(int r, double defaultValue);

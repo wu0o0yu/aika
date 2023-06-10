@@ -116,6 +116,11 @@ public abstract class Field implements FieldInput, FieldOutput, Writable {
     }
 
     @Override
+    public double getLastValue(double defaultValue) {
+        return getValue(lastRound, defaultValue);
+    }
+
+    @Override
     public Double getValue(int r) {
         r = checkRound(r);
 
@@ -123,6 +128,10 @@ public abstract class Field implements FieldInput, FieldOutput, Writable {
             return null;
 
         return value[r];
+    }
+
+    public Double[] getValues() {
+        return value;
     }
 
     @Override
@@ -219,8 +228,17 @@ public abstract class Field implements FieldInput, FieldOutput, Writable {
 
         propagateUpdate(r, u);
         value[r] = updatedValue;
+        resetAfterwards(r);
 
         withinUpdate = false;
+    }
+
+    private void resetAfterwards(int r) {
+        for(int i = r + 1; i < value.length; i++) {
+            if(value[i] == null)
+                return;
+            value[i] = null;
+        }
     }
 
     protected void propagateUpdate(int r, double update) {

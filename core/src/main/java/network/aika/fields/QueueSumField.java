@@ -19,6 +19,7 @@ package network.aika.fields;
 
 import network.aika.callbacks.FieldObserver;
 import network.aika.elements.Element;
+import network.aika.elements.activations.TokenActivation;
 import network.aika.steps.FieldStep;
 import network.aika.steps.Phase;
 import network.aika.steps.Step;
@@ -73,7 +74,7 @@ public class QueueSumField extends MultiInputField implements IQueueField {
         FieldStep s = getOrCreateStep(r);
         s.updateDelta(u);
 
-        if(!s.isQueued()) {
+        if(u != 0.0 && !s.isQueued()) {
             if(!Step.add(s)) {
                 process(s);
             }
@@ -90,6 +91,12 @@ public class QueueSumField extends MultiInputField implements IQueueField {
     public void process(FieldStep s) {
         triggerUpdate(s.getRound(), s.getDelta());
         step = null;
+
+        if(!(getReference() instanceof TokenActivation) && !getLabel().equalsIgnoreCase("netPreAnneal")) {
+            if (Math.abs(getLastValue() - verifySum()) > 0.00001) {
+                System.out.println();
+            }
+        }
 
         updateObservers();
     }
