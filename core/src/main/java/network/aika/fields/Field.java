@@ -26,7 +26,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import static java.lang.Integer.MAX_VALUE;
 import static network.aika.fields.ListenerFieldLink.createEventListener;
 import static network.aika.utils.Utils.doubleToString;
 
@@ -36,16 +35,12 @@ import static network.aika.utils.Utils.doubleToString;
  */
 public abstract class Field implements FieldInput, FieldOutput, Writable {
 
-    public static int FIRST_ROUND = 0;
-    public static int MAX_ROUNDS = 20;
-
     private static double MIN_TOLERANCE = 0.0000000001;
 
     private String label;
     private FieldObject reference;
 
-    protected int lastRound = -1;
-    protected Double[] value;
+    protected double value;
 
     private boolean withinUpdate;
     private double updatedValue;
@@ -55,15 +50,13 @@ public abstract class Field implements FieldInput, FieldOutput, Writable {
     protected Double tolerance;
 
     public Field(FieldObject reference, String label, Double tolerance) {
-        this(reference, label, MAX_ROUNDS, tolerance, false);
+        this(reference, label, tolerance, false);
     }
 
-    public Field(FieldObject reference, String label, int maxRounds, Double tolerance, boolean weakRefs) {
+    public Field(FieldObject reference, String label, Double tolerance, boolean weakRefs) {
         this.reference = reference;
         this.label = label;
         this.tolerance = tolerance;
-
-        value = new Double[maxRounds];
 
         initIO(weakRefs);
     }
@@ -80,15 +73,13 @@ public abstract class Field implements FieldInput, FieldOutput, Writable {
         receivers = new ArrayList<>();
     }
 
-    public Field setInitialValue(int r, double initialValue) {
-        value[r] = initialValue;
-        lastRound = Math.max(r, lastRound);
+    public Field setInitialValue(double initialValue) {
+        value = initialValue;
         return this;
     }
 
-    public void setValue(int r, double v) {
-        Double ov = value[r];
-        triggerUpdate(r, ov != null ? v - value[r] : v);
+    public void setValue(double v) {
+        triggerUpdate(0, v - value);
     }
 
     @Override
@@ -101,72 +92,20 @@ public abstract class Field implements FieldInput, FieldOutput, Writable {
     }
 
     @Override
-    public int getLastRound() {
-        return lastRound;
-    }
-
-    @Override
     public String getLabel() {
         return label;
     }
 
     @Override
-    public Double getLastValue() {
-        return getValue(lastRound);
-    }
-
-    @Override
-    public double getLastValue(double defaultValue) {
-        return getValue(lastRound, defaultValue);
-    }
-
-    @Override
-    public Double getValue(int r) {
-        r = checkRound(r);
-
-        if(r < 0 || r > lastRound)
-            return null;
-
-        return value[r];
-    }
-
-    public Double[] getValues() {
+    public double getValue() {
         return value;
     }
 
     @Override
-    public double getValue(int r, double defaultValue) {
-        r = checkRound(r);
-
-        if(r < 0 || r > lastRound || value[r] == null)
-            return defaultValue;
-
-        return value[r];
-    }
-
-    @Override
-    public Double getUpdatedValue(int r) {
-        r = checkRound(r);
-
-        if(r < 0 || r > lastRound)
-            return null;
-
+    public double getUpdatedValue() {
         return withinUpdate ?
                 updatedValue :
-                value[r];
-    }
-
-    @Override
-    public Double getUpdatedLastValue() {
-        return getUpdatedValue(lastRound);
-    }
-
-    private int checkRound(int r) {
-        if(r == MAX_VALUE)
-            r = lastRound;
-
-        r = Math.min(r, lastRound);
-        return r;
+                value;
     }
 
     public void connectInputs(boolean initialize) {
@@ -214,31 +153,22 @@ public abstract class Field implements FieldInput, FieldOutput, Writable {
         triggerUpdate(r, u);
     }
 
+
     public void triggerUpdate(int r, double u) {
-        if(r > 0 && Utils.belowTolerance(tolerance, u))
+        if(Utils.belowTolerance(tolerance, u))
             return;
 
         withinUpdate = true;
 
-        updatedValue = getValue(r, 0.0) + u;
-        lastRound = r;
+        updatedValue = value + u;
         if(updatedValue > -MIN_TOLERANCE && updatedValue < MIN_TOLERANCE) {
             updatedValue = 0.0; // TODO: Find a better solution to this hack
         }
 
         propagateUpdate(r, u);
-        value[r] = updatedValue;
-        resetAfterwards(r);
+        value = updatedValue;
 
         withinUpdate = false;
-    }
-
-    private void resetAfterwards(int r) {
-        for(int i = r + 1; i < value.length; i++) {
-            if(value[i] == null)
-                return;
-            value[i] = null;
-        }
     }
 
     protected void propagateUpdate(int r, double update) {
@@ -251,16 +181,12 @@ public abstract class Field implements FieldInput, FieldOutput, Writable {
 
     @Override
     public void write(DataOutput out) throws IOException {
-        out.writeInt(value.length);
-        for(int i = 0; i < value.length; i++)
-            out.writeDouble(value[i]);
+        out.writeDouble(value);
     }
 
     @Override
     public void readFields(DataInput in, Model m) throws IOException {
-        int l = in.readInt();
-        for(int i = 0; i < l; i++)
-            value[i] = in.readDouble();
+        value = in.readDouble();
     }
 
     @Override
@@ -269,6 +195,6 @@ public abstract class Field implements FieldInput, FieldOutput, Writable {
     }
 
     public String getValueString() {
-        return doubleToString(getLastValue());
+        return doubleToString(getValue());
     }
 }

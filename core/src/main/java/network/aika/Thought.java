@@ -39,7 +39,6 @@ import java.util.*;
 import java.util.function.Consumer;
 
 import static network.aika.callbacks.EventType.*;
-import static network.aika.fields.Fields.invert;
 import static network.aika.steps.Phase.*;
 
 /**
@@ -63,6 +62,8 @@ public abstract class Thought implements Element {
 
     private Step currentStep;
 
+    int round = 0;
+
     private final NavigableMap<QueueKey, Step> queue = new TreeMap<>(QueueKey.COMPARATOR);
 
     private final TreeMap<Integer, Activation> activationsById = new TreeMap<>();
@@ -84,6 +85,14 @@ public abstract class Thought implements Element {
 
         assert m.getCurrentThought() == null;
         m.setCurrentThought(this);
+    }
+
+    public int getRound() {
+        return round;
+    }
+
+    public void increaseRound() {
+        round++;
     }
 
     public long getNewVisitorId() {

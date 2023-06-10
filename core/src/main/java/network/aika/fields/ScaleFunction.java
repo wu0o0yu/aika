@@ -29,7 +29,7 @@ public class ScaleFunction extends AbstractFunction {
     }
 
     @Override
-    protected Double computeUpdate(AbstractFieldLink fl, int r, double u) {
+    protected double computeUpdate(AbstractFieldLink fl, int r, double u) {
         return scale * u;
     }
 }

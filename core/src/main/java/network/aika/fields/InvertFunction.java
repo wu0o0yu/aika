@@ -23,11 +23,11 @@ public class InvertFunction extends AbstractFunction {
 
     public InvertFunction(FieldObject ref, String label) {
         super(ref, label);
-        setInitialValue(FIRST_ROUND, 1.0);
+        setInitialValue(1.0);
     }
 
     @Override
-    protected Double computeUpdate(AbstractFieldLink fl, int r, double u) {
-        return (1.0 - fl.getUpdatedInputValue(r)) - getValue(r, 0.0);
+    protected double computeUpdate(AbstractFieldLink fl, int r, double u) {
+        return (1.0 - fl.getUpdatedInputValue()) - value;
     }
 }

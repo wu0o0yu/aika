@@ -6,7 +6,7 @@ import network.aika.steps.FieldStep;
 
 public interface IQueueField extends FieldOutput {
 
-    void setValue(int r, double v);
+    void setValue(double v);
 
     void addObserver(FieldObserver observer);
 

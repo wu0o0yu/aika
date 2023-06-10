@@ -11,8 +11,8 @@ public class MultiInputField extends Field {
         super(reference, label, tolerance);
     }
 
-    public MultiInputField(FieldObject reference, String label, int maxRounds, Double tolerance, boolean weakRefs) {
-        super(reference, label, maxRounds, tolerance, weakRefs);
+    public MultiInputField(FieldObject reference, String label, Double tolerance, boolean weakRefs) {
+        super(reference, label, tolerance, weakRefs);
     }
 
     @Override
@@ -41,11 +41,5 @@ public class MultiInputField extends Field {
     @Override
     public Collection<FieldLink> getInputs() {
         return inputs;
-    }
-
-    public double verifySum() {
-        return inputs.stream()
-                .mapToDouble(i -> i.input.getValue(lastRound, 0.0))
-                .sum();
     }
 }

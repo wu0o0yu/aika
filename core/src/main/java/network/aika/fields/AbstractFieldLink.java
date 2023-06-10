@@ -18,8 +18,6 @@ package network.aika.fields;
 
 import network.aika.callbacks.UpdateListener;
 
-import static network.aika.fields.Field.FIRST_ROUND;
-
 /**
  * @author Lukas Molzberger
  */
@@ -70,10 +68,9 @@ public abstract class AbstractFieldLink<O extends UpdateListener> {
         if(connected)
             return;
 
-        int r = input.getLastRound();
-        if(initialize && r >= FIRST_ROUND) {
-            double cv = input.getValue(r);
-            output.receiveUpdate(this, r, cv);
+        if(initialize) {
+            double cv = input.getValue();
+            output.receiveUpdate(this, input.getLastRound(), cv);
         }
 
         connected = true;
@@ -83,10 +80,9 @@ public abstract class AbstractFieldLink<O extends UpdateListener> {
         if(!connected)
             return;
 
-        int r = input.getLastRound();
-        if(deinitialize && r >= FIRST_ROUND) {
-            double cv = input.getValue(r);
-            output.receiveUpdate(this, r, -cv);
+        if(deinitialize) {
+            double cv = input.getValue();
+            output.receiveUpdate(this, input.getLastRound(), -cv);
         }
 
         connected = false;
@@ -94,16 +90,16 @@ public abstract class AbstractFieldLink<O extends UpdateListener> {
 
     public abstract void unlink();
 
-    public Double getInputValue(int r) {
+    public double getInputValue() {
         return connected ?
-                input.getValue(r) :
-                (Double) 0.0;
+                input.getValue() :
+                0.0;
     }
 
-    public Double getUpdatedInputValue(int r) {
+    public double getUpdatedInputValue() {
         return connected ?
-                input.getUpdatedValue(r) :
-                (Double) 0.0;
+                input.getUpdatedValue() :
+                0.0;
     }
 
     public int getArgument() {

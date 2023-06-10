@@ -45,8 +45,8 @@ public class QueueSumField extends MultiInputField implements IQueueField {
         phase = p;
     }
 
-    public QueueSumField(FieldObject e, Phase p, String label, int maxRounds, Double tolerance, boolean weakRefs) {
-        super(e, label, maxRounds, tolerance, weakRefs);
+    public QueueSumField(FieldObject e, Phase p, String label, Double tolerance, boolean weakRefs) {
+        super(e, label, tolerance, weakRefs);
         phase = p;
     }
 
@@ -92,18 +92,12 @@ public class QueueSumField extends MultiInputField implements IQueueField {
         triggerUpdate(s.getRound(), s.getDelta());
         step = null;
 
-        if(!(getReference() instanceof TokenActivation) && !getLabel().equalsIgnoreCase("netPreAnneal")) {
-            if (Math.abs(getLastValue() - verifySum()) > 0.00001) {
-                System.out.println();
-            }
-        }
-
         updateObservers();
     }
 
     private void updateObservers() {
         observers.forEach(o ->
-                o.receiveUpdate(getLastValue())
+                o.receiveUpdate(value)
         );
     }
 }

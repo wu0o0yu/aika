@@ -30,17 +30,9 @@ public interface FieldOutput {
 
     String getValueString();
 
-    Double getLastValue();
+    double getValue();
 
-    double getLastValue(double defaultValue);
-
-    Double getValue(int r);
-
-    double getValue(int r, double defaultValue);
-
-    Double getUpdatedLastValue();
-
-    Double getUpdatedValue(int r);
+    double getUpdatedValue();
 
     void addOutput(AbstractFieldLink fl);
 
@@ -49,8 +41,6 @@ public interface FieldOutput {
     Collection<AbstractFieldLink> getReceivers();
 
     FieldObject getReference();
-
-    int getLastRound();
 
     void disconnectOutputs(boolean deinitialize);
 

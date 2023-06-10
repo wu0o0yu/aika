@@ -41,26 +41,26 @@ public class MaxField extends MultiInputField {
         );
     }
 
-    protected Double computeUpdate(AbstractFieldLink fl, int r, double u) {
+    protected double computeUpdate(AbstractFieldLink fl, int r, double u) {
         if(selectedInput == null) {
             selectedInput = fl;
-            return fl.getUpdatedInputValue(r) - getValue(r, 0.0);
+            return fl.getUpdatedInputValue() - value;
         }
 
         selectedInput = getInputs().stream()
-                .max(getComparator(fl, r))
+                .max(getComparator(fl))
                 .orElse(null);
 
-        return getInput(selectedInput, fl, r) - getValue(r, 0.0);
+        return getInput(selectedInput, fl) - value;
     }
 
-    private Comparator<FieldLink> getComparator(AbstractFieldLink fl, int r) {
-        return Comparator.comparingDouble(in -> getInput(in, fl, r));
+    private Comparator<FieldLink> getComparator(AbstractFieldLink fl) {
+        return Comparator.comparingDouble(in -> getInput(in, fl));
     }
 
-    private double getInput(AbstractFieldLink fl, AbstractFieldLink updateFL, int r) {
+    private double getInput(AbstractFieldLink fl, AbstractFieldLink updateFL) {
         return fl == updateFL ?
-                fl.getUpdatedInputValue(r) :
-                fl.getInputValue(r);
+                fl.getUpdatedInputValue() :
+                fl.getInputValue();
     }
 }
