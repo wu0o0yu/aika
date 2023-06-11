@@ -25,7 +25,7 @@ public class DelayedIdentityFunction extends IdentityFunction {
         super(ref, label);
     }
 
-    int triggerRound = 0;
+    boolean triggerMode = true;
 
     @Override
     protected int getNumberOfFunctionArguments() {
@@ -34,20 +34,24 @@ public class DelayedIdentityFunction extends IdentityFunction {
 
     @Override
     protected double computeUpdate(AbstractFieldLink fl, int r, double u) {
-        if(r == triggerRound)
-            return 0.0;
+        if(triggerMode && fl.connected) {
+            triggerMode = false;
+            return u - 1.0;
+        }
 
         return u;
     }
 
-    public void updateTriggerRound(int r) {
-        triggerRound = r;
-        triggerUpdate(r, 1.0 - value);
-        triggerUpdate(r + 1, getInputValueByArg(0) - 1.0);
+    public void setTriggerMode() {
+        triggerUpdate(getRound(), 1.0 - value);
+        triggerMode = true;
     }
 
     @Override
     public void receiveUpdate(AbstractFieldLink fl, int r, double u) {
+        if(fl.getArgument() != 0)
+            return; // Ignore the annealing updates
+
         int nr = r + 1;
         double update = computeUpdate(fl, nr, u);
         if(update == 0.0)

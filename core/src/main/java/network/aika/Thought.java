@@ -95,6 +95,10 @@ public abstract class Thought implements Element {
         round = Math.max(round, r);
     }
 
+    public void incrementRound() {
+        round++;
+    }
+
     public long getNewVisitorId() {
         return visitorCounter++;
     }

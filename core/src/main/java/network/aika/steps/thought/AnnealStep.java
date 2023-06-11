@@ -59,12 +59,13 @@ public class AnnealStep extends Step<Thought> {
         double nextAnnealValue = nextStep + av;
         nextAnnealValue = Math.min(nextAnnealValue, 1.0);
 
+        t.incrementRound();
         t.getAnnealing().setValue(nextAnnealValue);
         t.getAnnealing().getReceivers().stream()
                 .map(AbstractFieldLink::getOutput)
                 .filter(ul -> ul instanceof DelayedIdentityFunction)
                 .map(ul -> (DelayedIdentityFunction) ul)
-                .forEach(f -> f.updateTriggerRound(t.getRound()));
+                .forEach(DelayedIdentityFunction::setTriggerMode);
 
         if (nextAnnealValue < 1.0)
             AnnealStep.add(t);
