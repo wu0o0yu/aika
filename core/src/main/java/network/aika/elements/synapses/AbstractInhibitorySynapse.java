@@ -42,7 +42,7 @@ public abstract class AbstractInhibitorySynapse<S extends AbstractInhibitorySyna
 {
     private Scope type;
 
-    private AbstractInhibitorySynapse() {
+    public AbstractInhibitorySynapse() {
         super(null);
     }
 

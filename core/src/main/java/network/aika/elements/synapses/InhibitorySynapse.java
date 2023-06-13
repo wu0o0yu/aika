@@ -28,6 +28,10 @@ import network.aika.elements.neurons.InhibitoryNeuron;
  */
 public class InhibitorySynapse extends AbstractInhibitorySynapse<InhibitorySynapse, BindingNeuron, InhibitoryLink, BindingActivation> {
 
+    public InhibitorySynapse() {
+        super();
+    }
+
     public InhibitorySynapse(Scope type) {
         super(type);
     }
