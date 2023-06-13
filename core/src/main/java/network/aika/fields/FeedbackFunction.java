@@ -19,9 +19,9 @@ package network.aika.fields;
 /**
  * @author Lukas Molzberger
  */
-public class DelayedIdentityFunction extends IdentityFunction {
+public class FeedbackFunction extends IdentityFunction {
 
-    public DelayedIdentityFunction(FieldObject ref, String label) {
+    public FeedbackFunction(FieldObject ref, String label) {
         super(ref, label);
     }
 
@@ -33,30 +33,29 @@ public class DelayedIdentityFunction extends IdentityFunction {
     }
 
     @Override
-    protected double computeUpdate(AbstractFieldLink fl, int r, double u) {
+    protected double computeUpdate(AbstractFieldLink fl, double u) {
         if(triggerMode && fl.connected) {
             triggerMode = false;
-            return u - 1.0;
+            return fl.getUpdatedInputValue() - 1.0;
         }
 
         return u;
     }
 
     public void setTriggerMode() {
-        triggerUpdate(getRound(), 1.0 - value);
+        triggerUpdate(false, 1.0 - value);
         triggerMode = true;
     }
 
     @Override
-    public void receiveUpdate(AbstractFieldLink fl, int r, double u) {
+    public void receiveUpdate(AbstractFieldLink fl, boolean nextRound, double u) {
         if(fl.getArgument() != 0)
             return; // Ignore the annealing updates
 
-        int nr = r + 1;
-        double update = computeUpdate(fl, nr, u);
+        double update = computeUpdate(fl, u);
         if(update == 0.0)
             return;
 
-        triggerUpdate(nr, update);
+        triggerUpdate(true, update);
     }
 }

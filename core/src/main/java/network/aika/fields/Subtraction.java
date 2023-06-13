@@ -31,7 +31,7 @@ public class Subtraction extends AbstractFunction {
     }
 
     @Override
-    protected double computeUpdate(AbstractFieldLink fl, int r, double u) {
+    protected double computeUpdate(AbstractFieldLink fl, double u) {
         return fl.getArgument() == 0 ? u : -u;
     }
 }

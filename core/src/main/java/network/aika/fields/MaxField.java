@@ -34,14 +34,14 @@ public class MaxField extends MultiInputField {
     }
 
     @Override
-    public void receiveUpdate(AbstractFieldLink fl, int r, double u) {
+    public void receiveUpdate(AbstractFieldLink fl, boolean nextRound, double u) {
         triggerUpdate(
-                r,
-                computeUpdate(fl, r, u)
+                nextRound,
+                computeUpdate(fl, u)
         );
     }
 
-    protected double computeUpdate(AbstractFieldLink fl, int r, double u) {
+    protected double computeUpdate(AbstractFieldLink fl, double u) {
         if(selectedInput == null) {
             selectedInput = fl;
             return fl.getUpdatedInputValue() - value;

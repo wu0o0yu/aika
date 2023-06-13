@@ -17,6 +17,7 @@
 package network.aika.fields;
 
 
+import network.aika.Thought;
 import network.aika.callbacks.FieldObserver;
 import network.aika.elements.Element;
 import network.aika.steps.FieldStep;
@@ -67,10 +68,10 @@ public class QueueSumField extends MultiInputField implements IQueueField {
     }
 
     @Override
-    public void receiveUpdate(int r, double u) {
+    public void receiveUpdate(boolean nextRound, double u) {
         updateObservers();
 
-        FieldStep s = getOrCreateStep(r);
+        FieldStep s = getOrCreateStep(getRound() + (nextRound ? 1 : 0));
         s.updateDelta(u);
 
         if(u != 0.0 && !s.isQueued()) {
@@ -78,6 +79,11 @@ public class QueueSumField extends MultiInputField implements IQueueField {
                 process(s);
             }
         }
+    }
+
+    private int getRound() {
+        Thought t = getReference().getThought();
+        return t != null ? t.getRound() : 0;
     }
 
     private FieldStep getOrCreateStep(int r) {
@@ -88,7 +94,7 @@ public class QueueSumField extends MultiInputField implements IQueueField {
     }
 
     public void process(FieldStep s) {
-        triggerUpdate(s.getRound(), s.getDelta());
+        triggerUpdate(false, s.getDelta());
         step = null;
 
         updateObservers();

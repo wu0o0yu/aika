@@ -72,8 +72,6 @@ public class FieldOutputProperty<F extends FieldOutput> extends AbstractProperty
         currentValueField = new JFormattedTextField(fieldFormatter);
         fieldLabel.setLabelFor(currentValueField);
 
-        lastRoundLabel = new JLabel("" + f.getReference().getThought().getRound());
-
         setCurrentValue(f);
 
         currentValueField.setColumns(10);
@@ -103,7 +101,7 @@ public class FieldOutputProperty<F extends FieldOutput> extends AbstractProperty
     }
 
     @Override
-    public void receiveUpdate(AbstractFieldLink fl, int r, double u) {
+    public void receiveUpdate(AbstractFieldLink fl, boolean nextRound, double u) {
         withinUpdate = true;
         currentValueField.setValue(field.getValue());
         withinUpdate = false;
@@ -112,11 +110,10 @@ public class FieldOutputProperty<F extends FieldOutput> extends AbstractProperty
     public void addField(int pos, Insets insets) {
         addGridEntry(fieldLabel, 0, pos, 1, insets);
         addGridEntry(currentValueField, 1, pos, 1, insets);
-        addGridEntry(lastRoundLabel, 2, pos, 1, insets);
 
-        showReference(3, pos, insets);
+        showReference(2, pos, insets);
         if(isConnected != null || isPropagateUpdate != null)
-            showConnected(4, pos, insets);
+            showConnected(3, pos, insets);
     }
 
     protected void showReference(int xPos, int yPos, Insets insets) {

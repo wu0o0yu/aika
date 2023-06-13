@@ -59,9 +59,9 @@ public abstract class AbstractFieldLink<O extends UpdateListener> {
         input.addOutput(this);
     }
 
-    public void receiveUpdate(int r, double u) {
+    public void receiveUpdate(boolean nextRound, double u) {
         if(connected && propagateUpdates)
-            output.receiveUpdate(this, r, u);
+            output.receiveUpdate(this, nextRound, u);
     }
 
     public void connect(boolean initialize) {
@@ -70,7 +70,7 @@ public abstract class AbstractFieldLink<O extends UpdateListener> {
 
         if(initialize) {
             double cv = input.getValue();
-            output.receiveUpdate(this, input.getRound(), cv);
+            output.receiveUpdate(this, false, cv);
         }
 
         connected = true;
@@ -82,7 +82,7 @@ public abstract class AbstractFieldLink<O extends UpdateListener> {
 
         if(deinitialize) {
             double cv = input.getValue();
-            output.receiveUpdate(this, input.getRound(), -cv);
+            output.receiveUpdate(this, false, -cv);
         }
 
         connected = false;

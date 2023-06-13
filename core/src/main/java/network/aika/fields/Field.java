@@ -70,15 +70,6 @@ public abstract class Field implements FieldInput, FieldOutput, Writable {
         return this;
     }
 
-    public int getRound() {
-        Thought t = reference.getThought();
-
-        if(t == null)
-            return 0;
-
-        return t.getRound();
-    }
-
     protected void initIO(boolean weakRefs) {
         receivers = new ArrayList<>();
     }
@@ -89,7 +80,7 @@ public abstract class Field implements FieldInput, FieldOutput, Writable {
     }
 
     public void setValue(double v) {
-        triggerUpdate(0, v - value);
+        triggerUpdate(false, v - value);
     }
 
     @Override
@@ -150,21 +141,20 @@ public abstract class Field implements FieldInput, FieldOutput, Writable {
         this.receivers.remove(fl);
     }
 
-    public void receiveUpdate(AbstractFieldLink fl, int r, double u) {
+    public void receiveUpdate(AbstractFieldLink fl, boolean nextRound, double u) {
         receiveUpdate(
-                r,
+                nextRound,
                 u
         );
     }
 
-    public void receiveUpdate(int r, double u) {
+    public void receiveUpdate(boolean nextRound, double u) {
         assert !withinUpdate;
 
-        triggerUpdate(r, u);
+        triggerUpdate(nextRound, u);
     }
 
-
-    public void triggerUpdate(int r, double u) {
+    public void triggerUpdate(boolean nextRound, double u) {
         if(Utils.belowTolerance(tolerance, u))
             return;
 
@@ -175,17 +165,17 @@ public abstract class Field implements FieldInput, FieldOutput, Writable {
             updatedValue = 0.0; // TODO: Find a better solution to this hack
         }
 
-        propagateUpdate(r, u);
+        propagateUpdate(nextRound, u);
         value = updatedValue;
 
         withinUpdate = false;
     }
 
-    protected void propagateUpdate(int r, double update) {
+    protected void propagateUpdate(boolean nextRound, double update) {
         AbstractFieldLink[] recs = receivers.toArray(new AbstractFieldLink[0]);
 
         for(int i = 0; i < recs.length; i++) {
-            recs[i].receiveUpdate(r, update);
+            recs[i].receiveUpdate(nextRound, update);
         }
     }
 
