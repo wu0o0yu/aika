@@ -66,31 +66,6 @@ public abstract class AbstractTemplateModel {
 
     public AbstractTemplateModel(Model m) {
         model = m;
-
-        relPT = TokenPositionRelationNeuron.lookupRelation(model, -1, -1)
-                .getProvider(true);
-
-        relNT = TokenPositionRelationNeuron.lookupRelation(model, 1, 1)
-                .getProvider(true);
-
-        initInputCategoryNeuron();
-
-        inputToken = new TokenNeuron()
-                .init(model, "Abstract Input Token")
-                .getProvider(true);
-
-        abstractNeurons.add(inputToken);
-
-        PatternCategoryInputSynapse pCatInputSyn = new PatternCategoryInputSynapse()
-                .setWeight(PASSIVE_SYNAPSE_WEIGHT)
-                .init(inputTokenCategory.getNeuron(), inputToken.getNeuron());
-
-        inputPatternValueTarget = ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT
-                .f(inputPatternNetTarget);
-
-        log.info("Input Token: netTarget:" + inputPatternNetTarget + " valueTarget:" + inputPatternValueTarget);
-
-        inputToken.getNeuron().setBias(inputPatternNetTarget - pCatInputSyn.getWeight().getValue());
     }
 
     protected void initInputCategoryNeuron() {
@@ -120,6 +95,8 @@ public abstract class AbstractTemplateModel {
     public abstract String getPatternType();
 
     public void initTemplates() {
+        initStaticNeurons();
+
         // Abstract
         patternN = new PatternNeuron()
                 .init(model, getPatternType())
@@ -152,6 +129,35 @@ public abstract class AbstractTemplateModel {
         new InhibitoryCategoryInputSynapse()
                 .setWeight(1.0)
                 .init(inhibCat.getNeuron(), inhibitoryN.getNeuron());
+    }
+
+    public void initStaticNeurons() {
+        relPT = TokenPositionRelationNeuron.lookupRelation(model, -1, -1)
+                .getProvider(true);
+
+        relNT = TokenPositionRelationNeuron.lookupRelation(model, 1, 1)
+                .getProvider(true);
+
+        initInputCategoryNeuron();
+
+        inputToken = model.lookupNeuronByLabel("Abstract Input Token", l ->
+                new TokenNeuron()
+                        .init(model, l)
+        ).getProvider(true);
+
+        abstractNeurons.add(inputToken);
+
+        PatternCategoryInputSynapse pCatInputSyn = new PatternCategoryInputSynapse()
+                .setWeight(PASSIVE_SYNAPSE_WEIGHT)
+                .init(inputTokenCategory.getNeuron(), inputToken.getNeuron());
+
+        inputPatternValueTarget = ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT
+                .f(inputPatternNetTarget);
+
+        log.info("Input Token: netTarget:" + inputPatternNetTarget + " valueTarget:" + inputPatternValueTarget);
+
+        inputToken.getNeuron()
+                .setBias(inputPatternNetTarget - pCatInputSyn.getWeight().getValue());
     }
 
     protected abstract void initTemplateBindingNeurons();

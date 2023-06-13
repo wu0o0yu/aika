@@ -83,6 +83,8 @@ public class NegativeFeedbackLink extends FeedbackLink<NegativeFeedbackSynapse, 
     @Override
     public void disconnect() {
         super.disconnect();
-        weightUpdate.disconnectOutputs(false);
+
+        if(weightUpdate != null)
+            weightUpdate.disconnectOutputs(false);
     }
 }

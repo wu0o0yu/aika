@@ -42,7 +42,7 @@ public abstract class AbstractInhibitorySynapse<S extends AbstractInhibitorySyna
 {
     private Scope type;
 
-    public AbstractInhibitorySynapse() {
+    private AbstractInhibitorySynapse() {
         super(null);
     }
 
@@ -59,6 +59,7 @@ public abstract class AbstractInhibitorySynapse<S extends AbstractInhibitorySyna
     public void write(DataOutput out) throws IOException {
         super.write(out);
 
+        out.writeBoolean(type != null);
         out.writeInt(type.ordinal());
     }
 
@@ -66,6 +67,7 @@ public abstract class AbstractInhibitorySynapse<S extends AbstractInhibitorySyna
     public void readFields(DataInput in, Model m) throws IOException {
         super.readFields(in, m);
 
-        type = Scope.values()[in.readInt()];
+        if(in.readBoolean())
+            type = Scope.values()[in.readInt()];
     }
 }
