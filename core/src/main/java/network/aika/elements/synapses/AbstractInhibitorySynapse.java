@@ -60,7 +60,8 @@ public abstract class AbstractInhibitorySynapse<S extends AbstractInhibitorySyna
         super.write(out);
 
         out.writeBoolean(type != null);
-        out.writeInt(type.ordinal());
+        if(type != null)
+            out.writeInt(type.ordinal());
     }
 
     @Override
