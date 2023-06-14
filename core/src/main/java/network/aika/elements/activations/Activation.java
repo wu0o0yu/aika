@@ -548,8 +548,6 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
                         )
                 );
 
-        getConfig().updateLabel(this, instanceAct);
-
         instanceAct.initFromTemplate();
 
         getOutputLinks()

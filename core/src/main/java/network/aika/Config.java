@@ -116,10 +116,6 @@ public class Config {
         return this;
     }
 
-    public void updateLabel(Activation templateAct, Activation instanceAct) {
-        instanceAct.getNeuron().setLabel("");
-    }
-
     public String toString() {
         return "Alpha: " + alpha + "\n" +
                 "LearnRate" + learnRate + "\n\n";
