@@ -84,12 +84,6 @@ public class FieldReceiversDialog extends JDialog
         addConstant("Operator", field.getClass().getSimpleName());
         addField(field);
 
-        if(field instanceof FeedbackFunction) {
-            FeedbackFunction ff = (FeedbackFunction) field;
-
-            addConstant("Trigger Mode:", ff.isTriggerMode() ? "active" : "inactive");
-        }
-
         if(field instanceof QueueSumField) {
             QueueSumField qsf = (QueueSumField) field;
 

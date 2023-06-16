@@ -60,6 +60,7 @@ public class AnnealStep extends Step<Thought> {
         nextAnnealValue = Math.min(nextAnnealValue, 1.0);
 
         t.incrementRound();
+        t.setFeedbackTriggerRound();
         t.getAnnealing().setValue(nextAnnealValue);
 
         if (nextAnnealValue < 1.0)

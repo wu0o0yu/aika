@@ -105,6 +105,7 @@ public class SyllablesExperiment {
         Model model = new Model();
 
         AbstractTemplateModel syllableModel = new SyllableTemplateModel(model);
+        syllableModel.initStaticNeurons();
 
         model.setN(0);
 

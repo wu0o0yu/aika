@@ -49,6 +49,7 @@ public abstract class Thought implements Element {
 
     private Field annealing;
     private Field feedbackTrigger;
+    private int feedbackTriggerRound = 0;
 
     protected final Model model;
 
@@ -83,7 +84,7 @@ public abstract class Thought implements Element {
         absoluteBegin = m.getN();
 
         annealing = new ConstantField(this, "anneal", 0.0);
-        feedbackTrigger = new ConstantField(this, "feedback trigger", 0.0);
+        feedbackTrigger = new ConstantField(this, "feedback trigger", 1.0);
 
         assert m.getCurrentThought() == null;
         m.setCurrentThought(this);
@@ -94,7 +95,10 @@ public abstract class Thought implements Element {
     }
 
     public void updateRound(int r) {
-        round = Math.max(round, r);
+        if(round < r) {
+            beforeNewRound();
+            round = r;
+        }
     }
 
     public void incrementRound() {
@@ -123,6 +127,10 @@ public abstract class Thought implements Element {
 
     public Field getFeedbackTrigger() {
         return feedbackTrigger;
+    }
+
+    public void setFeedbackTriggerRound() {
+        feedbackTriggerRound = round;
     }
 
     public abstract int length();
@@ -229,7 +237,11 @@ public abstract class Thought implements Element {
     }
 
     private void beforeNewRound() {
-        feedbackTrigger.setValue(1.0);
+        feedbackTrigger.setValue(
+                round == feedbackTriggerRound ?
+                        1.0 :
+                        0.0
+        );
     }
 
     private boolean checkMaxPhaseReached(Phase maxPhase) {
