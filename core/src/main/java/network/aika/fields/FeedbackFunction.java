@@ -32,9 +32,13 @@ public class FeedbackFunction extends IdentityFunction {
 
     @Override
     public void receiveUpdate(AbstractFieldLink fl, boolean nextRound, double u) {
+        AbstractFieldLink oppositeFl = getInputLinkByArg(fl.getArgument() == 0 ? 1 : 0);
         switch (fl.getArgument()) {
             case 0:
-                if (u == 0.0 || getInputLinkByArg(1).getUpdatedInputValue() > 0.5)
+                if (u == 0.0)
+                    return;
+
+                if(oppositeFl != null && oppositeFl.getUpdatedInputValue() > 0.5)
                     return;
 
                 triggerUpdate(true, u);

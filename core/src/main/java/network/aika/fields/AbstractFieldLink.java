@@ -28,6 +28,7 @@ public abstract class AbstractFieldLink<O extends UpdateListener> {
     protected O output;
 
     protected boolean connected;
+    protected boolean within;
 
     protected boolean propagateUpdates = true;
 
@@ -68,10 +69,12 @@ public abstract class AbstractFieldLink<O extends UpdateListener> {
         if(connected)
             return;
 
+        within = true;
         if(initialize) {
             double cv = input.getValue();
             output.receiveUpdate(this, false, cv);
         }
+        within = false;
 
         connected = true;
     }
@@ -80,10 +83,12 @@ public abstract class AbstractFieldLink<O extends UpdateListener> {
         if(!connected)
             return;
 
+        within = true;
         if(deinitialize) {
             double cv = input.getValue();
             output.receiveUpdate(this, false, -cv);
         }
+        within = false;
 
         connected = false;
     }
@@ -97,7 +102,7 @@ public abstract class AbstractFieldLink<O extends UpdateListener> {
     }
 
     public double getUpdatedInputValue() {
-        return connected ?
+        return connected != within ?
                 input.getUpdatedValue() :
                 0.0;
     }
