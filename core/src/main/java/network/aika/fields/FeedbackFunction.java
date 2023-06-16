@@ -42,6 +42,10 @@ public class FeedbackFunction extends IdentityFunction {
         return u;
     }
 
+    public boolean isTriggerMode() {
+        return triggerMode;
+    }
+
     public void setTriggerMode() {
         triggerUpdate(false, 1.0 - value);
         triggerMode = true;
