@@ -61,11 +61,6 @@ public class AnnealStep extends Step<Thought> {
 
         t.incrementRound();
         t.getAnnealing().setValue(nextAnnealValue);
-        t.getAnnealing().getReceivers().stream()
-                .map(AbstractFieldLink::getOutput)
-                .filter(ul -> ul instanceof FeedbackFunction)
-                .map(ul -> (FeedbackFunction) ul)
-                .forEach(FeedbackFunction::setTriggerMode);
 
         if (nextAnnealValue < 1.0)
             AnnealStep.add(t);

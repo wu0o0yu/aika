@@ -25,41 +25,29 @@ public class FeedbackFunction extends IdentityFunction {
         super(ref, label);
     }
 
-    boolean triggerMode = true;
-
     @Override
     protected int getNumberOfFunctionArguments() {
         return 2;
     }
 
     @Override
-    protected double computeUpdate(AbstractFieldLink fl, double u) {
-        if(triggerMode && fl.connected) {
-            triggerMode = false;
-            return fl.getUpdatedInputValue() - 1.0;
-        }
-
-        return u;
-    }
-
-    public boolean isTriggerMode() {
-        return triggerMode;
-    }
-
-    public void setTriggerMode() {
-        triggerUpdate(false, 1.0 - value);
-        triggerMode = true;
-    }
-
-    @Override
     public void receiveUpdate(AbstractFieldLink fl, boolean nextRound, double u) {
-        if(fl.getArgument() != 0)
-            return; // Ignore the annealing updates
+        switch (fl.getArgument()) {
+            case 0:
+                if (u == 0.0 || getInputLinkByArg(1).getUpdatedInputValue() > 0.5)
+                    return;
 
-        double update = computeUpdate(fl, u);
-        if(update == 0.0)
-            return;
+                triggerUpdate(true, u);
+                break;
+            case 1:
+                double inputValue = getInputLinkByArg(0).getUpdatedInputValue();
+                double newValue = fl.getUpdatedInputValue() > 0.5 ?
+                        1.0 - inputValue :
+                        inputValue - 1.0;
 
-        triggerUpdate(true, update);
+                triggerUpdate(false, newValue);
+                break;
+            default:
+        }
     }
 }

@@ -48,6 +48,7 @@ import static network.aika.steps.Phase.*;
 public abstract class Thought implements Element {
 
     private Field annealing;
+    private Field feedbackTrigger;
 
     protected final Model model;
 
@@ -82,6 +83,7 @@ public abstract class Thought implements Element {
         absoluteBegin = m.getN();
 
         annealing = new ConstantField(this, "anneal", 0.0);
+        feedbackTrigger = new ConstantField(this, "feedback trigger", 0.0);
 
         assert m.getCurrentThought() == null;
         m.setCurrentThought(this);
@@ -117,6 +119,10 @@ public abstract class Thought implements Element {
 
     public Field getAnnealing() {
         return annealing;
+    }
+
+    public Field getFeedbackTrigger() {
+        return feedbackTrigger;
     }
 
     public abstract int length();
@@ -220,6 +226,10 @@ public abstract class Thought implements Element {
             queueEvent(AFTER, currentStep);
             currentStep = null;
         }
+    }
+
+    private void beforeNewRound() {
+        feedbackTrigger.setValue(1.0);
     }
 
     private boolean checkMaxPhaseReached(Phase maxPhase) {
