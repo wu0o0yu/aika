@@ -17,14 +17,15 @@
 package experiment;
 
 import network.aika.direction.Direction;
-import network.aika.elements.activations.BindingActivation;
-import network.aika.elements.activations.PatternActivation;
+import network.aika.elements.activations.*;
 import network.aika.elements.links.Link;
+import network.aika.elements.links.PositiveFeedbackLink;
 import network.aika.elements.neurons.BindingNeuron;
 import network.aika.elements.neurons.PatternNeuron;
 import network.aika.elements.synapses.PatternSynapse;
 import network.aika.elements.synapses.RelationInputSynapse;
 import network.aika.elements.synapses.Synapse;
+import network.aika.text.Document;
 
 import java.util.function.Predicate;
 
@@ -36,6 +37,37 @@ import static network.aika.direction.Direction.OUTPUT;
  * @author Lukas Molzberger
  */
 public class LabelUtil {
+
+    public static void generateTemplateInstanceLabels(Activation<?> act) {
+        Document doc = (Document) act.getThought();
+        String actTxt = doc.getTextSegment(act.getRange());
+        if(act instanceof BindingActivation) {
+            if(act.getNeuron().getLabel() == null) {
+                Activation<?> tAct = act.getTemplate();
+                PositiveFeedbackLink pfl = tAct.getInputLinkByType(PositiveFeedbackLink.class)
+                        .orElse(null);
+                String context = "...";
+                if(pfl != null && pfl.getInput() != null) {
+                    PatternActivation pAct = pfl.getInput();
+                    context = doc.getTextSegment(pAct.getRange());
+                }
+
+                act.getNeuron().setLabel(actTxt + " (" + context + ")");
+            }
+        } else if(act instanceof PatternActivation) {
+            if(act.getNeuron().getLabel() == null) {
+                act.getNeuron().setLabel(actTxt);
+            }
+        } else if(act instanceof InhibitoryActivation) {
+            if(act.getNeuron().getLabel() == null) {
+                act.getNeuron().setLabel(actTxt);
+            }
+        } else if(act instanceof CategoryActivation) {
+            if(act.getNeuron().getLabel() == null) {
+                act.getNeuron().setLabel(actTxt);
+            }
+        }
+    }
 
     public static String generateLabel(PatternActivation pAct, boolean fired, boolean netPreAnneal) {
         PatternNeuron pn = pAct.getNeuron();
@@ -63,9 +95,11 @@ public class LabelUtil {
         BindingNeuron[] bn = getOrderedBindingNeurons(pn);
 
         StringBuilder sb = new StringBuilder();
+        boolean first = true;
         for (int i = 0; i < bn.length; i++) {
             if (test.test(bn[i])) {
-                sb.append(bn[i].getLabel());
+                sb.append((!first ? ", " : "") + bn[i].getLabel());
+                first = false;
             }
         }
         return sb.toString();

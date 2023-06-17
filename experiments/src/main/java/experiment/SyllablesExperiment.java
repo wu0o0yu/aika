@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static experiment.LabelUtil.generateTemplateInstanceLabels;
 import static network.aika.utils.Utils.doubleToString;
 
 
@@ -146,12 +147,12 @@ public class SyllablesExperiment {
                     .setCountingEnabled(true);
 
             doc.setInstantiationCallback(act ->
-                    initTemplateInstanceNeuron(act)
+                    generateTemplateInstanceLabels(act)
             );
 
             AIKADebugger debugger = null;
             System.out.println(counter[0] + " " + w);
-            if(counter[0] >= 0) {// 3, 6, 11, 18, 100, 39, 49
+            if(counter[0] >= 28) {// 3, 6, 11, 18, 100, 39, 49
                 debugger = AIKADebugger.createAndShowGUI(doc);
             }
 
@@ -337,35 +338,5 @@ public class SyllablesExperiment {
         return inputs;
     }
 
-    private void initTemplateInstanceNeuron(Activation<?> act) {
-        Document doc = (Document) act.getThought();
-        String actTxt = doc.getTextSegment(act.getRange());
-        if(act instanceof BindingActivation) {
-            if(act.getNeuron().getLabel() == null) {
-                Activation<?> tAct = act.getTemplate();
-                PositiveFeedbackLink pfl = tAct.getInputLinkByType(PositiveFeedbackLink.class)
-                        .orElse(null);
-                String context = "...";
-                if(pfl != null && pfl.getInput() != null) {
-                    PatternActivation pAct = pfl.getInput();
-                    context = doc.getTextSegment(pAct.getRange());
-                }
-
-                act.getNeuron().setLabel(actTxt + " (" + context + ")");
-            }
-        } else if(act instanceof PatternActivation) {
-            if(act.getNeuron().getLabel() == null) {
-                act.getNeuron().setLabel(actTxt);
-            }
-        } else if(act instanceof InhibitoryActivation) {
-            if(act.getNeuron().getLabel() == null) {
-                act.getNeuron().setLabel(actTxt);
-            }
-        } else if(act instanceof CategoryActivation) {
-            if(act.getNeuron().getLabel() == null) {
-                act.getNeuron().setLabel(actTxt);
-            }
-        }
-    }
 
 }
