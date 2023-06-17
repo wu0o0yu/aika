@@ -25,6 +25,7 @@ import network.aika.elements.activations.Activation;
 import network.aika.elements.activations.BindingActivation;
 import network.aika.elements.activations.PatternActivation;
 import network.aika.elements.activations.TokenActivation;
+import network.aika.elements.links.PositiveFeedbackLink;
 import network.aika.steps.Phase;
 import network.aika.text.Document;
 import org.apache.commons.io.IOUtils;
@@ -36,6 +37,7 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static network.aika.utils.Utils.doubleToString;
 
@@ -145,6 +147,10 @@ public class SyllablesExperiment {
                     .setTrainingEnabled(true)
                     .setMetaInstantiationEnabled(true)
                     .setCountingEnabled(true);
+
+            doc.setInstantiationCallback(act ->
+                    initTemplateInstanceNeuron(act)
+            );
 
             AIKADebugger debugger = null;
             System.out.println(counter[0] + " " + w);
@@ -332,6 +338,27 @@ public class SyllablesExperiment {
             }
         }
         return inputs;
+    }
+
+    private void initTemplateInstanceNeuron(Activation<?> act) {
+        Document doc = (Document) act.getThought();
+        String actTxt = doc.getTextSegment(act.getRange());
+        if(act instanceof BindingActivation) {
+            if(act.getNeuron().getLabel() == null) {
+                PositiveFeedbackLink pfl = (PositiveFeedbackLink) act.getInputLinksByType(PositiveFeedbackLink.class);
+                String context = "...";
+                if(pfl != null && pfl.getInput() != null) {
+                    PatternActivation pAct = pfl.getInput();
+                    context = doc.getTextSegment(pAct.getRange());
+                }
+
+                act.getNeuron().setLabel(actTxt + " (" + context + ")");
+            }
+        } else if(act instanceof PatternActivation) {
+            if(act.getNeuron().getLabel() == null) {
+                act.getNeuron().setLabel(actTxt);
+            }
+        }
     }
 
 }
