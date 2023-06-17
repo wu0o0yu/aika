@@ -38,19 +38,14 @@ public class FieldLinkProperty {
 
     protected AbstractProperty fieldProperty;
 
-    public FieldLinkProperty(Container parent, AbstractFieldLink fl, Direction dir) {
+    public FieldLinkProperty(Container parent, FieldLink fl, Direction dir) {
         fieldLink = fl;
         this.parent = parent;
 
         if(dir == INPUT) {
             fieldProperty = createFieldProperty(parent, fl.getInput(), true, fl.isConnected(), fl.isPropagateUpdates());
         } else {
-            if(fl instanceof FieldLink) {
-                fieldProperty = createFieldProperty(parent, (FieldOutput) fl.getOutput(), true, fl.isConnected(), fl.isPropagateUpdates());
-            } else if(fl instanceof ListenerFieldLink) {
-                ListenerFieldLink lfl = (ListenerFieldLink) fl;
-                fieldProperty = new ConstantProperty(parent, lfl.getListenerName(), "");
-            }
+            fieldProperty = createFieldProperty(parent, (FieldOutput) fl.getOutput(), true, fl.isConnected(), fl.isPropagateUpdates());
         }
     }
 

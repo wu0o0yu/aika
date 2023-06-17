@@ -64,7 +64,7 @@ public abstract class Thought implements Element {
 
     private Step currentStep;
 
-    int round = 0;
+    int round = -1;
 
     private final NavigableMap<QueueKey, Step> queue = new TreeMap<>(QueueKey.COMPARATOR);
 
@@ -84,20 +84,20 @@ public abstract class Thought implements Element {
         absoluteBegin = m.getN();
 
         annealing = new ConstantField(this, "anneal", 0.0);
-        feedbackTrigger = new ConstantField(this, "feedback trigger", 1.0);
+        feedbackTrigger = new ConstantField(this, "feedback trigger", 0.0);
 
         assert m.getCurrentThought() == null;
         m.setCurrentThought(this);
     }
 
-    public int getRound() {
-        return round;
+    public int getRound(boolean nextRound) {
+        return Math.max(0, round + (nextRound ? 1 : 0));
     }
 
     public void updateRound(int r) {
         if(round < r) {
-            beforeNewRound();
             round = r;
+            beforeNewRound();
         }
     }
 
@@ -325,7 +325,7 @@ public abstract class Thought implements Element {
                 .forEach(Instantiation::add);
     }
 
-    public String toString() {
+    public String activationsToString() {
         StringBuilder sb = new StringBuilder();
 
         for(Activation act: activationsById.values()) {
@@ -334,5 +334,9 @@ public abstract class Thought implements Element {
         }
 
         return sb.toString();
+    }
+
+    public String toString() {
+        return getClass().getSimpleName() + " id:" + id;
     }
 }

@@ -130,10 +130,18 @@ public class Document extends Thought {
         return this;
     }
 
-    public String toString() {
+    public String docToString() {
         StringBuilder sb = new StringBuilder(content);
         sb.append("\n");
+        sb.append(super.activationsToString());
+        return sb.toString();
+    }
+
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
         sb.append(super.toString());
+        sb.append(" Content: ");
+        sb.append(content.substring(0, Math.min(content.length(), 100)));
         return sb.toString();
     }
 }

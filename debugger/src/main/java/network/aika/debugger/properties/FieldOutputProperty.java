@@ -47,7 +47,6 @@ public class FieldOutputProperty<F extends FieldOutput> extends AbstractProperty
 
     protected JLabel fieldLabel;
     protected JFormattedTextField currentValueField;
-    protected JLabel lastRoundLabel;
 
     public static FieldOutputProperty createFieldProperty(Container parent, FieldOutput f, boolean showReference, Boolean isConnected, Boolean isPropagateUpdates) {
         if(f instanceof IQueueField) {

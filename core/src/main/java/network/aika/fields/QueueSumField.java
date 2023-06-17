@@ -71,7 +71,7 @@ public class QueueSumField extends MultiInputField implements IQueueField {
     public void receiveUpdate(boolean nextRound, double u) {
         updateObservers();
 
-        FieldStep s = getOrCreateStep(getRound() + (nextRound ? 1 : 0));
+        FieldStep s = getOrCreateStep(getRound(nextRound));
         s.updateDelta(u);
 
         if(u != 0.0 && !s.isQueued()) {
@@ -81,9 +81,9 @@ public class QueueSumField extends MultiInputField implements IQueueField {
         }
     }
 
-    private int getRound() {
+    private int getRound(boolean nextRound) {
         Thought t = getReference().getThought();
-        return t != null ? t.getRound() : 0;
+        return t != null ? t.getRound(nextRound) : 0;
     }
 
     private FieldStep getOrCreateStep(int r) {

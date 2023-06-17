@@ -21,10 +21,7 @@ import meta.SyllableTemplateModel;
 import network.aika.Config;
 import network.aika.Model;
 import network.aika.debugger.AIKADebugger;
-import network.aika.elements.activations.Activation;
-import network.aika.elements.activations.BindingActivation;
-import network.aika.elements.activations.PatternActivation;
-import network.aika.elements.activations.TokenActivation;
+import network.aika.elements.activations.*;
 import network.aika.elements.links.PositiveFeedbackLink;
 import network.aika.steps.Phase;
 import network.aika.text.Document;
@@ -345,7 +342,9 @@ public class SyllablesExperiment {
         String actTxt = doc.getTextSegment(act.getRange());
         if(act instanceof BindingActivation) {
             if(act.getNeuron().getLabel() == null) {
-                PositiveFeedbackLink pfl = (PositiveFeedbackLink) act.getInputLinksByType(PositiveFeedbackLink.class);
+                Activation<?> tAct = act.getTemplate();
+                PositiveFeedbackLink pfl = tAct.getInputLinkByType(PositiveFeedbackLink.class)
+                        .orElse(null);
                 String context = "...";
                 if(pfl != null && pfl.getInput() != null) {
                     PatternActivation pAct = pfl.getInput();
@@ -355,6 +354,14 @@ public class SyllablesExperiment {
                 act.getNeuron().setLabel(actTxt + " (" + context + ")");
             }
         } else if(act instanceof PatternActivation) {
+            if(act.getNeuron().getLabel() == null) {
+                act.getNeuron().setLabel(actTxt);
+            }
+        } else if(act instanceof InhibitoryActivation) {
+            if(act.getNeuron().getLabel() == null) {
+                act.getNeuron().setLabel(actTxt);
+            }
+        } else if(act instanceof CategoryActivation) {
             if(act.getNeuron().getLabel() == null) {
                 act.getNeuron().setLabel(actTxt);
             }

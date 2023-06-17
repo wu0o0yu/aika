@@ -111,9 +111,10 @@ public class FieldReceiversDialog extends JDialog
 
         field.getReceivers()
                 .stream()
+                .filter(FieldLink.class::isInstance)
                 .limit(100)
                 .forEach(fl ->
-                        addFieldLink(fl, OUTPUT)
+                        addFieldLink((FieldLink) fl, OUTPUT)
                 );
 
         addFinal();
@@ -163,7 +164,7 @@ public class FieldReceiversDialog extends JDialog
         posCounter++;
     }
 
-    public void addFieldLink(AbstractFieldLink fl, Direction dir) {
+    public void addFieldLink(FieldLink fl, Direction dir) {
         if (fl == null)
             return;
 

@@ -42,7 +42,7 @@ public class PositiveFeedbackLink extends FeedbackLink<PositiveFeedbackSynapse, 
     @Override
     protected void initInputValue() {
         inputValue = new FeedbackFunction(this, "input value");
-        inputValue.setInitialValue(1.0);
+        linkAndConnect(getThought().getFeedbackTrigger(), 1, inputValue);
     }
 
     public void relinkInput(PatternActivation in) {
@@ -56,7 +56,6 @@ public class PositiveFeedbackLink extends FeedbackLink<PositiveFeedbackSynapse, 
         linkInput();
 
         linkAndConnect(input.getValue(), 0, inputValue);
-        linkAndConnect(getThought().getFeedbackTrigger(), 1, inputValue);
 
         if(inputGradient != null)
             linkAndConnect(input.getGradient(), 0, inputGradient);

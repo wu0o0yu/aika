@@ -44,7 +44,7 @@ public class FeedbackFunction extends IdentityFunction {
                 triggerUpdate(true, u);
                 break;
             case 1:
-                double inputValue = getInputLinkByArg(0).getUpdatedInputValue();
+                double inputValue = oppositeFl != null ? oppositeFl.getUpdatedInputValue() : 0.0;
                 double newValue = fl.getUpdatedInputValue() > 0.5 ?
                         1.0 - inputValue :
                         inputValue - 1.0;
