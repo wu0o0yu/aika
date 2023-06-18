@@ -47,7 +47,11 @@ public class AnnealStep extends Step<Thought> {
 
     @Override
     public void createQueueKey(Timestamp timestamp) {
-        queueKey = new DocQueueKey(getPhase(), timestamp);
+        queueKey = new DocQueueKey(
+                getElement().getRound(false),
+                getPhase(),
+                timestamp
+        );
     }
 
     @Override

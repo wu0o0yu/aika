@@ -23,37 +23,30 @@ import network.aika.steps.Phase;
 import java.util.Comparator;
 
 import static network.aika.elements.activations.Timestamp.NOT_SET;
+import static network.aika.utils.Utils.roundToString;
 
 /**
  * @author Lukas Molzberger
  */
-public class FiredQueueKey implements QueueKey {
+public class FiredQueueKey extends QueueKey {
 
     private static Comparator<FiredQueueKey> COMPARATOR = Comparator
             .<FiredQueueKey, Timestamp>comparing(k -> k.fired)
             .thenComparing(k -> k.created);
 
-    private Phase phase;
     private Timestamp created;
     private Timestamp fired;
-    private Timestamp currentTimestamp;
 
-    public FiredQueueKey(Phase phase, Element element, Timestamp currentTimestamp) {
-        this.phase = phase;
+    public FiredQueueKey(int round, Phase phase, Element element, Timestamp currentTimestamp) {
+        super(round, phase, currentTimestamp);
         this.created = element.getCreated();
         this.fired = element.getFired();
-        this.currentTimestamp = currentTimestamp;
     }
 
-    public FiredQueueKey(Phase phase, Long fired, long created, long currentTimestamp) {
-        this.phase = phase;
+    public FiredQueueKey(int round, Phase phase, Long fired, long created, long currentTimestamp) {
+        super(round, phase, new Timestamp(currentTimestamp));
         this.fired = fired != null ? new Timestamp(fired) : NOT_SET;
         this.created = new Timestamp(created);
-        this.currentTimestamp = new Timestamp(currentTimestamp);
-    }
-
-    public Phase getPhase() {
-        return phase;
     }
 
     public Timestamp getFired() {
@@ -64,16 +57,14 @@ public class FiredQueueKey implements QueueKey {
         return created;
     }
 
-    public Timestamp getCurrentTimestamp() {
-        return currentTimestamp;
-    }
-
+    @Override
     public String toString() {
         String firedStr = getFired() == NOT_SET ?
                 "NOT_FIRED" : "" +
                 getFired();
 
-        return "[p:" + getPhase() + "-" + getPhase().ordinal() +
+        return "[r:" + getRoundStr() +
+                ",p:" + getPhraseStr() +
                 ",f:" + firedStr +
                 ",c:" + getCreated() +
                 ",ts:" + getCurrentTimestamp() +

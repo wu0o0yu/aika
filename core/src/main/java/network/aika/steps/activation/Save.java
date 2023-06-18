@@ -36,6 +36,11 @@ public class Save extends Step<Neuron> {
     }
 
     @Override
+    public int getRound() {
+        return Integer.MAX_VALUE;
+    }
+
+    @Override
     public Phase getPhase() {
         return Phase.SAVE;
     }

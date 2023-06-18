@@ -19,28 +19,15 @@ package network.aika.steps.keys;
 import network.aika.elements.activations.Timestamp;
 import network.aika.steps.Phase;
 
+import static network.aika.utils.Utils.roundToString;
+
 /**
  * @author Lukas Molzberger
  */
-public class DocQueueKey implements QueueKey {
+public class DocQueueKey extends QueueKey {
 
-    private Phase phase;
-
-    private Timestamp currentTimestamp;
-
-    public DocQueueKey(Phase phase, Timestamp currentTimestamp) {
-        this.phase = phase;
-        this.currentTimestamp = currentTimestamp;
-    }
-
-    @Override
-    public Phase getPhase() {
-        return phase;
-    }
-
-    @Override
-    public Timestamp getCurrentTimestamp() {
-        return currentTimestamp;
+    public DocQueueKey(int round, Phase phase, Timestamp currentTimestamp) {
+        super(round, phase, currentTimestamp);
     }
 
     @Override
@@ -48,8 +35,10 @@ public class DocQueueKey implements QueueKey {
         return 0;
     }
 
+    @Override
     public String toString() {
-        return "[p:" + getPhase() + "-" + getPhase().ordinal() +
+        return "[r:" + getRoundStr() +
+                ",p:" + getPhase() + "-" + getPhase().ordinal() +
                 ",ts:" + getCurrentTimestamp() +
                 "]";
     }

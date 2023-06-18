@@ -44,7 +44,16 @@ public abstract class Step<E extends Element> {
     }
 
     public void createQueueKey(Timestamp timestamp) {
-        queueKey = new FiredQueueKey(getPhase(), element, timestamp);
+        queueKey = new FiredQueueKey(
+                getRound(),
+                getPhase(),
+                element,
+                timestamp
+        );
+    }
+
+    public int getRound() {
+        return element.getThought().getRound(false);
     }
 
     public void removeQueueKey() {

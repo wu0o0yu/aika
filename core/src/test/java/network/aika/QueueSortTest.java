@@ -38,12 +38,12 @@ public class QueueSortTest {
         testQueue.put(new TestQueueKey(337l, 316, 0.0, 384), 2);
 */
 
-        QueueKey tqk3 = new FieldQueueKey(Phase.INFERENCE, 0, -1802,  new Timestamp(78));
+        QueueKey tqk3 = new FieldQueueKey(0, Phase.INFERENCE, -1802,  new Timestamp(78));
 
         testQueue.put(tqk3, 3);
 
-        testQueue.put(new FieldQueueKey(Phase.INFERENCE, 0, 0,  new Timestamp(393)), 2);
-        testQueue.put(new FieldQueueKey(Phase.INFERENCE, 0, 0,  new Timestamp(339)), 1);
+        testQueue.put(new FieldQueueKey(0, Phase.INFERENCE,  0,  new Timestamp(393)), 2);
+        testQueue.put(new FieldQueueKey(0, Phase.INFERENCE, 0,  new Timestamp(339)), 1);
 
         System.out.println();
 

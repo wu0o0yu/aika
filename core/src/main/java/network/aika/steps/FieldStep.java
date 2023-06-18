@@ -85,7 +85,7 @@ public class FieldStep<E extends Element> extends Step<E> {
     }
 
     public void createQueueKey(Timestamp timestamp) {
-        queueKey = new FieldQueueKey(getPhase(), round, sortValue, timestamp);
+        queueKey = new FieldQueueKey(round, getPhase(), sortValue, timestamp);
     }
 
     @Override

@@ -49,6 +49,8 @@ public class SyllablesExperiment {
         int i = 0;
         int pos = 0;
 
+        doc.setFeedbackTriggerRound();
+
         List<TokenActivation> tokenActs = new ArrayList<>();
         for(String t: tokens) {
             int j = i + t.length();
@@ -117,7 +119,7 @@ public class SyllablesExperiment {
                     .setMetaInstantiationEnabled(false)
                     .setCountingEnabled(true);
 
-//            AIKADebugger.createAndShowGUI(doc);
+            AIKADebugger.createAndShowGUI(doc);
 
             processTokens(
                     syllableModel,

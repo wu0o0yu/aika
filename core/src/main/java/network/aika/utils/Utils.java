@@ -90,4 +90,8 @@ public class Utils {
         formatter.setRoundingMode( RoundingMode.DOWN );
         return formatter.format(d);
     }
+
+    public static String roundToString(int r) {
+        return r == Integer.MAX_VALUE ? "MAX" : "" + r;
+    }
 }

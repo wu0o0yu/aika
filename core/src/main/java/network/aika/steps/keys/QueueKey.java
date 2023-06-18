@@ -22,18 +22,49 @@ import network.aika.steps.Phase;
 import java.util.Comparator;
 import java.util.function.Function;
 
+import static network.aika.utils.Utils.roundToString;
+
 /**
  * @author Lukas Molzberger
  */
-public interface QueueKey extends Comparable<QueueKey> {
+public abstract class QueueKey implements Comparable<QueueKey> {
 
-    Comparator<QueueKey> COMPARATOR = Comparator
-            .<QueueKey>comparingInt(k -> k.getPhase().ordinal())
+    public static final Comparator<QueueKey> COMPARATOR = Comparator
+            .<QueueKey>comparingInt(k -> k.round)
+            .thenComparingInt(k -> k.getPhase().ordinal())
             .thenComparing(Function.identity())
             .thenComparing(QueueKey::getCurrentTimestamp);
 
-     Phase getPhase();
+    private int round;
 
-    Timestamp getCurrentTimestamp();
+    private Phase phase;
+
+    private Timestamp currentTimestamp;
+
+    public QueueKey(int round, Phase phase, Timestamp currentTimestamp) {
+        this.round = round;
+        this.phase = phase;
+        this.currentTimestamp = currentTimestamp;
+    }
+
+    public int getRound() {
+        return round;
+    }
+
+    protected String getRoundStr() {
+        return roundToString(getRound());
+    }
+
+    public Phase getPhase() {
+        return phase;
+    }
+
+    protected String getPhraseStr() {
+        return getPhase() + "-" + getPhase().ordinal();
+    }
+
+    public Timestamp getCurrentTimestamp() {
+        return currentTimestamp;
+    }
 
 }

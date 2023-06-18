@@ -49,7 +49,6 @@ public abstract class Thought implements Element {
 
     private Field annealing;
     private Field feedbackTrigger;
-    private int feedbackTriggerRound = 0;
 
     protected final Model model;
 
@@ -64,7 +63,7 @@ public abstract class Thought implements Element {
 
     private Step currentStep;
 
-    int round = -1;
+    int round = 0;
 
     private final NavigableMap<QueueKey, Step> queue = new TreeMap<>(QueueKey.COMPARATOR);
 
@@ -84,20 +83,19 @@ public abstract class Thought implements Element {
         absoluteBegin = m.getN();
 
         annealing = new ConstantField(this, "anneal", 0.0);
-        feedbackTrigger = new ConstantField(this, "feedback trigger", 0.0);
+        feedbackTrigger = new QueueSumField(this, FEEDBACK_TRIGGER, "feedback trigger", 0.0);
 
         assert m.getCurrentThought() == null;
         m.setCurrentThought(this);
     }
 
     public int getRound(boolean nextRound) {
-        return Math.max(0, round + (nextRound ? 1 : 0));
+        return round + (nextRound ? 1 : 0);
     }
 
     public void updateRound(int r) {
         if(round < r) {
             round = r;
-            beforeNewRound();
         }
     }
 
@@ -130,7 +128,8 @@ public abstract class Thought implements Element {
     }
 
     public void setFeedbackTriggerRound() {
-        feedbackTriggerRound = round;
+        feedbackTrigger.receiveUpdate(false, 1.0);
+        feedbackTrigger.receiveUpdate(true, -1.0);
     }
 
     public abstract int length();
@@ -234,14 +233,6 @@ public abstract class Thought implements Element {
             queueEvent(AFTER, currentStep);
             currentStep = null;
         }
-    }
-
-    private void beforeNewRound() {
-        feedbackTrigger.setValue(
-                round == feedbackTriggerRound ?
-                        1.0 :
-                        0.0
-        );
     }
 
     private boolean checkMaxPhaseReached(Phase maxPhase) {

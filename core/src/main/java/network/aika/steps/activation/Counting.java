@@ -37,6 +37,11 @@ public class Counting extends Step<Activation> {
     }
 
     @Override
+    public int getRound() {
+        return Integer.MAX_VALUE;
+    }
+
+    @Override
     public Phase getPhase() {
         return Phase.COUNTING;
     }

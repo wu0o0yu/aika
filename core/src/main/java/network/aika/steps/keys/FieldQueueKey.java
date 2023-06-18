@@ -22,39 +22,25 @@ import network.aika.steps.Phase;
 import java.util.Comparator;
 import java.util.function.Function;
 
+import static network.aika.utils.Utils.roundToString;
+
 
 /**
  * @author Lukas Molzberger
  */
-public class FieldQueueKey implements QueueKey {
+public class FieldQueueKey extends QueueKey {
 
     public static final double SORT_VALUE_PRECISION = 1000.0;
 
     Comparator<FieldQueueKey> COMPARATOR = Comparator
-            .<FieldQueueKey>comparingInt(k -> k.round)
-            .thenComparingInt(k -> -k.sortValue);
-
-    private Phase phase;
-
-    private int round;
+            .comparingInt(k -> -k.sortValue);
 
     private int sortValue;
 
-    private Timestamp currentTimestamp;
 
-    public FieldQueueKey(Phase phase, int round, int sortValue, Timestamp currentTimestamp) {
-        this.phase = phase;
-        this.round = round;
+    public FieldQueueKey(int round, Phase phase, int sortValue, Timestamp currentTimestamp) {
+        super(round, phase, currentTimestamp);
         this.sortValue = sortValue;
-        this.currentTimestamp = currentTimestamp;
-    }
-
-    public Phase getPhase() {
-        return phase;
-    }
-
-    public int getRound() {
-        return round;
     }
 
     public int getSortValue() {
@@ -67,19 +53,15 @@ public class FieldQueueKey implements QueueKey {
                 "" + getSortValue();
     }
 
-    public Timestamp getCurrentTimestamp() {
-        return currentTimestamp;
-    }
-
-
     @Override
     public int compareTo(QueueKey qk) {
         return COMPARATOR.compare(this, (FieldQueueKey) qk);
     }
 
+    @Override
     public String toString() {
-        return "[p:" + getPhase() + "-" + getPhase().ordinal() +
-                ",r:" + round +
+        return "[r:" + getRoundStr() +
+                ",p:" + getPhraseStr() +
                 ",sv:" + getSortValueAsString() +
                 ",ts:" + getCurrentTimestamp() +
                 "]";
