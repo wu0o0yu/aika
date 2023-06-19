@@ -67,8 +67,4 @@ public abstract class QueueKey implements Comparable<QueueKey> {
     public Timestamp getCurrentTimestamp() {
         return currentTimestamp;
     }
-
-    public String toShortString() {
-        return Utils.roundToString(round) + " " + phase;
-    }
 }
