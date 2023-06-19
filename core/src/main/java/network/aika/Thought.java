@@ -40,6 +40,7 @@ import java.util.function.Consumer;
 
 import static network.aika.callbacks.EventType.*;
 import static network.aika.steps.Phase.*;
+import static network.aika.steps.keys.QueueKey.MAX_ROUND;
 
 /**
  *
@@ -94,9 +95,8 @@ public abstract class Thought implements Element {
     }
 
     public void updateRound(int r) {
-        if(round < r) {
+        if(currentStep.getRound() != MAX_ROUND && round < r)
             round = r;
-        }
     }
 
     public void incrementRound() {
@@ -218,9 +218,9 @@ public abstract class Thought implements Element {
         return new Range(absoluteBegin, absoluteBegin + length());
     }
 
-    public void process(Phase maxPhase) {
+    public void process(int maxRound, Phase maxPhase) {
         while (!queue.isEmpty()) {
-            if(checkMaxPhaseReached(maxPhase))
+            if(checkMaxPhaseReached(maxRound, maxPhase))
                 break;
 
             currentStep = queue.pollFirstEntry().getValue();
@@ -229,23 +229,31 @@ public abstract class Thought implements Element {
             timestampOnProcess = getCurrentTimestamp();
 
             queueEvent(BEFORE, currentStep);
+
+            updateRound(currentStep.getRound());
+
             currentStep.process();
             queueEvent(AFTER, currentStep);
             currentStep = null;
         }
     }
 
-    private boolean checkMaxPhaseReached(Phase maxPhase) {
-        return maxPhase == null ?
-                false :
-                maxPhase.compareTo(queue.firstEntry().getValue().getPhase()) < 0;
+    private boolean checkMaxPhaseReached(int maxRound, Phase maxPhase) {
+        if(maxPhase == null)
+            return false;
+
+        QueueKey fe = queue.firstEntry().getKey();
+        if(fe.getRound() < maxRound)
+            return false;
+
+        return maxPhase.compareTo(fe.getPhase()) < 0;
     }
 
     /**
      * The postprocessing steps such as counting, cleanup or save are executed.
      */
     public void postProcessing() {
-        process(null);
+        process(MAX_ROUND, null);
     }
 
     public Timestamp getTimestampOnProcess() {
@@ -296,24 +304,29 @@ public abstract class Thought implements Element {
 
     public void anneal() {
         AnnealStep.add(this);
-        process(ANNEAL); // Anneal needs to be finished before instantiation can start.
+        process(MAX_ROUND, ANNEAL); // Anneal needs to be finished before instantiation can start.
     }
 
     public void train() {
         activationsById.values()
                 .forEach(InactiveLinks::add);
 
-        process(TRAINING);
+        process(MAX_ROUND, TRAINING);
     }
 
     public void instantiateTemplates() {
         if (!getConfig().isMetaInstantiationEnabled())
             return;
-        
+
         activationsById.values().stream()
                 .filter(act -> act.getNeuron().isAbstract())
                 .filter(act -> act.isFired())
                 .forEach(Instantiation::add);
+
+        process(MAX_ROUND, ANNEAL);
+
+        incrementRound();
+        setFeedbackTriggerRound();
     }
 
     public String activationsToString() {

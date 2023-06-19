@@ -20,6 +20,8 @@ import network.aika.elements.activations.Activation;
 import network.aika.steps.Phase;
 import network.aika.steps.Step;
 
+import static network.aika.steps.keys.QueueKey.MAX_ROUND;
+
 /**
  * Counts the number of activations a particular neuron has encountered.
  *
@@ -38,7 +40,7 @@ public class Counting extends Step<Activation> {
 
     @Override
     public int getRound() {
-        return Integer.MAX_VALUE;
+        return MAX_ROUND;
     }
 
     @Override

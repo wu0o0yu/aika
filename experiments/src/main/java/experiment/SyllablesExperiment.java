@@ -37,6 +37,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static experiment.LabelUtil.generateTemplateInstanceLabels;
+import static network.aika.steps.Phase.ANNEAL;
+import static network.aika.steps.Phase.INFERENCE;
+import static network.aika.steps.keys.QueueKey.MAX_ROUND;
 import static network.aika.utils.Utils.doubleToString;
 
 
@@ -126,7 +129,7 @@ public class SyllablesExperiment {
                     0
             );
 
-            doc.process(Phase.ANNEAL);
+            doc.process(MAX_ROUND, ANNEAL);
 
             doc.postProcessing();
             doc.updateModel();
@@ -169,7 +172,7 @@ public class SyllablesExperiment {
 
             waitForClick(debugger);
 
-            doc.process(Phase.INFERENCE);
+            doc.process(MAX_ROUND, INFERENCE);
 
             LoggingListener logger = null;
 

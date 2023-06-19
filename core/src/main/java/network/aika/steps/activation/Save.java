@@ -20,6 +20,8 @@ import network.aika.elements.neurons.Neuron;
 import network.aika.steps.Phase;
 import network.aika.steps.Step;
 
+import static network.aika.steps.keys.QueueKey.MAX_ROUND;
+
 /**
  * Store model
  *
@@ -37,7 +39,7 @@ public class Save extends Step<Neuron> {
 
     @Override
     public int getRound() {
-        return Integer.MAX_VALUE;
+        return MAX_ROUND;
     }
 
     @Override

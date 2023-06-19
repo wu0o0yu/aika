@@ -22,6 +22,8 @@ import network.aika.elements.activations.Timestamp;
 import network.aika.steps.keys.FiredQueueKey;
 import network.aika.steps.keys.QueueKey;
 
+import static network.aika.steps.keys.QueueKey.MAX_ROUND;
+
 
 /**
  * @author Lukas Molzberger
@@ -53,7 +55,9 @@ public abstract class Step<E extends Element> {
     }
 
     public int getRound() {
-        return element.getThought().getRound(false);
+        return getPhase().isDelayed() ?
+                MAX_ROUND :
+                element.getThought().getRound(false);
     }
 
     public void removeQueueKey() {

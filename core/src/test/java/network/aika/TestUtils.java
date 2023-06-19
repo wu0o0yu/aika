@@ -36,6 +36,7 @@ import java.util.List;
 import static network.aika.elements.synapses.Scope.INPUT;
 import static network.aika.elements.synapses.Scope.SAME;
 import static network.aika.steps.Phase.INFERENCE;
+import static network.aika.steps.keys.QueueKey.MAX_ROUND;
 
 
 /**
@@ -65,7 +66,7 @@ public class TestUtils {
     public static void process(Document doc, List<TokenActivation> tokenActs) {
         for(TokenActivation tAct: tokenActs) {
             tAct.setNet(10.0);
-            doc.process(INFERENCE);
+            doc.process(MAX_ROUND, INFERENCE);
         }
 
         doc.anneal();

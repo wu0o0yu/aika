@@ -67,9 +67,9 @@ public class StepConsoleRenderer implements ConsoleRenderer {
         if(qk != null)
             return s.getStepName() +
                     " " + Utils.roundToString(qk.getRound()) + " " + qk.getPhase() + " " +
-                (sortKey == Visible.SHOW ? " " + s.getQueueKey() : "") + " ";
+                (sortKey == Visible.SHOW ? " " + s.getQueueKey() : "");
         else
             return s.getStepName() + " " +
-                    Utils.roundToString(s.getRound()) + " " + s.getPhase();
+                    Utils.roundToString(s.getRound()) + " " + s.getPhase() + " ";
     }
 }

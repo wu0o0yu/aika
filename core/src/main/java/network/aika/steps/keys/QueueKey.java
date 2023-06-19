@@ -30,6 +30,8 @@ import static network.aika.utils.Utils.roundToString;
  */
 public abstract class QueueKey implements Comparable<QueueKey> {
 
+    public static final int MAX_ROUND = Integer.MAX_VALUE;
+
     public static final Comparator<QueueKey> COMPARATOR = Comparator
             .<QueueKey>comparingInt(k -> k.round)
             .thenComparingInt(k -> k.getPhase().ordinal())

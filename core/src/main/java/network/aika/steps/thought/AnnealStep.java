@@ -26,6 +26,7 @@ import network.aika.steps.Step;
 import network.aika.steps.keys.DocQueueKey;
 
 import static network.aika.steps.Phase.*;
+import static network.aika.steps.keys.QueueKey.MAX_ROUND;
 import static network.aika.utils.Utils.doubleToString;
 
 
@@ -48,7 +49,7 @@ public class AnnealStep extends Step<Thought> {
     @Override
     public void createQueueKey(Timestamp timestamp) {
         queueKey = new DocQueueKey(
-                getElement().getRound(true),
+                MAX_ROUND,
                 getPhase(),
                 timestamp
         );

@@ -45,13 +45,13 @@ public class FeedbackFunction extends IdentityFunction {
                 break;
             case 1:
                 double inputValue = oppositeFl != null ? oppositeFl.getUpdatedInputValue() : 0.0;
-                double newValue = fl.getUpdatedInputValue() > 0.5 ?
+                double update = fl.getUpdatedInputValue() > 0.5 ?
                         1.0 - inputValue :
                         inputValue - 1.0;
 
-                assert newValue >= 0.0 && newValue <= 1.0;
+                triggerUpdate(false, update);
+                assert value >= 0.0 && value <= 1.0;
 
-                triggerUpdate(false, newValue);
                 break;
             default:
         }

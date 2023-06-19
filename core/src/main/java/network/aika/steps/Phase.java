@@ -26,12 +26,12 @@ public enum Phase {
     OUTPUT_LINKING("OL"),
     FEEDBACK_TRIGGER("FT"),
     INFERENCE("IF"),
-    POST_CLOSE("PC"),
-    ANNEAL("A"),
+    POST_CLOSE("PC", true),
+    ANNEAL("A", true),
     TRAINING("T", true),
     INACTIVE_LINKS("IL"),
-    COUNTING("C"),
-    SAVE("S");
+    COUNTING("C", true),
+    SAVE("S", true);
 
     String label;
 

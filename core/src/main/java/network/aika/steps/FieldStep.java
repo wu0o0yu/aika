@@ -92,7 +92,6 @@ public class FieldStep<E extends Element> extends Step<E> {
 
     @Override
     public void process() {
-        field.getReference().getThought().updateRound(round);
         field.process(this);
     }
 

@@ -50,6 +50,7 @@ import java.util.SortedSet;
 import static network.aika.TestUtils.*;
 import static network.aika.elements.synapses.Scope.INPUT;
 import static network.aika.steps.Phase.INFERENCE;
+import static network.aika.steps.keys.QueueKey.MAX_ROUND;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -192,7 +193,7 @@ public class MutualExclusionTest {
 
         TokenActivation tAct = doc.addToken(in, 0, 0, 4);
         tAct.setNet(10.0);
-        doc.process(INFERENCE);
+        doc.process(MAX_ROUND, INFERENCE);
 
         doc.anneal();
 

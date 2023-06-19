@@ -22,6 +22,8 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 
+import static network.aika.steps.keys.QueueKey.MAX_ROUND;
+
 /**
  *
  * @author Lukas Molzberger
@@ -92,6 +94,6 @@ public class Utils {
     }
 
     public static String roundToString(int r) {
-        return r == Integer.MAX_VALUE ? "MAX" : "" + r;
+        return r == MAX_ROUND ? "MAX" : "" + r;
     }
 }
