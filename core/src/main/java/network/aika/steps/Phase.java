@@ -28,18 +28,29 @@ public enum Phase {
     INFERENCE("IF"),
     POST_CLOSE("PC"),
     ANNEAL("A"),
-    TRAINING("T"),
+    TRAINING("T", true),
     INACTIVE_LINKS("IL"),
     COUNTING("C"),
     SAVE("S");
 
     String label;
 
+    boolean delayed;
+
     Phase(String l) {
         label = l;
     }
 
+    Phase(String l, boolean delayed) {
+        this.label = l;
+        this.delayed = delayed;
+    }
+
     public String getLabel() {
         return label;
+    }
+
+    public boolean isDelayed() {
+        return delayed;
     }
 }

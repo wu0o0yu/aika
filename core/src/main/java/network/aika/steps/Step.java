@@ -84,5 +84,4 @@ public abstract class Step<E extends Element> {
     public String toString() {
         return "" + getElement();
     }
-
 }

@@ -21,6 +21,7 @@ import network.aika.debugger.ConsoleRenderer;
 import network.aika.debugger.Visible;
 import network.aika.elements.activations.Timestamp;
 import network.aika.steps.Step;
+import network.aika.steps.keys.QueueKey;
 
 import javax.swing.text.StyledDocument;
 import java.awt.*;
@@ -61,8 +62,12 @@ public class StepConsoleRenderer implements ConsoleRenderer {
     }
 
     private String stepToPrefix(Step s) {
-        return s.getPhase().getLabel() + " " +
-                s.getStepName() +
-                (sortKey == Visible.SHOW && s.getQueueKey() != null ? " " + s.getQueueKey() : "") + " ";
+        QueueKey qk = s.getQueueKey();
+        if(qk != null)
+            return s.getStepName() +
+                    " " + s.getQueueKey().toShortString() + " " +
+                (sortKey == Visible.SHOW ? " " + s.getQueueKey() : "") + " ";
+        else
+            return s.getStepName() + " ";
     }
 }

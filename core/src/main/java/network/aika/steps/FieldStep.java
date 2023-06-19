@@ -47,7 +47,9 @@ public class FieldStep<E extends Element> extends Step<E> {
     public FieldStep(E e, Phase p, int round, IQueueField qf) {
         super(e);
         this.phase = p;
-        this.round = round;
+        this.round = p.isDelayed() ?
+                Integer.MAX_VALUE :
+                round;
 
         this.field = qf;
     }
@@ -117,9 +119,7 @@ public class FieldStep<E extends Element> extends Step<E> {
     }
 
     public String toString() {
-        return "Phase:" + phase +
-                " Round:" + round +
-                " Delta:" + doubleToString(delta) +
+        return " Delta:" + doubleToString(delta) +
                 " Field: " + field +
                 " Ref:" + field.getReference();
     }

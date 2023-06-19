@@ -18,6 +18,7 @@ package network.aika.steps.keys;
 
 import network.aika.elements.activations.Timestamp;
 import network.aika.steps.Phase;
+import network.aika.utils.Utils;
 
 import java.util.Comparator;
 import java.util.function.Function;
@@ -67,4 +68,7 @@ public abstract class QueueKey implements Comparable<QueueKey> {
         return currentTimestamp;
     }
 
+    public String toShortString() {
+        return Utils.roundToString(round) + " " + phase;
+    }
 }
