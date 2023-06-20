@@ -239,11 +239,11 @@ public abstract class Thought implements Element {
     }
 
     private boolean checkMaxPhaseReached(int maxRound, Phase maxPhase) {
-        if(maxPhase == null)
-            return false;
-
         QueueKey fe = queue.firstEntry().getKey();
-        if(fe.getRound() < maxRound)
+        if(fe.getRound() > maxRound)
+            return true;
+
+        if(maxPhase == null)
             return false;
 
         return maxPhase.compareTo(fe.getPhase()) < 0;
