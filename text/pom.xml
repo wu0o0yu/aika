@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>experiments</artifactId>
+    <artifactId>aika-text</artifactId>
     <version>${revision}</version>
 
     <properties>
@@ -24,19 +24,36 @@
             <artifactId>aika</artifactId>
         </dependency>
 
+        <!-- Logging -->
         <dependency>
-            <groupId>network.aika</groupId>
-            <artifactId>aika-text</artifactId>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
         </dependency>
 
+        <!-- dependencies for tests: -->
         <dependency>
             <groupId>network.aika</groupId>
             <artifactId>aika-debugger</artifactId>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-csv</artifactId>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-params</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 </project>

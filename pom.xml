@@ -7,6 +7,7 @@
     <version>${revision}</version>
     <modules>
         <module>core</module>
+        <module>text</module>
         <module>debugger</module>
         <module>experiments</module>
     </modules>
@@ -62,7 +63,7 @@
     </distributionManagement>
 
     <properties>
-        <revision>2.0.9-SNAPSHOT</revision>
+        <revision>2.0.9-rc4</revision>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
@@ -212,6 +213,12 @@
             <dependency>
                 <groupId>network.aika</groupId>
                 <artifactId>aika</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>network.aika</groupId>
+                <artifactId>aika-text</artifactId>
                 <version>${revision}</version>
             </dependency>
 

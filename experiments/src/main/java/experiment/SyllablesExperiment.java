@@ -16,14 +16,12 @@
  */
 package experiment;
 
-import meta.AbstractTemplateModel;
-import meta.SyllableTemplateModel;
+import network.aika.meta.AbstractTemplateModel;
+import network.aika.meta.SyllableTemplateModel;
 import network.aika.Config;
 import network.aika.Model;
 import network.aika.debugger.AIKADebugger;
 import network.aika.elements.activations.*;
-import network.aika.elements.links.PositiveFeedbackLink;
-import network.aika.steps.Phase;
 import network.aika.text.Document;
 import org.apache.commons.io.IOUtils;
 import experiment.logger.ExperimentLogger;
@@ -34,7 +32,6 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static experiment.LabelUtil.generateTemplateInstanceLabels;
 import static network.aika.steps.Phase.ANNEAL;

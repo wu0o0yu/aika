@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package meta;
+package network.aika.meta;
 
 import network.aika.Model;
 import network.aika.elements.activations.Activation;
@@ -58,7 +58,8 @@ public abstract class AbstractTemplateModel {
             .f(patternNetTarget);
 
     protected static double POS_MARGIN = 1.0;
-    protected static double NEG_MARGIN = 1.1;
+    protected static double NEG_MARGIN_LEFT = 1.2;
+    protected static double NEG_MARGIN_RIGHT = 1.1;
 
     protected static double PASSIVE_SYNAPSE_WEIGHT = 0.0;
 
@@ -221,7 +222,7 @@ public abstract class AbstractTemplateModel {
                 .init(bn, inhibitoryN.getNeuron());
 
         new NegativeFeedbackSynapse()
-                .setWeight(NEG_MARGIN * -netTarget)
+                .setWeight(getNegMargin(pos) * -netTarget)
                 .init(inhibitoryN.getNeuron(), bn);
 
         if(lastPos == null || lastBN == null) {
@@ -316,7 +317,7 @@ public abstract class AbstractTemplateModel {
                 .init(bn, inhibitoryN.getNeuron());
 
         new NegativeFeedbackSynapse()
-                .setWeight(NEG_MARGIN * -netTarget)
+                .setWeight(getNegMargin(pos) * -netTarget)
                 .init(inhibitoryN.getNeuron(), bn)
                 .adjustBias();
 
@@ -382,6 +383,12 @@ public abstract class AbstractTemplateModel {
                     return n;
                 }
         );
+    }
+
+    private double getNegMargin(int pos) {
+        return pos >= 0 ?
+                NEG_MARGIN_RIGHT :
+                NEG_MARGIN_LEFT;
     }
 
     public void disableAbstractNeurons() {
