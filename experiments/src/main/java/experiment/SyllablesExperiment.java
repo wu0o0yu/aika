@@ -76,19 +76,6 @@ public class SyllablesExperiment {
         m.setTokenInputNet(tokenActs);
     }
 
-    public static Config getConfig() {
-        return new Config() {
-            public void updateLabel(Activation templateAct, Activation instanceAct) {
-                Document doc = (Document) templateAct.getThought();
-                String label = doc.getTextSegment(templateAct.getRange());
-
-                instanceAct.getNeuron().setLabel(label);
-
-                logInstantiation(instanceAct, label);
-            }
-        };
-    }
-
     public static void main(String[] args) throws IOException {
         new SyllablesExperiment()
                 .testTraining();
@@ -263,7 +250,7 @@ public class SyllablesExperiment {
     private Document initDocument(Model m, String txt) {
         Document doc = new Document(m, txt);
         doc.setConfig(
-                getConfig()
+                new Config()
                         .setAlpha(null)
                         .setLearnRate(0.01)
                         .setTrainingEnabled(false)

@@ -396,4 +396,8 @@ public abstract class AbstractTemplateModel {
                 n.getNeuron().getBias().setValue(-1000.0)
         );
     }
+
+    public Model getModel() {
+        return model;
+    }
 }
