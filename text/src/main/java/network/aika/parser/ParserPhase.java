@@ -1,6 +1,7 @@
 package network.aika.parser;
 
-public enum TrainingPhase {
+public enum ParserPhase {
+    INFERENCE,
     COUNTING,
     TRAINING
 }

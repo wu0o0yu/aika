@@ -1,43 +1,44 @@
 package network.aika.parser;
 
-import network.aika.Model;
+
 import network.aika.debugger.AIKADebugger;
 import network.aika.elements.activations.TokenActivation;
+import network.aika.meta.AbstractTemplateModel;
 import network.aika.text.Document;
 import network.aika.tokenizer.TokenConsumer;
 import network.aika.tokenizer.Tokenizer;
-import network.aika.tokenizer.TokenizerContext;
 
-import java.util.Set;
 
 import static network.aika.steps.Phase.INFERENCE;
 import static network.aika.steps.keys.QueueKey.MAX_ROUND;
 
-public class Parser {
 
-    protected Model model;
-    protected Tokenizer tokenizer;
+public abstract class Parser {
 
-    public Parser(Model model, Tokenizer tokenizer) {
-        this.model = model;
-        this.tokenizer = tokenizer;
-    }
+    public abstract Tokenizer getTokenizer();
 
-    protected Document initDocument(String txt) {
+    protected Document initDocument(String txt, Context context, ParserPhase phase) {
         return null;
     }
 
-    public void parse(Document doc, TokenizerContext context) {
+    protected abstract AbstractTemplateModel getTemplateModel();
+
+
+    public Document process(String txt, Context context, ParserPhase phase) {
+        Document doc = initDocument(txt, context, phase);
+
         TokenConsumer tokenConsumer = (n, pos, begin, end) -> {
             TokenActivation tAct = doc.addToken(n, pos, begin, end);
-            tAct.setNet(10.0);
+            tAct.setNet(getTemplateModel().getInputPatternNetTarget());
         };
 
-        tokenizer.tokenize(doc.getContent(), context, tokenConsumer);
+        getTokenizer().tokenize(doc.getContent(), context, tokenConsumer);
 
         doc.process(MAX_ROUND, INFERENCE);
 
         doc.anneal();
+
+        return doc;
     }
 
 

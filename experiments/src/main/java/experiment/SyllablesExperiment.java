@@ -100,24 +100,7 @@ public class SyllablesExperiment {
 
         // Counting letters loop
         inputs.forEach(w -> {
-            Document doc = initDocument(model, w);
-            doc.getConfig()
-                    .setTrainingEnabled(false)
-                    .setMetaInstantiationEnabled(false)
-                    .setCountingEnabled(true);
-
-            processTokens(
-                    syllableModel,
-                    doc,
-                    convertToCharTokens(w),
-                    0
-            );
-
-            doc.process(MAX_ROUND, ANNEAL);
-
-            doc.postProcessing();
-            doc.updateModel();
-            doc.disconnect();
+            countParse(model, syllableModel, w);
         });
 
         syllableModel.initTemplates();
@@ -127,73 +110,98 @@ public class SyllablesExperiment {
         ExperimentLogger el = new ExperimentLogger();
 
         inputs.forEach(w -> {
-            Document doc = initDocument(model, w);
-            doc.getConfig()
-                    .setTrainingEnabled(true)
-                    .setMetaInstantiationEnabled(true)
-                    .setCountingEnabled(true);
-
-            doc.setInstantiationCallback(act ->
-                    generateTemplateInstanceLabels(act)
-            );
-
-            AIKADebugger debugger = null;
-            System.out.println(counter[0] + " " + w);
-            if(counter[0] >= 0) {// 3, 6, 11, 18, 100, 39, 49
-                debugger = AIKADebugger.createAndShowGUI(doc);
-            }
-
-            if(w.equalsIgnoreCase("herankam")) {
-              //  debugger = AIKADebugger.createAndShowGUI(doc);
-            }
-
-            processTokens(
-                    syllableModel,
-                    doc,
-                    convertToCharTokens(w),
-                    0
-            );
-
-            waitForClick(debugger);
-
-            doc.process(MAX_ROUND, INFERENCE);
-
-            LoggingListener logger = null;
-
-            if(debugger != null) {
-                logger = new LoggingListener();
-                doc.addEventListener(logger);
-            }
-
-//            el.annealingLogInit(doc);
-
-            doc.anneal();
-
-            waitForClick(debugger);
-
-            doc.instantiateTemplates();
-
-            waitForClick(debugger);
-
-            doc.train();
-
-            logPatternMatches(doc);
-
-            el.log(doc);
-
-            waitForClick(debugger);
-
-            if(logger != null)
-                doc.removeEventListener(logger);
-
-            doc.postProcessing();
-            doc.updateModel();
-            doc.disconnect();
+            trainingParse(model, syllableModel, counter, el, w);
 
             counter[0]++;
         });
 
         el.close();
+    }
+
+    private void countParse(Model model, AbstractTemplateModel syllableModel, String w) {
+        Document doc = initDocument(model, w);
+        doc.getConfig()
+                .setTrainingEnabled(false)
+                .setMetaInstantiationEnabled(false)
+                .setCountingEnabled(true);
+
+        processTokens(
+                syllableModel,
+                doc,
+                convertToCharTokens(w),
+                0
+        );
+
+        doc.process(MAX_ROUND, ANNEAL);
+
+        doc.postProcessing();
+        doc.updateModel();
+        doc.disconnect();
+    }
+
+    private void trainingParse(Model model, AbstractTemplateModel syllableModel, int[] counter, ExperimentLogger el, String w) {
+        Document doc = initDocument(model, w);
+        doc.getConfig()
+                .setTrainingEnabled(true)
+                .setMetaInstantiationEnabled(true)
+                .setCountingEnabled(true);
+
+        doc.setInstantiationCallback(act ->
+                generateTemplateInstanceLabels(act)
+        );
+
+        AIKADebugger debugger = null;
+        System.out.println(counter[0] + " " + w);
+        if(counter[0] >= 0) {// 3, 6, 11, 18, 100, 39, 49
+            debugger = AIKADebugger.createAndShowGUI(doc);
+        }
+
+        if(w.equalsIgnoreCase("herankam")) {
+          //  debugger = AIKADebugger.createAndShowGUI(doc);
+        }
+
+        processTokens(
+                syllableModel,
+                doc,
+                convertToCharTokens(w),
+                0
+        );
+
+        waitForClick(debugger);
+
+        doc.process(MAX_ROUND, INFERENCE);
+
+        LoggingListener logger = null;
+
+        if(debugger != null) {
+            logger = new LoggingListener();
+            doc.addEventListener(logger);
+        }
+
+//            el.annealingLogInit(doc);
+
+        doc.anneal();
+
+        waitForClick(debugger);
+
+        doc.instantiateTemplates();
+
+        waitForClick(debugger);
+
+        doc.train();
+
+        logPatternMatches(doc);
+
+        el.log(doc);
+
+        waitForClick(debugger);
+
+        if(logger != null)
+            doc.removeEventListener(logger);
+
+        doc.postProcessing();
+        doc.updateModel();
+        doc.disconnect();
     }
 
     private static void logPatternMatches(Document doc) {
