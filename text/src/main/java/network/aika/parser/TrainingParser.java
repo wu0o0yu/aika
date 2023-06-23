@@ -3,14 +3,13 @@ package network.aika.parser;
 
 import network.aika.Config;
 import network.aika.debugger.AIKADebugger;
-import network.aika.elements.activations.TokenActivation;
 import network.aika.text.Document;
-import network.aika.tokenizer.TokenConsumer;
 
 import static network.aika.meta.LabelUtil.generateTemplateInstanceLabels;
 import static network.aika.parser.ParserPhase.TRAINING;
 import static network.aika.steps.Phase.ANNEAL;
 import static network.aika.steps.keys.QueueKey.MAX_ROUND;
+
 
 public abstract class TrainingParser extends Parser {
 
@@ -40,18 +39,6 @@ public abstract class TrainingParser extends Parser {
                 generateTemplateInstanceLabels(act)
         );
 
-        doc.setFeedbackTriggerRound();
-
-        TokenConsumer tokenConsumer = (n, pos, begin, end) -> {
-            TokenActivation tAct = doc.addToken(n, pos, begin, end);
-            tAct.setNet(10.0);
-        };
-
-        getTokenizer().tokenize(doc.getContent(), null, tokenConsumer);
-
-        doc.anneal();
-
-        doc.process(MAX_ROUND, ANNEAL);
 
         waitForClick(debugger);
 

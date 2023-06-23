@@ -9,6 +9,7 @@ import network.aika.tokenizer.TokenConsumer;
 import network.aika.tokenizer.Tokenizer;
 
 
+import static network.aika.steps.Phase.ANNEAL;
 import static network.aika.steps.Phase.INFERENCE;
 import static network.aika.steps.keys.QueueKey.MAX_ROUND;
 
@@ -32,11 +33,15 @@ public abstract class Parser {
             tAct.setNet(getTemplateModel().getInputPatternNetTarget());
         };
 
+        doc.setFeedbackTriggerRound();
+
         getTokenizer().tokenize(doc.getContent(), context, tokenConsumer);
 
         doc.process(MAX_ROUND, INFERENCE);
 
         doc.anneal();
+
+        doc.process(MAX_ROUND, ANNEAL);
 
         return doc;
     }
