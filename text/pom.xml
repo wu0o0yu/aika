@@ -24,6 +24,11 @@
             <artifactId>aika</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>network.aika</groupId>
+            <artifactId>aika-debugger</artifactId>
+        </dependency>
+
         <!-- Logging -->
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -31,11 +36,6 @@
         </dependency>
 
         <!-- dependencies for tests: -->
-        <dependency>
-            <groupId>network.aika</groupId>
-            <artifactId>aika-debugger</artifactId>
-            <scope>test</scope>
-        </dependency>
 
         <dependency>
             <groupId>org.junit.jupiter</groupId>

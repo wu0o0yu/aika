@@ -16,14 +16,40 @@
  */
 package network.aika.tokenizer;
 
+
+import network.aika.meta.AbstractTemplateModel;
 import network.aika.parser.Context;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public interface Tokenizer {
+public class SimpleCharTokenizer implements Tokenizer {
 
-    void tokenize(String text, Context context, TokenConsumer tokenConsumer);
+    private AbstractTemplateModel model;
 
+    public SimpleCharTokenizer(AbstractTemplateModel model) {
+        this.model = model;
+    }
+
+    @Override
+    public void tokenize(String text, Context context, TokenConsumer tokenConsumer) {
+        int i = 0;
+        int pos = 0;
+
+        for(char c: text.toCharArray()) {
+            int j = i + 1;
+
+            tokenConsumer.processToken(
+                    model.lookupInputToken("" + c),
+                    pos,
+                    i,
+                    j
+            );
+
+            pos++;
+
+            i = j;
+        }
+    }
 }
