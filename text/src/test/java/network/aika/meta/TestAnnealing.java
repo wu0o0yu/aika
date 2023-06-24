@@ -1,9 +1,9 @@
 package network.aika.meta;
 
 import network.aika.Model;
-import network.aika.parser.ParserPhase;
+import network.aika.elements.activations.Activation;
 import network.aika.parser.TrainingParser;
-import network.aika.tokenizer.SimpleCharTokenizer;
+import network.aika.tokenizer.SimpleWordTokenizer;
 import network.aika.tokenizer.Tokenizer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,19 +21,24 @@ public class TestAnnealing extends TrainingParser {
     public void init() {
         Model model = new Model();
 
-        templateModel = new SyllableTemplateModel(model);
+        templateModel = new PhraseTemplateModel(model);
         templateModel.initStaticNeurons();
 
         model.setN(0);
 
-        tokenizer = new SimpleCharTokenizer(templateModel);
+        tokenizer = new SimpleWordTokenizer(templateModel);
+    }
+
+    @Override
+    public boolean check(Activation iAct) {
+        return true;
     }
 
     @Test
     public void testAnnealing() {
-        process("ab", null, COUNTING);
+        process("a b", null, COUNTING);
         templateModel.initTemplates();
-        process("ab", null, TRAINING);
+        process("a b", null, TRAINING);
     }
 
     @Override

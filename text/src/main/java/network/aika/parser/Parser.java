@@ -17,6 +17,7 @@
 package network.aika.parser;
 
 
+import network.aika.Config;
 import network.aika.debugger.AIKADebugger;
 import network.aika.elements.activations.TokenActivation;
 import network.aika.meta.AbstractTemplateModel;
@@ -25,6 +26,7 @@ import network.aika.tokenizer.TokenConsumer;
 import network.aika.tokenizer.Tokenizer;
 
 
+import static network.aika.parser.ParserPhase.TRAINING;
 import static network.aika.steps.Phase.ANNEAL;
 import static network.aika.steps.Phase.INFERENCE;
 import static network.aika.steps.keys.QueueKey.MAX_ROUND;
@@ -38,7 +40,18 @@ public abstract class Parser {
     public abstract Tokenizer getTokenizer();
 
     protected Document initDocument(String txt, Context context, ParserPhase phase) {
-        return null;
+        Document doc = new Document(getTemplateModel().getModel(), txt);
+
+        Config conf = new Config()
+                .setAlpha(null)
+                .setLearnRate(0.01)
+                .setTrainingEnabled(phase == TRAINING)
+                .setMetaInstantiationEnabled(phase == TRAINING)
+                .setCountingEnabled(true);
+
+        doc.setConfig(conf);
+
+        return doc;
     }
 
     protected abstract AbstractTemplateModel getTemplateModel();
@@ -51,10 +64,6 @@ public abstract class Parser {
 
         if(phase == ParserPhase.TRAINING)
             debugger = AIKADebugger.createAndShowGUI(doc);
-
-        doc.setActivationCheckCallback(act ->
-                m.evaluatePrimaryBindingActs(act)
-        );
 
         doc.setFeedbackTriggerRound();
 

@@ -16,33 +16,28 @@
  */
 package network.aika.parser;
 
-import network.aika.Config;
-import network.aika.debugger.AIKADebugger;
+import network.aika.callbacks.ActivationCheckCallback;
+import network.aika.elements.activations.Activation;
 import network.aika.text.Document;
 
 import static network.aika.meta.LabelUtil.generateTemplateInstanceLabels;
-import static network.aika.parser.ParserPhase.TRAINING;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public abstract class TrainingParser extends Parser {
+public abstract class TrainingParser extends Parser implements ActivationCheckCallback {
 
     @Override
     protected Document initDocument(String txt, Context context, ParserPhase phase) {
-        Document doc = new Document(getTemplateModel().getModel(), txt);
-
-        Config conf = new Config()
-                .setAlpha(null)
-                .setLearnRate(0.01)
-                .setTrainingEnabled(phase == TRAINING)
-                .setMetaInstantiationEnabled(phase == TRAINING)
-                .setCountingEnabled(true);
-
-        doc.setConfig(conf);
-
+        Document doc = super.initDocument(txt, context, phase);
+        doc.setActivationCheckCallback(this);
         return doc;
+    }
+
+    @Override
+    public boolean check(Activation iAct) {
+        return getTemplateModel().evaluatePrimaryBindingActs(iAct);
     }
 
     @Override
