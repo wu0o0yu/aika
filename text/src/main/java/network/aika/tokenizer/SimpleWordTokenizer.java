@@ -19,6 +19,7 @@ package network.aika.tokenizer;
 
 import network.aika.meta.AbstractTemplateModel;
 import network.aika.parser.Context;
+import network.aika.text.Document;
 
 /**
  *
@@ -33,11 +34,11 @@ public class SimpleWordTokenizer implements Tokenizer {
     }
 
     @Override
-    public void tokenize(String text, Context context, TokenConsumer tokenConsumer) {
+    public void tokenize(Document doc, Context context, TokenConsumer tokenConsumer) {
         int i = 0;
         int pos = 0;
 
-        for(String w: text.split(" ")) {
+        for(String w: doc.getContent().split(" ")) {
             int j = i + w.length();
 
             tokenConsumer.processToken(

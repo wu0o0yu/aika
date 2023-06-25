@@ -19,6 +19,7 @@ package network.aika.tokenizer;
 
 import network.aika.meta.AbstractTemplateModel;
 import network.aika.parser.Context;
+import network.aika.text.Document;
 
 /**
  *
@@ -33,11 +34,11 @@ public class SimpleCharTokenizer implements Tokenizer {
     }
 
     @Override
-    public void tokenize(String text, Context context, TokenConsumer tokenConsumer) {
+    public void tokenize(Document doc, Context context, TokenConsumer tokenConsumer) {
         int i = 0;
         int pos = 0;
 
-        for(char c: text.toCharArray()) {
+        for(char c: doc.getContent().toCharArray()) {
             int j = i + 1;
 
             tokenConsumer.processToken(

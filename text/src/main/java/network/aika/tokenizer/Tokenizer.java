@@ -17,6 +17,7 @@
 package network.aika.tokenizer;
 
 import network.aika.parser.Context;
+import network.aika.text.Document;
 
 /**
  *
@@ -24,6 +25,6 @@ import network.aika.parser.Context;
  */
 public interface Tokenizer {
 
-    void tokenize(String text, Context context, TokenConsumer tokenConsumer);
+    void tokenize(Document doc, Context context, TokenConsumer tokenConsumer);
 
 }

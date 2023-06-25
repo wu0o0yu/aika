@@ -22,7 +22,6 @@ import network.aika.debugger.AIKADebugger;
 import network.aika.elements.activations.TokenActivation;
 import network.aika.meta.AbstractTemplateModel;
 import network.aika.text.Document;
-import network.aika.tokenizer.TokenConsumer;
 import network.aika.tokenizer.Tokenizer;
 
 
@@ -75,7 +74,7 @@ public abstract class Parser {
 
         doc.setFeedbackTriggerRound();
 
-        getTokenizer().tokenize(doc.getContent(), context, (n, pos, begin, end) -> {
+        getTokenizer().tokenize(doc, context, (n, pos, begin, end) -> {
             TokenActivation tAct = doc.addToken(n, pos, begin, end);
             tAct.setNet(getTemplateModel().getInputPatternNetTarget());
         });
