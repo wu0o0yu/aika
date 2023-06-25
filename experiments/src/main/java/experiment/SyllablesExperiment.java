@@ -77,9 +77,10 @@ public class SyllablesExperiment extends TrainingParser {
                 .setAlpha(null)
                 .setLearnRate(0.01);
 
-        doc.setInstantiationCallback(act ->
-                generateTemplateInstanceLabels(act)
-        );
+        doc.setInstantiationCallback(act -> {
+            generateTemplateInstanceLabels(act);
+            logInstantiation(act, act.getLabel());
+        });
 
         return doc;
     }
