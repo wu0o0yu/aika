@@ -18,14 +18,19 @@ package experiment;
 
 import network.aika.meta.AbstractTemplateModel;
 import network.aika.meta.SyllableTemplateModel;
-import network.aika.Config;
 import network.aika.Model;
 import network.aika.debugger.AIKADebugger;
 import network.aika.elements.activations.*;
+import network.aika.parser.Context;
+import network.aika.parser.ParserPhase;
+import network.aika.parser.TrainingParser;
 import network.aika.text.Document;
+import network.aika.tokenizer.SimpleCharTokenizer;
+import network.aika.tokenizer.Tokenizer;
 import org.apache.commons.io.IOUtils;
 import experiment.logger.ExperimentLogger;
 import experiment.logger.LoggingListener;
+
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,46 +39,59 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static experiment.LabelUtil.generateTemplateInstanceLabels;
-import static network.aika.steps.Phase.ANNEAL;
-import static network.aika.steps.Phase.INFERENCE;
-import static network.aika.steps.keys.QueueKey.MAX_ROUND;
+import static network.aika.parser.ParserPhase.COUNTING;
+import static network.aika.parser.ParserPhase.TRAINING;
 import static network.aika.utils.Utils.doubleToString;
 
 
 /**
  * @author Lukas Molzberger
  */
-public class SyllablesExperiment {
+public class SyllablesExperiment extends TrainingParser {
 
-    public static void processTokens(AbstractTemplateModel m, Document doc, Iterable<String> tokens, int separatorLength) {
-        int i = 0;
-        int pos = 0;
+    Model model;
+    AbstractTemplateModel syllableModel;
 
-        doc.setFeedbackTriggerRound();
+    Tokenizer charTokenizer;
 
-        List<TokenActivation> tokenActs = new ArrayList<>();
-        for(String t: tokens) {
-            int j = i + t.length();
+    ExperimentLogger experimentLogger;
 
-            tokenActs.add(
-                    doc.addToken(
-                            m.lookupInputToken(t),
-                            pos,
-                            i,
-                            j
-                    )
-            );
+    int[] counter;
 
-            pos++;
+    public SyllablesExperiment() {
+        model = new Model();
 
-            i = j + separatorLength;
-        }
+        syllableModel = new SyllableTemplateModel(model);
+        syllableModel.initStaticNeurons();
 
-        doc.setActivationCheckCallback(act ->
-                m.evaluatePrimaryBindingActs(act)
+        model.setN(0);
+
+        charTokenizer = new SimpleCharTokenizer(syllableModel);
+    }
+
+    @Override
+    protected Document initDocument(String txt, Context context, ParserPhase phase) {
+        Document doc = super.initDocument(txt, context, phase);
+
+        doc.getConfig()
+                .setAlpha(null)
+                .setLearnRate(0.01);
+
+        doc.setInstantiationCallback(act ->
+                generateTemplateInstanceLabels(act)
         );
 
-        m.setTokenInputNet(tokenActs);
+        return doc;
+    }
+
+    @Override
+    protected AbstractTemplateModel getTemplateModel() {
+        return syllableModel;
+    }
+
+    @Override
+    public Tokenizer getTokenizer() {
+        return charTokenizer;
     }
 
     public static void main(String[] args) throws IOException {
@@ -91,85 +109,33 @@ public class SyllablesExperiment {
     }
 
     private void train(List<String> inputs) {
-        Model model = new Model();
-
-        AbstractTemplateModel syllableModel = new SyllableTemplateModel(model);
-        syllableModel.initStaticNeurons();
-
-        model.setN(0);
-
         // Counting letters loop
-        inputs.forEach(w -> {
-            countParse(model, syllableModel, w);
-        });
+        inputs.forEach(w ->
+            super.process(w, null, COUNTING)
+        );
 
         syllableModel.initTemplates();
 
-        int[] counter = new int[1];
+        counter = new int[1];
 
-        ExperimentLogger el = new ExperimentLogger();
+        experimentLogger = new ExperimentLogger();
 
-        inputs.forEach(w -> {
-            trainingParse(model, syllableModel, counter, el, w);
-
-            counter[0]++;
-        });
-
-        el.close();
-    }
-
-    private void countParse(Model model, AbstractTemplateModel syllableModel, String w) {
-        Document doc = initDocument(model, w);
-        doc.getConfig()
-                .setTrainingEnabled(false)
-                .setMetaInstantiationEnabled(false)
-                .setCountingEnabled(true);
-
-        processTokens(
-                syllableModel,
-                doc,
-                convertToCharTokens(w),
-                0
+        inputs.forEach(w ->
+            process(w,  null, TRAINING)
         );
 
-        doc.process(MAX_ROUND, ANNEAL);
-
-        doc.postProcessing();
-        doc.updateModel();
-        doc.disconnect();
+        experimentLogger.close();
     }
 
-    private void trainingParse(Model model, AbstractTemplateModel syllableModel, int[] counter, ExperimentLogger el, String w) {
-        Document doc = initDocument(model, w);
-        doc.getConfig()
-                .setTrainingEnabled(true)
-                .setMetaInstantiationEnabled(true)
-                .setCountingEnabled(true);
+    @Override
+    public Document process(String txt, Context context, ParserPhase phase) {
+        System.out.println(counter[0] + " " + txt);
 
-        doc.setInstantiationCallback(act ->
-                generateTemplateInstanceLabels(act)
-        );
+        Document doc = initDocument(txt, context, phase);
 
-        AIKADebugger debugger = null;
-        System.out.println(counter[0] + " " + w);
         if(counter[0] >= 0) {// 3, 6, 11, 18, 100, 39, 49
             debugger = AIKADebugger.createAndShowGUI(doc);
         }
-
-        if(w.equalsIgnoreCase("herankam")) {
-          //  debugger = AIKADebugger.createAndShowGUI(doc);
-        }
-
-        processTokens(
-                syllableModel,
-                doc,
-                convertToCharTokens(w),
-                0
-        );
-
-        waitForClick(debugger);
-
-        doc.process(MAX_ROUND, INFERENCE);
 
         LoggingListener logger = null;
 
@@ -178,31 +144,25 @@ public class SyllablesExperiment {
             doc.addEventListener(logger);
         }
 
-//            el.annealingLogInit(doc);
+        infer(doc, context, phase);
 
-        doc.anneal();
+        experimentLogger.annealingLogInit(doc);
 
-        waitForClick(debugger);
-
-        doc.instantiateTemplates();
-
-        waitForClick(debugger);
-
-        doc.train();
+        train(doc);
 
         logPatternMatches(doc);
-
-        el.log(doc);
-
-        waitForClick(debugger);
+        experimentLogger.log(doc);
 
         if(logger != null)
             doc.removeEventListener(logger);
 
-        doc.postProcessing();
-        doc.updateModel();
         doc.disconnect();
+
+        counter[0]++;
+
+        return doc;
     }
+
 
     private static void logPatternMatches(Document doc) {
         doc.getActivations()
@@ -242,30 +202,7 @@ public class SyllablesExperiment {
         );
     }
 
-    private static void waitForClick(AIKADebugger debugger) {
-        if(debugger != null)
-            debugger.getStepManager().waitForClick();
-    }
 
-    public List<String> convertToCharTokens(String w) {
-        ArrayList<String> result = new ArrayList<>();
-        for(char c: w.toCharArray()) {
-            result.add("" + c);
-        }
-        return result;
-    }
-
-    private Document initDocument(Model m, String txt) {
-        Document doc = new Document(m, txt);
-        doc.setConfig(
-                new Config()
-                        .setAlpha(null)
-                        .setLearnRate(0.01)
-                        .setTrainingEnabled(false)
-        );
-
-        return doc;
-    }
 
     private List<String> getInputs() throws IOException {
         String[] files = new String[]{
@@ -332,6 +269,4 @@ public class SyllablesExperiment {
         }
         return inputs;
     }
-
-
 }

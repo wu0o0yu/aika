@@ -18,13 +18,14 @@ package network.aika.elements.links;
 
 import network.aika.elements.activations.Activation;
 import network.aika.elements.activations.InhibitoryActivation;
-import network.aika.fields.AbstractFunction;
-import network.aika.fields.FieldOutput;
-import network.aika.fields.Fields;
+import network.aika.fields.*;
 import network.aika.elements.synapses.AbstractInhibitorySynapse;
 import network.aika.visitor.Visitor;
 
 import static network.aika.fields.FieldLink.linkAndConnect;
+import static network.aika.fields.Fields.add;
+import static network.aika.fields.Fields.mul;
+import static network.aika.steps.Phase.*;
 import static network.aika.utils.Utils.TOLERANCE;
 
 /**
@@ -34,7 +35,7 @@ public class AbstractInhibitoryLink<S extends AbstractInhibitorySynapse, I exten
 
     protected FieldOutput value;
 
-    protected AbstractFunction net;
+    protected Field net;
 
     public AbstractInhibitoryLink(S s, I input, InhibitoryActivation output) {
         super(s, input, output);
@@ -47,13 +48,9 @@ public class AbstractInhibitoryLink<S extends AbstractInhibitorySynapse, I exten
     }
 
     protected void initFields() {
-        net = Fields.add(
-                this,
-                "net",
-                output.getNeuron().getBias(),
-                input.getValue()
-        );
-        net.getInputLinkByArg(0)
+        net = new QueueSumField(this, NEGATIVE_FEEDBACK, "net", null);
+        linkAndConnect(weightedInput, net);
+        linkAndConnect(output.getNeuron().getBias(), net)
                 .setPropagateUpdates(false);
 
         value = Fields.func(

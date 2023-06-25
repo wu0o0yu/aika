@@ -32,6 +32,7 @@ public abstract class TrainingParser extends Parser implements ActivationCheckCa
     protected Document initDocument(String txt, Context context, ParserPhase phase) {
         Document doc = super.initDocument(txt, context, phase);
         doc.setActivationCheckCallback(this);
+
         return doc;
     }
 
@@ -42,8 +43,17 @@ public abstract class TrainingParser extends Parser implements ActivationCheckCa
 
     @Override
     public Document process(String txt, Context context, ParserPhase phase) {
-        Document doc = super.process(txt, context, phase);
+        Document doc = initDocument(txt, context, phase);
 
+        infer(doc, context, phase);
+        train(doc);
+
+        doc.disconnect();
+
+        return doc;
+    }
+
+    protected void train(Document doc) {
         doc.setInstantiationCallback(act ->
                 generateTemplateInstanceLabels(act)
         );
@@ -60,8 +70,5 @@ public abstract class TrainingParser extends Parser implements ActivationCheckCa
 
         doc.postProcessing();
         doc.updateModel();
-        doc.disconnect();
-
-        return doc;
     }
 }

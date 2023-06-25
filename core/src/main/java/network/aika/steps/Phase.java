@@ -21,33 +21,27 @@ package network.aika.steps;
  * @author Lukas Molzberger
  */
 public enum Phase {
-    INSTANTIATION("IS"),
-    INPUT_LINKING("IL"),
-    OUTPUT_LINKING("OL"),
-    FEEDBACK_TRIGGER("FT"),
-    INFERENCE("IF"),
-    POST_CLOSE("PC", true),
-    ANNEAL("A", true),
-    TRAINING("T", true),
-    INACTIVE_LINKS("IL"),
-    COUNTING("C", true),
-    SAVE("S", true);
+    INSTANTIATION(),
+    INPUT_LINKING(),
+    OUTPUT_LINKING(),
+    FEEDBACK_TRIGGER(),
+    INFERENCE(),
+    POST_CLOSE(true),
+    NEGATIVE_FEEDBACK(true),
+    ANNEAL(true),
+    TRAINING(true),
+    INACTIVE_LINKS(),
+    COUNTING(true),
+    SAVE(true);
 
-    String label;
 
     boolean delayed;
 
-    Phase(String l) {
-        label = l;
+    Phase() {
     }
 
-    Phase(String l, boolean delayed) {
-        this.label = l;
+    Phase(boolean delayed) {
         this.delayed = delayed;
-    }
-
-    public String getLabel() {
-        return label;
     }
 
     public boolean isDelayed() {

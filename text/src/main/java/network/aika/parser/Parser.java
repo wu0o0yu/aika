@@ -56,20 +56,28 @@ public abstract class Parser {
 
     protected abstract AbstractTemplateModel getTemplateModel();
 
-    AIKADebugger debugger = null;
+    protected AIKADebugger debugger = null;
 
     public Document process(String txt, Context context, ParserPhase phase) {
-        AbstractTemplateModel m = getTemplateModel();
         Document doc = initDocument(txt, context, phase);
 
-        if(phase == ParserPhase.TRAINING)
-            debugger = AIKADebugger.createAndShowGUI(doc);
+        infer(doc, context, phase);
+
+        doc.disconnect();
+
+        return doc;
+    }
+
+    protected void infer(Document doc, Context context, ParserPhase phase) {
+        if(phase == ParserPhase.TRAINING) {
+    //        debugger = AIKADebugger.createAndShowGUI(doc);
+        }
 
         doc.setFeedbackTriggerRound();
 
         getTokenizer().tokenize(doc.getContent(), context, (n, pos, begin, end) -> {
             TokenActivation tAct = doc.addToken(n, pos, begin, end);
-            tAct.setNet(m.getInputPatternNetTarget());
+            tAct.setNet(getTemplateModel().getInputPatternNetTarget());
         });
 
         doc.process(MAX_ROUND, INFERENCE);
@@ -77,8 +85,6 @@ public abstract class Parser {
         doc.anneal();
 
         doc.process(MAX_ROUND, ANNEAL);
-
-        return doc;
     }
 
 

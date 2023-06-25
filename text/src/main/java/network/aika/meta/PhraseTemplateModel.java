@@ -75,7 +75,8 @@ public class PhraseTemplateModel extends AbstractTemplateModel {
                 .map(PatternActivation.class::cast)
                 .max(Comparator.comparingDouble(act ->
                         act.getSurprisal(Sign.POS)
-                )).orElse(null);
+                ))
+                .orElse(null);
     }
 
     @Override
