@@ -18,6 +18,7 @@ package experiment.logger;
 
 import network.aika.elements.links.NegativeFeedbackLink;
 import network.aika.fields.Field;
+import network.aika.fields.ListenerFieldLink;
 import network.aika.text.Document;
 import org.apache.commons.csv.CSVPrinter;
 
@@ -29,6 +30,8 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static experiment.logger.ExperimentLogger.CSV_FORMAT;
+import static network.aika.fields.ListenerFieldLink.createEventListener;
+import static network.aika.fields.ListenerFieldLink.createUpdateListener;
 import static network.aika.utils.Utils.doubleToString;
 
 /**
@@ -58,10 +61,12 @@ public class AnnealingLogger {
             throw new RuntimeException(e);
         }
 
-        doc.getAnnealing().addListener(
-                "Annealing Logger",
-                () -> log(doc)
+        ListenerFieldLink fl = createUpdateListener(doc.getAnnealing(), "Annealing Logger",
+                (l, nr, u) ->
+                        log(doc)
         );
+        doc.getAnnealing().addOutput(fl);
+        fl.connect(false);
     }
 
     private List<String> createHeader(Document doc) {
