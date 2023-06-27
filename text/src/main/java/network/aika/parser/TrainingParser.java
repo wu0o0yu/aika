@@ -17,6 +17,7 @@
 package network.aika.parser;
 
 import network.aika.callbacks.ActivationCheckCallback;
+import network.aika.callbacks.InstantiationCallback;
 import network.aika.elements.activations.Activation;
 import network.aika.text.Document;
 
@@ -26,12 +27,13 @@ import static network.aika.meta.LabelUtil.generateTemplateInstanceLabels;
  *
  * @author Lukas Molzberger
  */
-public abstract class TrainingParser extends Parser implements ActivationCheckCallback {
+public abstract class TrainingParser extends Parser implements ActivationCheckCallback, InstantiationCallback {
 
     @Override
     protected Document initDocument(String txt, Context context, ParserPhase phase) {
         Document doc = super.initDocument(txt, context, phase);
         doc.setActivationCheckCallback(this);
+        doc.setInstantiationCallback(this);
 
         return doc;
     }
@@ -39,6 +41,10 @@ public abstract class TrainingParser extends Parser implements ActivationCheckCa
     @Override
     public boolean check(Activation iAct) {
         return getTemplateModel().evaluatePrimaryBindingActs(iAct);
+    }
+
+    public void onInstantiation(Activation act) {
+        generateTemplateInstanceLabels(act);
     }
 
     @Override
@@ -54,10 +60,6 @@ public abstract class TrainingParser extends Parser implements ActivationCheckCa
     }
 
     protected void train(Document doc) {
-        doc.setInstantiationCallback(act ->
-                generateTemplateInstanceLabels(act)
-        );
-
         waitForClick(debugger);
 
         doc.instantiateTemplates();

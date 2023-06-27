@@ -19,6 +19,7 @@ package network.aika.elements.links;
 import network.aika.elements.activations.BindingActivation;
 import network.aika.elements.activations.PatternActivation;
 import network.aika.elements.synapses.PositiveFeedbackSynapse;
+import network.aika.exceptions.InvalidRelinkingException;
 import network.aika.fields.*;
 import network.aika.visitor.Visitor;
 
@@ -47,7 +48,9 @@ public class PositiveFeedbackLink extends FeedbackLink<PositiveFeedbackSynapse, 
 
     public void relinkInput(PatternActivation in) {
         if(input != null) {
-            assert input == in;
+            if(input != in) {
+                throw new InvalidRelinkingException(input, in);
+            }
             return;
         }
 
