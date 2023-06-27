@@ -44,6 +44,7 @@ import java.util.stream.Stream;
 import static java.lang.Integer.MAX_VALUE;
 import static network.aika.callbacks.EventType.CREATE;
 import static network.aika.callbacks.EventType.UPDATE;
+import static network.aika.elements.activations.Timestamp.NOT_SET;
 import static network.aika.elements.neurons.Range.joinTokenPosition;
 import static network.aika.elements.neurons.Range.tokenPositionEquals;
 import static network.aika.fields.FieldLink.linkAndConnect;
@@ -63,8 +64,8 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
     protected N neuron;
     protected Thought thought;
 
-    protected Timestamp created = Timestamp.NOT_SET;
-    protected Timestamp fired = Timestamp.NOT_SET;
+    protected Timestamp created = NOT_SET;
+    protected Timestamp fired = NOT_SET;
 
     protected FieldOutput value;
 
@@ -105,9 +106,11 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
         isFired = threshold(this, "isFired", 0.0, ABOVE, net);
 
         isFired.addEventListener("onFired", () -> {
-                    fired = thought.getCurrentTimestamp();
-                    LinkingOut.add(this);
-                    Counting.add(this);
+                    if(fired == NOT_SET) {
+                        fired = thought.getCurrentTimestamp();
+                        LinkingOut.add(this);
+                        Counting.add(this);
+                    }
                 }
         );
 
