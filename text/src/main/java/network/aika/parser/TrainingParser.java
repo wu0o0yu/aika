@@ -52,6 +52,7 @@ public abstract class TrainingParser extends Parser implements ActivationCheckCa
         Document doc = initDocument(txt, context, phase);
 
         infer(doc, context, phase);
+        anneal(doc);
         train(doc);
 
         doc.disconnect();

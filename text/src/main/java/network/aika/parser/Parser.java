@@ -62,6 +62,8 @@ public abstract class Parser {
 
         infer(doc, context, phase);
 
+        anneal(doc);
+
         doc.disconnect();
 
         return doc;
@@ -80,12 +82,12 @@ public abstract class Parser {
         });
 
         doc.process(MAX_ROUND, INFERENCE);
-
-        doc.anneal();
-
-        doc.process(MAX_ROUND, ANNEAL);
     }
 
+    public void anneal(Document doc) {
+        doc.anneal();
+        doc.process(MAX_ROUND, ANNEAL);
+    }
 
     protected static void waitForClick(AIKADebugger debugger) {
         if(debugger != null)
