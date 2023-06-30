@@ -19,6 +19,7 @@ package network.aika.meta;
 import network.aika.Model;
 import network.aika.elements.activations.*;
 import network.aika.elements.neurons.BindingNeuron;
+import network.aika.elements.neurons.NeuronProvider;
 import network.aika.sign.Sign;
 
 import java.util.Comparator;
@@ -30,6 +31,18 @@ import java.util.List;
  * @author Lukas Molzberger
  */
 public class PhraseTemplateModel extends AbstractTemplateModel {
+
+    protected NeuronProvider textSectionPatternN;
+
+    protected NeuronProvider textSectionPatternCategory;
+
+
+    protected NeuronProvider topicPatternN;
+
+    protected NeuronProvider topicPatternCategory;
+
+
+
 
     PatternActivation maxSurprisalAct = null;
 
