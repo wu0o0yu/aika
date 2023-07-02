@@ -12,7 +12,7 @@ import static network.aika.parser.ParserPhase.COUNTING;
 import static network.aika.parser.ParserPhase.TRAINING;
 
 
-public class TestAnnealing extends TrainingParser {
+public class AnnealingTest extends TrainingParser {
 
     private AbstractTemplateModel templateModel;
     private Tokenizer tokenizer;

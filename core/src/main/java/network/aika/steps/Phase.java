@@ -26,7 +26,7 @@ public enum Phase {
     OUTPUT_LINKING(),
     FEEDBACK_TRIGGER(),
     INFERENCE(),
-    POST_CLOSE(true),
+    PRE_ANNEAL(),
     NEGATIVE_FEEDBACK(true),
     ANNEAL(true),
     TRAINING(true),

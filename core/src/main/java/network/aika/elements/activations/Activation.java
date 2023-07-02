@@ -146,7 +146,7 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
         linkAndConnect(getNeuron().getBias(), net)
                 .setPropagateUpdates(false);
 
-        netPreAnneal = new QueueSumField(this, POST_CLOSE, "netPreAnneal", TOLERANCE);
+        netPreAnneal = new QueueSumField(this, PRE_ANNEAL, "netPreAnneal", TOLERANCE);
         linkAndConnect(net, netPreAnneal);
 
         netPreAnneal.addUpdateListener("disconnect listener", () ->
