@@ -137,6 +137,9 @@ public class SyllablesExperiment extends TrainingParser {
         if(counter[0] >= 1) {// 3, 6, 11, 18, 100, 39, 49
     //        debugger = AIKADebugger.createAndShowGUI(doc);
         }
+        if(txt.equalsIgnoreCase("kleider")) {
+//            debugger = AIKADebugger.createAndShowGUI(doc);
+        }
 
         LoggingListener logger = null;
 
