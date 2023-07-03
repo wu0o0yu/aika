@@ -27,6 +27,7 @@ import network.aika.visitor.DownVisitor;
 import network.aika.visitor.linking.pattern.PatternCategoryDownVisitor;
 import network.aika.visitor.linking.pattern.PatternCategoryUpVisitor;
 
+import java.util.Objects;
 import java.util.stream.Stream;
 
 import static network.aika.fields.Fields.isTrue;
@@ -54,7 +55,8 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
 
     public Stream<PatternActivation> getOutputPatternActivations() {
         return getInputLinksByType(PositiveFeedbackLink.class)
-                .map(Link::getInput);
+                .map(Link::getInput)
+                .filter(Objects::nonNull);
     }
 
     public PatternActivation getInputPatternActivation() {
