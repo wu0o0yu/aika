@@ -100,7 +100,7 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
 
     @Override
     public void disconnect() {
-        weightedInput.disconnectInputs(false);
+        weightedInput.disconnectAndUnlinkInputs(false);
     }
 
     public void instantiateTemplate(I iAct, O oAct) {

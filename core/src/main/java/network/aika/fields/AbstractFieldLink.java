@@ -93,7 +93,11 @@ public abstract class AbstractFieldLink<O extends UpdateListener> {
         connected = false;
     }
 
-    public abstract void unlink();
+    public void unlinkInput() {
+        input.removeOutput(this);
+    }
+
+    public abstract void unlinkOutput();
 
     public double getInputValue() {
         return connected ?

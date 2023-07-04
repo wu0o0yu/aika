@@ -52,8 +52,7 @@ public class ListenerFieldLink extends AbstractFieldLink<UpdateListener> {
     }
 
     @Override
-    public void unlink() {
-
+    public void unlinkOutput() {
     }
 
     public String getListenerName() {

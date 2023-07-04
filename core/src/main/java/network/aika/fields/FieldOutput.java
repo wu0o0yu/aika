@@ -42,7 +42,7 @@ public interface FieldOutput {
 
     FieldObject getReference();
 
-    void disconnectOutputs(boolean deinitialize);
+    void disconnectUnlinkOutputs(boolean deinitialize);
 
     default void addEventListener(String listenerName, FieldOnTrueEvent eventListener) {
         addEventListener(listenerName, eventListener, false);

@@ -35,7 +35,7 @@ public interface FieldInput extends UpdateListener {
 
     void connectInputs(boolean initialize);
 
-    void disconnectInputs(boolean deinitialize);
+    void disconnectAndUnlinkInputs(boolean deinitialize);
 
     int getNextArg();
 

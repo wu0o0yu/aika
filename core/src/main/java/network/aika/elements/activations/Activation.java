@@ -150,7 +150,7 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
         linkAndConnect(net, netPreAnneal);
 
         netPreAnneal.addUpdateListener("disconnect listener", () ->
-                netPreAnneal.disconnectInputs(false)
+                netPreAnneal.disconnectAndUnlinkInputs(false)
         );
     }
 
@@ -434,13 +434,13 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
 
     @Override
     public void disconnect() {
-        net.disconnectInputs(false);
+        net.disconnectAndUnlinkInputs(false);
 
         if(updateValue != null)
-            updateValue.disconnectOutputs(false);
+            updateValue.disconnectUnlinkOutputs(false);
 
         if(negUpdateValue != null)
-            negUpdateValue.disconnectOutputs(false);
+            negUpdateValue.disconnectUnlinkOutputs(false);
 
         getInputLinks().forEach(l ->
                 l.disconnect()

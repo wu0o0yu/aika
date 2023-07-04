@@ -70,9 +70,9 @@ public class FieldLink extends AbstractFieldLink<FieldInput> {
         super(input, arg, output);
     }
 
+
     @Override
-    public void unlink() {
-        input.removeOutput(this);
+    public void unlinkOutput() {
         output.removeInput(this);
     }
 }
