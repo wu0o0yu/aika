@@ -100,11 +100,11 @@ public class Model implements Writable {
     }
 
     public <N extends Neuron> N lookupNeuronByLabel(String tokenLabel, NeuronProducer<N> onNewCallback) {
-        Long id = suspensionCallback.getIdByLabel(tokenLabel);
-        if(id != null)
-            return (N) lookupNeuronProvider(id).getNeuron();
+        N n = getNeuronByLabel(tokenLabel);
+        if(n != null)
+            return n;
 
-        N n = onNewCallback.createNeuron(tokenLabel);
+        n = onNewCallback.createNeuron(tokenLabel);
         n.addProvider(this);
 
         suspensionCallback.putLabel(tokenLabel, n.getId());
@@ -112,15 +112,9 @@ public class Model implements Writable {
         return n;
     }
 
-    public NeuronProvider getNeuronProvider(String tokenLabel) {
+    public <N extends Neuron> N getNeuronByLabel(String tokenLabel) {
         Long id = suspensionCallback.getIdByLabel(tokenLabel);
-        if(id == null) return null;
-        return lookupNeuronProvider(id);
-    }
-
-    public Neuron getNeuron(String tokenLabel) {
-        NeuronProvider np = getNeuronProvider(tokenLabel);
-        return np != null ? np.getNeuron() : null;
+        return id != null ? (N) lookupNeuronProvider(id).getNeuron() : null;
     }
 
     public Stream<NeuronProvider> getAllNeurons() {
