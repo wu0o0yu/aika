@@ -51,15 +51,11 @@ public abstract class Field implements FieldInput, FieldOutput, Writable {
     protected Double tolerance;
 
     public Field(FieldObject reference, String label, Double tolerance) {
-        this(reference, label, tolerance, false);
-    }
-
-    public Field(FieldObject reference, String label, Double tolerance, boolean weakRefs) {
         this.reference = reference;
         this.label = label;
         this.tolerance = tolerance;
 
-        initIO(weakRefs);
+        initIO();
     }
 
     public Field addListener(String listenerName, FieldOnTrueEvent fieldListener) {
@@ -70,7 +66,7 @@ public abstract class Field implements FieldInput, FieldOutput, Writable {
         return this;
     }
 
-    protected void initIO(boolean weakRefs) {
+    protected void initIO() {
         receivers = new ArrayList<>();
     }
 

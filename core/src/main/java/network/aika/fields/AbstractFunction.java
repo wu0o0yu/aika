@@ -35,10 +35,8 @@ public abstract class AbstractFunction extends Field implements FieldInput {
     }
 
     @Override
-    protected void initIO(boolean weakRefs) {
-        super.initIO(weakRefs);
-
-        // TODO: implement weakRefs
+    protected void initIO() {
+        super.initIO();
         inputs = new FieldLink[getNumberOfFunctionArguments()];
     }
 

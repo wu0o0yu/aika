@@ -63,7 +63,7 @@ public abstract class ConjunctiveNeuron<A extends ConjunctiveActivation> extends
     }
 
     protected MultiInputField initSynapseBiasSum() {
-        MultiInputField synBiasSum = (MultiInputField) new MultiInputField(this, "synapseBiasSum", TOLERANCE, true)
+        MultiInputField synBiasSum = (MultiInputField) new MultiInputField(this, "synapseBiasSum", TOLERANCE)
                 .addListener("onSynapseBiasSumModified", () ->
                         setModified()
                 );

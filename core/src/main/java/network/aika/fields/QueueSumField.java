@@ -45,11 +45,6 @@ public class QueueSumField extends MultiInputField implements IQueueField {
         phase = p;
     }
 
-    public QueueSumField(FieldObject e, Phase p, String label, Double tolerance, boolean weakRefs) {
-        super(e, label, tolerance, weakRefs);
-        phase = p;
-    }
-
     public FieldStep getOrCreateStep() {
         return step;
     }

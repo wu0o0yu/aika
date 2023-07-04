@@ -56,7 +56,7 @@ public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends
                 >
 {
 
-    protected MultiInputField synapseBias = (MultiInputField) new QueueSumField(this, TRAINING, "synapseBias", TOLERANCE, true)
+    protected MultiInputField synapseBias = (MultiInputField) new QueueSumField(this, TRAINING, "synapseBias", TOLERANCE)
             .addListener("onSynapseBiasModified", () ->
                     setModified()
             );

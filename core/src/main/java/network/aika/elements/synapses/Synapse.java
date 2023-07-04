@@ -58,7 +58,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
 
     protected S template;
 
-    protected MultiInputField weight = (MultiInputField) new QueueSumField(this, TRAINING, "weight", TOLERANCE, true)
+    protected MultiInputField weight = (MultiInputField) new QueueSumField(this, TRAINING, "weight", TOLERANCE)
             .addListener("onWeightModified", () -> {
                 checkWeight();
                 setModified();
@@ -384,6 +384,12 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
     @Override
     public Timestamp getFired() {
         return MAX;
+    }
+
+
+    public void delete() {
+        input.removeOutputSynapse(this);
+        output.removeInputSynapse(this);
     }
 
     @Override

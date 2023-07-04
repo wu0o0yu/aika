@@ -11,15 +11,10 @@ public class MultiInputField extends Field {
         super(reference, label, tolerance);
     }
 
-    public MultiInputField(FieldObject reference, String label, Double tolerance, boolean weakRefs) {
-        super(reference, label, tolerance, weakRefs);
-    }
-
     @Override
-    protected void initIO(boolean weakRefs) {
-        super.initIO(weakRefs);
+    protected void initIO() {
+        super.initIO();
 
-        // TODO: implement weakRefs
         inputs = new ArrayList<>();
     }
 
