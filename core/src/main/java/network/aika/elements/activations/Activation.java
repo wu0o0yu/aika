@@ -458,9 +458,13 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
     }
 
     public Activation getTemplate() {
+        CategoryActivation cAct = getCategoryActivation();
+        return cAct != null ? cAct.getTemplate() : null;
+    }
+
+    public CategoryActivation getCategoryActivation() {
         return getOutputLinksByType(CategoryLink.class)
-                .map(Link::getOutput)
-                .map(Activation::getTemplate)
+                .map(l -> (CategoryActivation) l.getOutput())
                 .filter(Objects::nonNull)
                 .findFirst()
                 .orElse(null);

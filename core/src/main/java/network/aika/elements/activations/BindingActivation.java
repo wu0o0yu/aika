@@ -87,10 +87,10 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
 
     @Override
     public void patternCatVisitUp(PatternCategoryUpVisitor v, Link lastLink) {
-        Activation template = getTemplate();
-        Activation refTemplate = v.getReferenceAct().getTemplate();
+        CategoryActivation cAct = getCategoryActivation();
+        CategoryActivation refCAct = v.getReferenceAct().getCategoryActivation();
 
-        if(template != null && template == refTemplate)
+        if(cAct != null && cAct == refCAct)
             super.patternCatVisitUp(v, lastLink);
     }
 
