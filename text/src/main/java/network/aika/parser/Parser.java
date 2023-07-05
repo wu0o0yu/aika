@@ -23,6 +23,8 @@ import network.aika.elements.activations.TokenActivation;
 import network.aika.meta.AbstractTemplateModel;
 import network.aika.text.Document;
 import network.aika.tokenizer.Tokenizer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 import static network.aika.parser.ParserPhase.TRAINING;
@@ -35,6 +37,8 @@ import static network.aika.steps.keys.QueueKey.MAX_ROUND;
  * @author Lukas Molzberger
  */
 public abstract class Parser {
+
+    protected static final Logger log = LoggerFactory.getLogger(Parser.class);
 
     public abstract Tokenizer getTokenizer();
 
@@ -60,11 +64,14 @@ public abstract class Parser {
     public Document process(String txt, Context context, ParserPhase phase) {
         Document doc = initDocument(txt, context, phase);
 
-        infer(doc, context, phase);
-
-        anneal(doc);
-
-        doc.disconnect();
+        try {
+            infer(doc, context, phase);
+            anneal(doc);
+        } catch(Exception e) {
+            log.warn("Error while training:", e);
+        } finally {
+            doc.disconnect();
+        }
 
         return doc;
     }

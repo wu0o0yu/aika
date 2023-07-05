@@ -20,6 +20,8 @@ import network.aika.callbacks.ActivationCheckCallback;
 import network.aika.callbacks.InstantiationCallback;
 import network.aika.elements.activations.Activation;
 import network.aika.text.Document;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static network.aika.meta.LabelUtil.generateTemplateInstanceLabels;
 
@@ -28,6 +30,8 @@ import static network.aika.meta.LabelUtil.generateTemplateInstanceLabels;
  * @author Lukas Molzberger
  */
 public abstract class TrainingParser extends Parser implements ActivationCheckCallback, InstantiationCallback {
+
+    protected static final Logger log = LoggerFactory.getLogger(TrainingParser.class);
 
     @Override
     protected Document initDocument(String txt, Context context, ParserPhase phase) {
@@ -51,11 +55,15 @@ public abstract class TrainingParser extends Parser implements ActivationCheckCa
     public Document process(String txt, Context context, ParserPhase phase) {
         Document doc = initDocument(txt, context, phase);
 
-        infer(doc, context, phase);
-        anneal(doc);
-        train(doc);
-
-        doc.disconnect();
+        try {
+            infer(doc, context, phase);
+            anneal(doc);
+            train(doc);
+        } catch(Exception e) {
+            log.warn("Error while training:", e);
+        } finally {
+            doc.disconnect();
+        }
 
         return doc;
     }
