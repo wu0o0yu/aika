@@ -37,6 +37,7 @@ import network.aika.steps.thought.AnnealStep;
 
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import static network.aika.callbacks.EventType.*;
 import static network.aika.steps.Phase.*;
@@ -288,10 +289,6 @@ public abstract class Thought implements Element {
         return activationsById.values();
     }
 
-    public int getNumberOfActivations() {
-        return activationsById.size();
-    }
-
     public void disconnect() {
         if(model.getCurrentThought() == this)
             model.setCurrentThought(null);
@@ -320,7 +317,7 @@ public abstract class Thought implements Element {
 
         activationsById.values().stream()
                 .filter(act -> act.getNeuron().isAbstract())
-                .filter(act -> act.isFired())
+                .filter(Activation::isFired)
                 .forEach(Instantiation::add);
 
         process(MAX_ROUND, ANNEAL);
@@ -330,14 +327,11 @@ public abstract class Thought implements Element {
     }
 
     public String activationsToString() {
-        StringBuilder sb = new StringBuilder();
-
-        for(Activation act: activationsById.values()) {
-            sb.append(act.toString());
-            sb.append("\n");
-        }
-
-        return sb.toString();
+        return activationsById
+                .values()
+                .stream()
+                .map(act -> act + "\n")
+                .collect(Collectors.joining());
     }
 
     public String toString() {
