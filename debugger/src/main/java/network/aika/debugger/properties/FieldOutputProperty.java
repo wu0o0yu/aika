@@ -85,7 +85,7 @@ public class FieldOutputProperty<F extends FieldOutput> extends AbstractProperty
     @Override
     public void registerListener() {
         if(listenerLink == null) {
-            listenerLink = ListenerFieldLink.createUpdateListener(field, "fieldPropertyListener " + (field != null ? "(" + field.getLabel() + ")" : ""), this);
+            listenerLink = new ListenerFieldLink(field, "fieldPropertyListener " + (field != null ? "(" + field.getLabel() + ")" : ""), this);
             field.addOutput(listenerLink);
             listenerLink.connect(true);
         }

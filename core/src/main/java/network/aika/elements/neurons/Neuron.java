@@ -251,7 +251,7 @@ public abstract class Neuron<A extends Activation> implements Element, Writable 
 
     protected MultiInputField initBias() {
         return (MultiInputField) new QueueSumField(this, TRAINING, "bias", TOLERANCE)
-                .addListener("onBiasModified", () ->
+                .addListener("onBiasModified", (fl, nr, u) ->
                         setModified()
                 );
     }

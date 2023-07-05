@@ -16,10 +16,9 @@
  */
 package network.aika.fields;
 
-import java.util.Collection;
+import network.aika.callbacks.UpdateListener;
 
-import static network.aika.fields.ListenerFieldLink.createEventListener;
-import static network.aika.fields.ListenerFieldLink.createUpdateListener;
+import java.util.Collection;
 
 /**
  * @author Lukas Molzberger
@@ -44,23 +43,15 @@ public interface FieldOutput {
 
     void disconnectUnlinkOutputs(boolean deinitialize);
 
-    default void addEventListener(String listenerName, FieldOnTrueEvent eventListener) {
-        addEventListener(listenerName, eventListener, false);
+
+    default FieldOutput addListener(String listenerName, UpdateListener fieldListener) {
+        return addListener(listenerName, fieldListener, false);
     }
 
-    default void addEventListener(String listenerName, FieldOnTrueEvent eventListener, boolean assumeInitialized) {
-        AbstractFieldLink fl = createEventListener(this, listenerName, eventListener);
+    default FieldOutput addListener(String listenerName, UpdateListener fieldListener, boolean assumeInitialized) {
+        ListenerFieldLink fl = new ListenerFieldLink(this, listenerName, fieldListener);
         addOutput(fl);
         fl.connect(!assumeInitialized);
-    }
-
-    default void addUpdateListener(String listenerName, FieldOnTrueEvent eventListener) {
-        addUpdateListener(listenerName, eventListener, true);
-    }
-
-    default void addUpdateListener(String listenerName, FieldOnTrueEvent eventListener, boolean assumeInitialized) {
-        AbstractFieldLink fl = createUpdateListener(this, listenerName, eventListener);
-        addOutput(fl);
-        fl.connect(!assumeInitialized);
+        return this;
     }
 }

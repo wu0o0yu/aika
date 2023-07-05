@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static experiment.logger.ExperimentLogger.CSV_FORMAT;
-import static network.aika.fields.ListenerFieldLink.createUpdateListener;
 import static network.aika.utils.Utils.doubleToString;
 
 /**
@@ -60,12 +59,10 @@ public class AnnealingLogger {
             throw new RuntimeException(e);
         }
 
-        ListenerFieldLink fl = createUpdateListener(doc.getAnnealing(), "Annealing Logger",
+        doc.getAnnealing().addListener("Annealing Logger",
                 (l, nr, u) ->
-                        log(doc)
-        );
-        doc.getAnnealing().addOutput(fl);
-        fl.connect(false);
+                        log(doc),
+                true);
     }
 
     private List<String> createHeader(Document doc) {

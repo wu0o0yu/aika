@@ -17,7 +17,7 @@
 package network.aika.fields;
 
 import network.aika.Model;
-import network.aika.Thought;
+import network.aika.callbacks.UpdateListener;
 import network.aika.utils.Utils;
 import network.aika.utils.Writable;
 
@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import static network.aika.fields.ListenerFieldLink.createEventListener;
 import static network.aika.utils.Utils.doubleToString;
 
 
@@ -56,14 +55,6 @@ public abstract class Field implements FieldInput, FieldOutput, Writable {
         this.tolerance = tolerance;
 
         initIO();
-    }
-
-    public Field addListener(String listenerName, FieldOnTrueEvent fieldListener) {
-        ListenerFieldLink fl = createEventListener(this, listenerName, fieldListener);
-        addOutput(fl);
-        fl.connect(true);
-
-        return this;
     }
 
     protected void initIO() {

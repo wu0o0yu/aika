@@ -105,8 +105,8 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
 
         isFired = threshold(this, "isFired", 0.0, ABOVE, net);
 
-        isFired.addEventListener("onFired", () -> {
-                    if(fired == NOT_SET) {
+        isFired.addListener("onFired", (fl, nr, u) -> {
+                    if(u > 0.0 && fired == NOT_SET) {
                         fired = thought.getCurrentTimestamp();
                         LinkingOut.add(this);
                         Counting.add(this);
@@ -149,7 +149,7 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
         netPreAnneal = new QueueSumField(this, PRE_ANNEAL, "netPreAnneal", TOLERANCE);
         linkAndConnect(net, netPreAnneal);
 
-        netPreAnneal.addUpdateListener("disconnect listener", () ->
+        netPreAnneal.addListener("disconnect listener", (fl, nr, u) ->
                 netPreAnneal.disconnectAndUnlinkInputs(false)
         );
     }

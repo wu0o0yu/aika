@@ -50,21 +50,23 @@ public abstract class ConjunctiveNeuron<A extends ConjunctiveActivation> extends
     protected MultiInputField synapseBiasSum = initSynapseBiasSum();
 
     public ConjunctiveNeuron() {
-        bias.addEventListener(
+        bias.addListener(
                 "onBiasUpdate",
-                this::updateSumOfLowerWeights,
+                (fl, nr, u) ->
+                        updateSumOfLowerWeights(),
                 true
         );
-        synapseBiasSum.addEventListener(
+        synapseBiasSum.addListener(
                 "onSynapseBiasSumUpdate",
-                this::updateSumOfLowerWeights,
+                (fl, nr, u) ->
+                        updateSumOfLowerWeights(),
                 true
         );
     }
 
     protected MultiInputField initSynapseBiasSum() {
         MultiInputField synBiasSum = (MultiInputField) new MultiInputField(this, "synapseBiasSum", TOLERANCE)
-                .addListener("onSynapseBiasSumModified", () ->
+                .addListener("onSynapseBiasSumModified", (fl, nr, u) ->
                         setModified()
                 );
         synBiasSum.setInitialValue(0.0);
@@ -146,9 +148,10 @@ public abstract class ConjunctiveNeuron<A extends ConjunctiveActivation> extends
     @Override
     public void addInputSynapse(Synapse s) {
         super.addInputSynapse(s);
-        s.getWeight().addEventListener(
+        s.getWeight().addListener(
                 "onWeightUpdate",
-                this::updateSumOfLowerWeights,
+                (fl, nr, u) ->
+                        updateSumOfLowerWeights(),
                 true
         );
     }
