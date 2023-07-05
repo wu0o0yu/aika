@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static experiment.logger.ExperimentLogger.CSV_FORMAT;
-import static network.aika.fields.ListenerFieldLink.createEventListener;
 import static network.aika.fields.ListenerFieldLink.createUpdateListener;
 import static network.aika.utils.Utils.doubleToString;
 
