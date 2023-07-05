@@ -79,7 +79,8 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
     }
 
     protected void checkWeight() {
-        assert !isNegative();
+        if(isNegative())
+            delete();
     }
 
     public Scope getScope() {
@@ -388,6 +389,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
 
 
     public void delete() {
+        log.info("Delete synapse: " + this);
         input.removeOutputSynapse(this);
         output.removeInputSynapse(this);
     }

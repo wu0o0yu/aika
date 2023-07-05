@@ -39,7 +39,8 @@ public class NegativeFeedbackSynapse extends FeedbackSynapse<
 
     @Override
     protected void checkWeight() {
-        assert isNegative();
+        if(!isNegative())
+            delete();
     }
 
     @Override
