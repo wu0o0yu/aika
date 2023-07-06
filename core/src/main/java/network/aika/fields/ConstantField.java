@@ -22,31 +22,65 @@ import java.util.Collections;
 /**
  * @author Lukas Molzberger
  */
-public class ConstantField extends Field implements FieldOutput {
+public class ConstantField implements FieldOutput {
 
     public static final ConstantField ZERO = new ConstantField(null, "ZERO", 0.0);
     public static final ConstantField ONE = new ConstantField(null, "ONE", 1.0);
 
+    private FieldObject reference;
+
+    private String label;
+
+    private double value;
+
     public ConstantField(FieldObject ref, String label, double value) {
-        super(ref, label, null);
-        setInitialValue(value);
+        this.reference = ref;
+        this.label = label;
+        this.value = value;
     }
 
     @Override
-    public void addInput(FieldLink fl) {
+    public String getLabel() {
+        return label;
     }
 
     @Override
-    public void removeInput(FieldLink fl) {
+    public String getValueString() {
+        return "" + value;
     }
 
     @Override
-    public Collection<FieldLink> getInputs() {
+    public double getValue() {
+        return value;
+    }
+
+    @Override
+    public double getUpdatedValue() {
+        return value;
+    }
+
+    @Override
+    public void addOutput(AbstractFieldLink fl) {
+
+    }
+
+    @Override
+    public void removeOutput(AbstractFieldLink fl) {
+
+    }
+
+    @Override
+    public Collection<AbstractFieldLink> getReceivers() {
         return Collections.emptyList();
     }
 
     @Override
-    public int getNextArg() {
-        return 0;
+    public FieldObject getReference() {
+        return reference;
+    }
+
+    @Override
+    public void disconnectUnlinkOutputs(boolean deinitialize) {
+
     }
 }

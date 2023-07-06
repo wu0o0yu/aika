@@ -76,9 +76,17 @@ public class ActivationViewManager extends AbstractViewManager<Activation, Activ
         graphManager = new ActivationGraphManager(graph, doc);
 
         this.doc = doc;
-        doc.addEventListener(this);
+        register();
 
         view = initView();
+    }
+
+    public void register() {
+        doc.addEventListener(this);
+    }
+
+    public void unregister() {
+        doc.removeEventListener(this);
     }
 
     public StepManager getStepManager() {
@@ -101,7 +109,7 @@ public class ActivationViewManager extends AbstractViewManager<Activation, Activ
     }
 
     @Override
-    public Component getConsoleManager() {
+    public ActivationConsoleManager getConsoleManager() {
         return consoleManager;
     }
 

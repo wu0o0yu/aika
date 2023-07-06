@@ -108,6 +108,7 @@ public class DebuggerKeyListener implements KeyListener {
         public void execute(ActivationViewManager avm) {
             StepManager sm = avm.getStepManager();
             sm.setStepMode(false);
+//            debugger.getActivationViewManager().getConsoleManager().unregister();
             sm.setBreakpoint(null);
             sm.resetTimestamp();
             sm.click();
@@ -130,6 +131,7 @@ public class DebuggerKeyListener implements KeyListener {
         public void execute(ActivationViewManager avm) {
             StepManager sm = avm.getStepManager();
             sm.setStepMode(true);
+//            debugger.getActivationViewManager().getConsoleManager().register();
             sm.click();
         }
     }

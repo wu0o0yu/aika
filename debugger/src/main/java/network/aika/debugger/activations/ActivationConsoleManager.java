@@ -62,7 +62,15 @@ public class ActivationConsoleManager extends JSplitPane implements AbstractCons
         setBottomComponent(getScrollPane(queueConsole));
         setResizeWeight(0.65);
 
+        register();
+    }
+
+    public void register() {
         doc.addEventListener(this);
+    }
+
+    public void unregister() {
+        doc.removeEventListener(this);
     }
 
     public ActivationPanelMode getMode() {

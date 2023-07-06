@@ -108,7 +108,7 @@ public class Model implements Writable {
         n.addProvider(this);
 
         suspensionCallback.putLabel(tokenLabel, n.getId());
-//        n.getProvider().save();
+        n.getProvider().save();
         return n;
     }
 

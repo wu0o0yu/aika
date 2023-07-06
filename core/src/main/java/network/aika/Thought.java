@@ -71,7 +71,7 @@ public abstract class Thought implements Element {
 
     private final TreeMap<Integer, Activation> activationsById = new TreeMap<>();
     private final Map<NeuronProvider, PreActivation<? extends Activation>> actsPerNeuron = new HashMap<>();
-    private final List<network.aika.callbacks.EventListener> eventListeners = new ArrayList<>();
+    private final Set<EventListener> eventListeners = new HashSet<>();
 
     private Config config;
 
@@ -84,7 +84,7 @@ public abstract class Thought implements Element {
         id = model.createThoughtId();
         absoluteBegin = m.getN();
 
-        annealing = new ConstantField(this, "anneal", 0.0);
+        annealing = new InputField(this, "anneal", 0.0);
         feedbackTrigger = new QueueSumField(this, FEEDBACK_TRIGGER, "feedback trigger", 0.0);
 
         assert m.getCurrentThought() == null;
@@ -175,15 +175,15 @@ public abstract class Thought implements Element {
         this.instantiationCallback = instantiationCallback;
     }
 
-    private void callEventListener(Consumer<network.aika.callbacks.EventListener> el) {
+    private void callEventListener(Consumer<EventListener> el) {
         getEventListeners().forEach(el);
     }
 
-    public synchronized Collection<network.aika.callbacks.EventListener> getEventListeners() {
+    public synchronized Collection<EventListener> getEventListeners() {
         return new ArrayList<>(eventListeners);
     }
 
-    public synchronized void addEventListener(network.aika.callbacks.EventListener l) {
+    public synchronized void addEventListener(EventListener l) {
         eventListeners.add(l);
     }
 

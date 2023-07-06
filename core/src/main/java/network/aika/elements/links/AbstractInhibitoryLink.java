@@ -64,6 +64,12 @@ public class AbstractInhibitoryLink<S extends AbstractInhibitorySynapse, I exten
         output.connectOutgoingLinks(this);
     }
 
+    @Override
+    public void disconnect() {
+        super.disconnect();
+        net.disconnectAndUnlinkInputs(false);
+    }
+
     public FieldOutput getValue() {
         return value;
     }

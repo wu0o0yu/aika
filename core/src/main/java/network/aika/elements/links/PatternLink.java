@@ -23,6 +23,7 @@ import network.aika.elements.synapses.Synapse;
 import network.aika.fields.AbstractFunction;
 import network.aika.elements.synapses.PatternSynapse;
 import network.aika.fields.Field;
+import network.aika.fields.FieldOutput;
 import network.aika.fields.MultiInputField;
 import network.aika.sign.Sign;
 import network.aika.steps.link.LinkCounting;
@@ -103,7 +104,7 @@ public class PatternLink extends ConjunctiveLink<PatternSynapse, BindingActivati
         return r;
     }
 
-    public Field getInputPatternNet() {
+    public FieldOutput getInputPatternNet() {
         if(input == null)
             return ZERO;
 

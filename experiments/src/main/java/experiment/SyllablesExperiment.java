@@ -134,14 +134,14 @@ public class SyllablesExperiment extends TrainingParser {
 
         Document doc = initDocument(txt, context, phase);
 
-        if(counter[0] >= 1) {// 3, 6, 11, 18, 100, 39, 49
-    //        debugger = AIKADebugger.createAndShowGUI(doc);
+        if(counter[0] >= 18) {// 3, 6, 11, 18, 100, 39, 49
+            debugger = AIKADebugger.createAndShowGUI(doc);
         }
         if(txt.equalsIgnoreCase("kleider")) {
 //            debugger = AIKADebugger.createAndShowGUI(doc);
         }
         if(doc.getId() == 49183l) {
-            debugger = AIKADebugger.createAndShowGUI(doc);
+//            debugger = AIKADebugger.createAndShowGUI(doc);
         }
 
         LoggingListener logger = null;
