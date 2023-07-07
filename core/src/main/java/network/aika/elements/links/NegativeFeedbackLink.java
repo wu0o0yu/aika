@@ -30,7 +30,9 @@ import static network.aika.fields.Fields.mul;
  */
 public class NegativeFeedbackLink extends FeedbackLink<NegativeFeedbackSynapse, InhibitoryActivation> {
 
-    Field weightUpdate;
+    private Field weightUpdate;
+
+    private Multiplication innerWeightedInput;
 
     public NegativeFeedbackLink(NegativeFeedbackSynapse s, InhibitoryActivation input, BindingActivation output) {
         super(s, input, output);
@@ -52,11 +54,12 @@ public class NegativeFeedbackLink extends FeedbackLink<NegativeFeedbackSynapse, 
 
     @Override
     protected Multiplication initWeightedInput() {
+        innerWeightedInput = super.initWeightedInput();
         return mul(
                 this,
                 "annealing * iAct(" + getInputKeyString() + ").value * weight",
                 getThought().getAnnealing(),
-                super.initWeightedInput()
+                innerWeightedInput
         );
     }
 
@@ -83,6 +86,8 @@ public class NegativeFeedbackLink extends FeedbackLink<NegativeFeedbackSynapse, 
     @Override
     public void disconnect() {
         super.disconnect();
+
+        innerWeightedInput.disconnectAndUnlinkInputs(false);
 
         if(weightUpdate != null)
             weightUpdate.disconnectAndUnlinkOutputs(false);
