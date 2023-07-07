@@ -78,6 +78,13 @@ public abstract class ConjunctiveLink<S extends ConjunctiveSynapse, IA extends A
         );
     }
 
+    @Override
+    public void disconnect() {
+        weightUpdatePosCase.disconnectAndUnlinkOutputs(false);
+        weightUpdateNegCase.disconnectAndUnlinkOutputs(false);
+        biasUpdateNegCase.disconnectAndUnlinkOutputs(false);
+    }
+
     public FieldOutput getWeightUpdatePosCase() {
         return weightUpdatePosCase;
     }

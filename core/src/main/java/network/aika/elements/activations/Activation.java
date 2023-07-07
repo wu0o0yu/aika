@@ -437,10 +437,10 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
         net.disconnectAndUnlinkInputs(false);
 
         if(updateValue != null)
-            updateValue.disconnectUnlinkOutputs(false);
+            updateValue.disconnectAndUnlinkOutputs(false);
 
         if(negUpdateValue != null)
-            negUpdateValue.disconnectUnlinkOutputs(false);
+            negUpdateValue.disconnectAndUnlinkOutputs(false);
 
         getInputLinks().forEach(l ->
                 l.disconnect()

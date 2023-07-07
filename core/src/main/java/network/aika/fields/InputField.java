@@ -16,42 +16,34 @@
  */
 package network.aika.fields;
 
-import network.aika.callbacks.UpdateListener;
-
 import java.util.Collection;
+import java.util.Collections;
 
 /**
  * @author Lukas Molzberger
  */
-public interface FieldOutput {
+public class InputField extends Field implements FieldOutput {
 
-    String getLabel();
-
-    String getValueString();
-
-    double getValue();
-
-    double getUpdatedValue();
-
-    void addOutput(AbstractFieldLink fl);
-
-    void removeOutput(AbstractFieldLink fl);
-
-    Collection<AbstractFieldLink> getReceivers();
-
-    FieldObject getReference();
-
-    void disconnectAndUnlinkOutputs(boolean deinitialize);
-
-
-    default FieldOutput addListener(String listenerName, UpdateListener fieldListener) {
-        return addListener(listenerName, fieldListener, false);
+    public InputField(FieldObject ref, String label, double value) {
+        super(ref, label, null);
+        setInitialValue(value);
     }
 
-    default FieldOutput addListener(String listenerName, UpdateListener fieldListener, boolean assumeInitialized) {
-        ListenerFieldLink fl = new ListenerFieldLink(this, listenerName, fieldListener);
-        addOutput(fl);
-        fl.connect(!assumeInitialized);
-        return this;
+    @Override
+    public void addInput(FieldLink fl) {
+    }
+
+    @Override
+    public void removeInput(FieldLink fl) {
+    }
+
+    @Override
+    public Collection<FieldLink> getInputs() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public int getNextArg() {
+        return 0;
     }
 }

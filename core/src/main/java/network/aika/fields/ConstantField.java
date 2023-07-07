@@ -80,7 +80,7 @@ public class ConstantField implements FieldOutput {
     }
 
     @Override
-    public void disconnectUnlinkOutputs(boolean deinitialize) {
+    public void disconnectAndUnlinkOutputs(boolean deinitialize) {
 
     }
 }

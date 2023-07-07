@@ -109,7 +109,7 @@ public abstract class Field implements FieldInput, FieldOutput, Writable {
         });
     }
 
-    public void disconnectUnlinkOutputs(boolean deinitialize) {
+    public void disconnectAndUnlinkOutputs(boolean deinitialize) {
         getReceivers().forEach(fl -> {
             fl.disconnect(deinitialize);
             fl.unlinkOutput();
