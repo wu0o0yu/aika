@@ -80,6 +80,8 @@ public abstract class ConjunctiveLink<S extends ConjunctiveSynapse, IA extends A
 
     @Override
     public void disconnect() {
+        super.disconnect();
+
         if(weightUpdatePosCase != null)
             weightUpdatePosCase.disconnectAndUnlinkOutputs(false);
         if(weightUpdateNegCase != null)
