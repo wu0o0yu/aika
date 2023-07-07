@@ -253,8 +253,16 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
     }
 
     public void link() {
-        input.linkInput(this);
-        output.linkOutput(this);
+        input.addOutputSynapse(this);
+        output.addInputSynapse(this);
+    }
+
+    public void unlinkInput() {
+        input.removeOutputSynapse(this);
+    }
+
+    public void unlinkOutput() {
+        input.removeInputSynapse(this);
     }
 
     public abstract L createLink(IA input, OA output);

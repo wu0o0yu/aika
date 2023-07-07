@@ -31,6 +31,8 @@ import network.aika.visitor.LinkLinkingOperator;
 import network.aika.steps.activation.Save;
 import network.aika.utils.Writable;
 import network.aika.visitor.linking.LinkingOperator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -54,6 +56,8 @@ import static network.aika.utils.Utils.TOLERANCE;
  * @author Lukas Molzberger
  */
 public abstract class Neuron<A extends Activation> implements Element, Writable {
+
+    protected static final Logger log = LoggerFactory.getLogger(Neuron.class);
 
     volatile long retrievalCount = 0;
 
@@ -370,6 +374,12 @@ public abstract class Neuron<A extends Activation> implements Element, Writable 
 
     public void removeOutputSynapse(Synapse s) {
         setModified();
+    }
+
+    public void delete() {
+        log.info("Delete Neuron: " + this);
+        provider.getInputSynapses().forEach(Synapse::unlinkInput);
+        provider.getOutputSynapses().forEach(Synapse::unlinkOutput);
     }
 
     public Writable getCustomData() {

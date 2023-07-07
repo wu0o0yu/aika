@@ -176,30 +176,6 @@ public class NeuronProvider implements Comparable<NeuronProvider> {
         checkRegister();
     }
 
-    public void linkInput(Synapse s) {
-        lock.acquireWriteLock();
-        addOutputSynapse(s);
-        lock.releaseWriteLock();
-    }
-
-    public void unlinkInput(Synapse s) {
-        lock.acquireWriteLock();
-        removeOutputSynapse(s);
-        lock.releaseWriteLock();
-    }
-
-    public void linkOutput(Synapse s) {
-        lock.acquireWriteLock();
-        addInputSynapse(s);
-        lock.releaseWriteLock();
-    }
-
-    public void unlinkOutput(Synapse s) {
-        lock.acquireWriteLock();
-        removeOutputSynapse(s);
-        lock.releaseWriteLock();
-    }
-
     public void addInputSynapse(Synapse s) {
         lock.acquireWriteLock();
         inputSynapses.put(s.getPInput().getId(), s);

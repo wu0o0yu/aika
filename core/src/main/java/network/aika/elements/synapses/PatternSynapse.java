@@ -86,6 +86,12 @@ public class PatternSynapse extends ConjunctiveSynapse<
     }
 
     @Override
+    public void delete() {
+        super.delete();
+        getInput().delete();
+    }
+
+    @Override
     public double getPropagatePreNet(BindingActivation iAct) {
         return getOutput().getBias().getValue() +
                 weight.getValue() +

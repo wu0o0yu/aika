@@ -42,7 +42,7 @@ public abstract class CategorySynapse<S extends CategorySynapse, I extends Neuro
 
     @Override
     public void link() {
-        input.linkInput(this);
+        input.addOutputSynapse(this);
     }
 
     @Override
