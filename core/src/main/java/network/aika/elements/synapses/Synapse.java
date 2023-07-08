@@ -145,32 +145,8 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
                 .anyMatch(iAct -> iAct == iActB);
     }
 
-    public boolean linkExists(IA iAct, OA oAct) {
-        assert iAct.getNeuron() == getInput();
-
-        Link existingLink = oAct.getInputLink(iAct.getNeuron());
-        if(existingLink == null)
-            return false;
-
-        assert existingLink.getSynapse() == this;
-
-        if(existingLink.getInput() != iAct) {
-            log.warn("Invalid relinking: (Previous iAct: " +
-                    existingLink.getInput().getId() + ":" + existingLink.getInput().getLabel() +
-                    " New iAct: " + iAct.getId() + ":" + iAct.getLabel() +
-                    " oAct:" + oAct.getId() + ":" + oAct.getLabel()
-            );
-        }
-
-        return true;
-    }
-
     public boolean linkExists(OA oAct) {
         return oAct.getInputLink(getInput()) != null;
-    }
-
-    public static boolean synapseExists(Activation iAct, Activation oAct) {
-        return oAct.getNeuron().getInputSynapse(iAct.getNeuronProvider()) != null;
     }
 
     public boolean propagateLinkExists(IA iAct) {
