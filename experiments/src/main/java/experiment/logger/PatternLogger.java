@@ -17,8 +17,12 @@
 package experiment.logger;
 
 import experiment.LabelUtil;
+import network.aika.elements.activations.Activation;
 import network.aika.elements.activations.BindingActivation;
 import network.aika.elements.activations.PatternActivation;
+import network.aika.elements.links.InhibitoryLink;
+import network.aika.elements.links.Link;
+import network.aika.elements.links.NegativeFeedbackLink;
 import network.aika.elements.links.PatternLink;
 import network.aika.elements.neurons.BindingNeuron;
 import network.aika.elements.neurons.PatternNeuron;
@@ -84,6 +88,7 @@ public class PatternLogger {
                 headerLabels.addAll(
                     List.of(
                             "|",
+                            i + "-suppr-label",
                             i + "-syn-weight",
                             i + "-syn-bias",
                             i + "-label",
@@ -174,6 +179,7 @@ public class PatternLogger {
     private static List<? extends Serializable> getEntry(PatternSynapse s, BindingNeuron bn, BindingActivation iAct) {
         return List.of(
                 "|",
+                getSuppressingBindingActLabel(iAct),
                 print(s.getWeight()),
                 print(s.getSynapseBias()),
                 iAct.getLabel(),
@@ -207,6 +213,17 @@ public class PatternLogger {
                 print(bn.getBias()),
                 print(bn.getSynapseBiasSum())
         );
+    }
+
+    private static String getSuppressingBindingActLabel(BindingActivation act) {
+        return act.getInputLinksByType(NegativeFeedbackLink.class)
+                .map(Link::getInput)
+                .flatMap(inhibAct -> inhibAct.getInputLinksByType(InhibitoryLink.class))
+                .map(Link::getInput)
+                .filter(supprAct -> supprAct.getNet().getUpdatedValue() > 0.0)
+                .map(Activation::getLabel)
+                .findFirst()
+                .orElse("--");
     }
 
     private static String print(FieldOutput f) {
