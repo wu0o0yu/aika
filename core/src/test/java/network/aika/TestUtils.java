@@ -150,8 +150,8 @@ public class TestUtils {
         s.setOutput(output);
         s.setWeight(weight);
 
-        s.getPInput().linkInput(s);
-        s.getPOutput().linkOutput(s);
+        s.getPInput().addOutputSynapse(s);
+        s.getPOutput().addInputSynapse(s);
         s.getOutput().getBias().receiveUpdate(false, -weight);
         s.getWeight().receiveUpdate(false, feedbackWeight);
         return s;

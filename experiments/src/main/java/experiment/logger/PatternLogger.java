@@ -20,10 +20,8 @@ import experiment.LabelUtil;
 import network.aika.elements.activations.Activation;
 import network.aika.elements.activations.BindingActivation;
 import network.aika.elements.activations.PatternActivation;
-import network.aika.elements.links.InhibitoryLink;
-import network.aika.elements.links.Link;
-import network.aika.elements.links.NegativeFeedbackLink;
-import network.aika.elements.links.PatternLink;
+import network.aika.elements.activations.TokenActivation;
+import network.aika.elements.links.*;
 import network.aika.elements.neurons.BindingNeuron;
 import network.aika.elements.neurons.PatternNeuron;
 import network.aika.elements.synapses.PatternSynapse;
@@ -37,6 +35,8 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static experiment.logger.ExperimentLogger.CSV_FORMAT;
 import static network.aika.utils.Utils.doubleToString;
@@ -66,6 +66,7 @@ public class PatternLogger {
                     List.of(
                             "doc-id",
                             "content",
+                            "dominant-acts",
                             "orig.-label",
                             "cur.-label",
                             "match",
@@ -134,6 +135,7 @@ public class PatternLogger {
                     List.of(
                             doc.getId(),
                             doc.getContent(),
+                            getAllDominantBindingAct(doc),
                             pAct.getLabel(),
                             LabelUtil.generateLabel(pn),
                             LabelUtil.generateLabel(pAct, false, false),
@@ -224,6 +226,16 @@ public class PatternLogger {
                 .map(Activation::getLabel)
                 .findFirst()
                 .orElse("--");
+    }
+
+    private static String getAllDominantBindingAct(Document doc) {
+        Stream<InputPatternLink> links = doc.getActivations().stream()
+                .filter(TokenActivation.class::isInstance)
+                .flatMap(act -> act.getOutputLinksByType(InputPatternLink.class));
+        return links.map(l -> l.getOutput())
+                .filter(supprAct -> supprAct.getNet().getUpdatedValue() > 0.0)
+                .map(act -> act.getTokenPos() + "-" + act.getLabel())
+                .collect(Collectors.joining(", "));
     }
 
     private static String print(FieldOutput f) {
