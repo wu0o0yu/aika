@@ -22,6 +22,8 @@ import network.aika.fields.*;
 import network.aika.elements.synapses.AbstractInhibitorySynapse;
 import network.aika.visitor.Visitor;
 
+import java.util.stream.Stream;
+
 import static network.aika.fields.FieldLink.linkAndConnect;
 import static network.aika.fields.Fields.add;
 import static network.aika.fields.Fields.mul;
@@ -31,11 +33,7 @@ import static network.aika.utils.Utils.TOLERANCE;
 /**
  * @author Lukas Molzberger
  */
-public class AbstractInhibitoryLink<S extends AbstractInhibitorySynapse, I extends Activation<?>> extends DisjunctiveLink<S, I, InhibitoryActivation> {
-
-    protected FieldOutput value;
-
-    protected Field net;
+public abstract class AbstractInhibitoryLink<S extends AbstractInhibitorySynapse, I extends Activation<?>> extends DisjunctiveLink<S, I, InhibitoryActivation> {
 
     public AbstractInhibitoryLink(S s, I input, InhibitoryActivation output) {
         super(s, input, output);
@@ -43,39 +41,11 @@ public class AbstractInhibitoryLink<S extends AbstractInhibitorySynapse, I exten
         initFields();
     }
 
-    public void connectFields(NegativeFeedbackLink out) {
-        linkAndConnect(getNet(), out.getInputValue());
-    }
-
     protected void initFields() {
-        net = new QueueSumField(this, NEGATIVE_FEEDBACK, "net", null);
-        linkAndConnect(weightedInput, net);
-        linkAndConnect(output.getNeuron().getBias(), net)
-                .setPropagateUpdates(false);
-
-        value = Fields.func(
-                this,
-                "value = f(net)",
-                TOLERANCE,
-                net,
-                x -> output.getActivationFunction().f(x)
-        );
-
-        output.connectOutgoingLinks(this);
     }
 
-    @Override
-    public void disconnect() {
-        super.disconnect();
-        net.disconnectAndUnlinkInputs(false);
-    }
+    public void connectFields(NegativeFeedbackLink out) {
 
-    public FieldOutput getValue() {
-        return value;
-    }
-
-    public FieldOutput getNet() {
-        return net;
     }
 
     @Override
@@ -85,4 +55,6 @@ public class AbstractInhibitoryLink<S extends AbstractInhibitorySynapse, I exten
     @Override
     public void patternCatVisit(Visitor v) {
     }
+
+    public abstract Stream<InhibitoryLink> getInhibitoryLinks();
 }

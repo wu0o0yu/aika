@@ -47,6 +47,11 @@ public class BindingCategoryInputSynapse extends DisjunctiveSynapse<
     }
 
     @Override
+    public boolean isLatentLinkingAllowed() {
+        return false;
+    }
+
+    @Override
     public boolean isTrainingAllowed() {
         return false;
     }

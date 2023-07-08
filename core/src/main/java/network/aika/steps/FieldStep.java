@@ -24,8 +24,7 @@ import network.aika.steps.keys.FieldQueueKey;
 import network.aika.utils.Utils;
 
 import static network.aika.steps.keys.FieldQueueKey.SORT_VALUE_PRECISION;
-import static network.aika.utils.Utils.TOLERANCE;
-import static network.aika.utils.Utils.doubleToString;
+import static network.aika.utils.Utils.*;
 
 /**
  *
@@ -113,7 +112,7 @@ public class FieldStep<E extends Element> extends Step<E> {
     }
 
     public String toShortString() {
-        return " Round:" + round +
+        return " Round:" + roundToString(round) +
                 " Delta:" + doubleToString(delta);
     }
 

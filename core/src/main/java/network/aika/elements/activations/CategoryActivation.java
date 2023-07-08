@@ -17,7 +17,7 @@
 package network.aika.elements.activations;
 
 import network.aika.Thought;
-import network.aika.elements.links.CategoryInputLink;
+import network.aika.elements.links.*;
 import network.aika.elements.neurons.Range;
 import network.aika.elements.neurons.CategoryNeuron;
 
@@ -31,6 +31,16 @@ public class CategoryActivation extends DisjunctiveActivation<CategoryNeuron> {
 
     public CategoryActivation(int id, Thought t, CategoryNeuron neuron) {
         super(id, t, neuron);
+    }
+
+    public Stream<InhibitoryLink> getInhibitoryLinks() {
+        return getInputLinksByType(InhibitoryCategoryLink.class)
+                .flatMap(l -> l.getInhibitoryLinks());
+    }
+
+    public Stream<NegativeFeedbackLink> getNegativeFeedbackLinks() {
+        return getOutputLinksByType(InhibitoryCategoryInputLink.class)
+                .flatMap(l -> l.getNegativeFeedbackLinks());
     }
 
     @Override

@@ -87,8 +87,8 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
         return scope;
     }
 
-    public boolean isFeedback() {
-        return false;
+    public boolean isLatentLinkingAllowed() {
+        return true;
     }
 
     @Override
@@ -159,7 +159,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
         getOutput()
                 .linkOutgoing(this, act);
 
-        if (!isFeedback())
+        if (isLatentLinkingAllowed())
             getOutput()
                     .latentLinkOutgoing(this, act);
 

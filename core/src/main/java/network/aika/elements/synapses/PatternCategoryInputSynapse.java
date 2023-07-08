@@ -41,13 +41,6 @@ public class PatternCategoryInputSynapse extends DisjunctiveSynapse<
     }
 
     @Override
-    public double getPropagatePreNet(CategoryActivation iAct) {
-        return getOutput().getBias().getValue() +
-                weight.getValue() +
-                getSumOfLowerWeights();
-    }
-
-    @Override
     public PatternCategoryInputLink createLink(CategoryActivation input, Activation output) {
         return new PatternCategoryInputLink(this, input, output);
     }

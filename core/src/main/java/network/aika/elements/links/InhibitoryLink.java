@@ -19,13 +19,26 @@ package network.aika.elements.links;
 import network.aika.elements.activations.BindingActivation;
 import network.aika.elements.activations.InhibitoryActivation;
 import network.aika.elements.synapses.InhibitorySynapse;
+import network.aika.fields.Field;
+import network.aika.fields.FieldOutput;
+import network.aika.fields.Fields;
+import network.aika.fields.QueueSumField;
+
+import java.util.stream.Stream;
 
 import static network.aika.elements.activations.Activation.isSelfRef;
+import static network.aika.fields.FieldLink.linkAndConnect;
+import static network.aika.steps.Phase.NEGATIVE_FEEDBACK;
+import static network.aika.utils.Utils.TOLERANCE;
 
 /**
  * @author Lukas Molzberger
  */
 public class InhibitoryLink extends AbstractInhibitoryLink<InhibitorySynapse, BindingActivation> {
+
+    protected FieldOutput value;
+
+    protected Field net;
 
     public InhibitoryLink(InhibitorySynapse inhibitorySynapse, BindingActivation input, InhibitoryActivation output) {
         super(inhibitorySynapse, input, output);
@@ -36,6 +49,46 @@ public class InhibitoryLink extends AbstractInhibitoryLink<InhibitorySynapse, Bi
         if(isSelfRef(getInput(), out.getOutput()))
             return;
 
-        super.connectFields(out);
+        linkAndConnect(getNet(), out.getInputValue());
+    }
+
+    @Override
+    public Stream<InhibitoryLink> getInhibitoryLinks() {
+        return Stream.of(this);
+    }
+
+    @Override
+    protected void initFields() {
+        net = new QueueSumField(this, NEGATIVE_FEEDBACK, "net", null);
+        linkAndConnect(weightedInput, net);
+        linkAndConnect(output.getNeuron().getBias(), net)
+                .setPropagateUpdates(false);
+
+        value = Fields.func(
+                this,
+                "value = f(net)",
+                TOLERANCE,
+                net,
+                x -> output.getActivationFunction().f(x)
+        );
+
+        InhibitoryActivation.connectFields(
+                Stream.of(this),
+                output.getNegativeFeedbackLinks()
+        );
+    }
+
+    @Override
+    public void disconnect() {
+        super.disconnect();
+        net.disconnectAndUnlinkInputs(false);
+    }
+
+    public FieldOutput getValue() {
+        return value;
+    }
+
+    public FieldOutput getNet() {
+        return net;
     }
 }

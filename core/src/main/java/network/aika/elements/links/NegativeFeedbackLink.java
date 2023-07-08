@@ -22,6 +22,8 @@ import network.aika.fields.*;
 import network.aika.elements.synapses.NegativeFeedbackSynapse;
 import network.aika.visitor.Visitor;
 
+import java.util.stream.Stream;
+
 import static network.aika.fields.FieldLink.linkAndConnect;
 import static network.aika.fields.Fields.mul;
 
@@ -40,7 +42,10 @@ public class NegativeFeedbackLink extends FeedbackLink<NegativeFeedbackSynapse, 
         if(input == null)
             return;
 
-        input.connectIncomingLinks(this);
+        InhibitoryActivation.connectFields(
+                input.getInhibitoryLinks(),
+                Stream.of(this)
+        );
     }
 
     @Override

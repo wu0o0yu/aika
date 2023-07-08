@@ -18,8 +18,13 @@ package network.aika.elements.activations;
 
 import network.aika.Thought;
 import network.aika.elements.links.AbstractInhibitoryLink;
+import network.aika.elements.links.InhibitoryCategoryLink;
+import network.aika.elements.links.InhibitoryLink;
 import network.aika.elements.links.NegativeFeedbackLink;
 import network.aika.elements.neurons.InhibitoryNeuron;
+
+import java.util.List;
+import java.util.stream.Stream;
 
 
 /**
@@ -39,17 +44,26 @@ public class InhibitoryActivation extends DisjunctiveActivation<InhibitoryNeuron
         return true;
     }
 
-    public void connectOutgoingLinks(AbstractInhibitoryLink il) {
-        getOutputLinksByType(NegativeFeedbackLink.class)
-                .forEach(ol ->
-                        il.connectFields(ol)
-                );
+    public Stream<InhibitoryLink> getInhibitoryLinks() {
+        return getInputLinksByType(AbstractInhibitoryLink.class)
+                .flatMap(AbstractInhibitoryLink::getInhibitoryLinks);
     }
 
-    public void connectIncomingLinks(NegativeFeedbackLink ol) {
-        getInputLinksByType(AbstractInhibitoryLink.class)
-                .forEach(il ->
-                        il.connectFields(ol)
-                );
+    public Stream<NegativeFeedbackLink> getNegativeFeedbackLinks() {
+        return Stream.concat(
+                getOutputLinksByType(NegativeFeedbackLink.class),
+                getOutputLinksByType(InhibitoryCategoryLink.class)
+                        .flatMap(InhibitoryCategoryLink::getNegativeFeedbackLinks)
+        );
+    }
+
+    public static void connectFields(Stream<InhibitoryLink> in, Stream<NegativeFeedbackLink> out) {
+        List<NegativeFeedbackLink> nfls = out.toList();
+
+        in.forEach(il ->
+                nfls.forEach(nfl ->
+                        il.connectFields(nfl)
+                )
+        );
     }
 }

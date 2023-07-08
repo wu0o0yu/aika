@@ -165,7 +165,7 @@ public abstract class Neuron<A extends Activation> implements Element, Writable 
     public void latentLinkOutgoing(Synapse synA, Activation iActA) {
         getInputSynapsesAsStream()
                 .filter(synB -> synA != synB)
-                .filter(synB -> !synB.isFeedback())
+                .filter(Synapse::isLatentLinkingAllowed)
                 .filter(synB -> getLatentLinkingPreNet(synA, synB) > 0.0)
                 .forEach(synB ->
                         synB.getOutput().startVisitor(

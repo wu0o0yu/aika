@@ -20,6 +20,8 @@ import network.aika.elements.activations.*;
 import network.aika.elements.synapses.*;
 import network.aika.visitor.Visitor;
 
+import java.util.stream.Stream;
+
 
 /**
  * @author Lukas Molzberger
@@ -28,6 +30,11 @@ public class InhibitoryCategoryInputLink extends AbstractInhibitoryLink<Inhibito
 
     public InhibitoryCategoryInputLink(InhibitoryCategoryInputSynapse s, CategoryActivation input, InhibitoryActivation output) {
         super(s, input, output);
+
+        InhibitoryActivation.connectFields(
+                input.getInhibitoryLinks(),
+                output.getNegativeFeedbackLinks()
+        );
     }
 
     @Override
@@ -37,6 +44,15 @@ public class InhibitoryCategoryInputLink extends AbstractInhibitoryLink<Inhibito
 
     @Override
     public void patternCatVisit(Visitor v) {
+    }
+
+    @Override
+    public Stream<InhibitoryLink> getInhibitoryLinks() {
+        return input.getInhibitoryLinks();
+    }
+
+    public Stream<NegativeFeedbackLink> getNegativeFeedbackLinks() {
+        return output.getNegativeFeedbackLinks();
     }
 
     @Override
