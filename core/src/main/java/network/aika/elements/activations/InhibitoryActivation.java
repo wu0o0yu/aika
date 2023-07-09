@@ -21,6 +21,7 @@ import network.aika.elements.links.*;
 import network.aika.elements.neurons.InhibitoryNeuron;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 
@@ -78,7 +79,8 @@ public class InhibitoryActivation extends DisjunctiveActivation<InhibitoryNeuron
     private Stream<InhibitoryActivation> getAbstractInhibitoryActivations() {
         return getOutputLinksByType(InhibitoryCategoryLink.class)
                 .map(Link::getOutput)
-                .map(act -> (InhibitoryActivation) act.getTemplate());
+                .map(act -> (InhibitoryActivation) act.getTemplate())
+                .filter(Objects::nonNull);
     }
 
     public static void crossConnectFields(InhibitoryActivation concrInhibAct, InhibitoryActivation templateInhibAct) {
