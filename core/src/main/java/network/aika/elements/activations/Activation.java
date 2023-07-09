@@ -180,9 +180,7 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
 
     public static boolean isSelfRef(BindingActivation in, BindingActivation out) {
         return in.isSelfRef(out) ||
-                out.isSelfRef(in) ||
-                in.getNeuron().isInstanceOf(out.getNeuron()) ||
-                out.getNeuron().isInstanceOf(in.getNeuron());
+                out.isSelfRef(in);
     }
 
     public void bindingVisitDown(DownVisitor v, Link lastLink) {
