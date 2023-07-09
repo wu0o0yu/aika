@@ -43,7 +43,7 @@ public class NegativeFeedbackLink extends FeedbackLink<NegativeFeedbackSynapse, 
             return;
 
         InhibitoryActivation.connectFields(
-                input.getInhibitoryLinks(),
+                input.getAllInhibitoryLinks(),
                 Stream.of(this)
         );
     }

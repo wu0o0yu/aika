@@ -33,16 +33,6 @@ public class CategoryActivation extends DisjunctiveActivation<CategoryNeuron> {
         super(id, t, neuron);
     }
 
-    public Stream<InhibitoryLink> getInhibitoryLinks() {
-        return getInputLinksByType(InhibitoryCategoryLink.class)
-                .flatMap(l -> l.getInhibitoryLinks());
-    }
-
-    public Stream<NegativeFeedbackLink> getNegativeFeedbackLinks() {
-        return getOutputLinksByType(InhibitoryCategoryInputLink.class)
-                .flatMap(l -> l.getNegativeFeedbackLinks());
-    }
-
     @Override
     public Activation getTemplate() {
         return getOutputLinksByType(CategoryInputLink.class)
@@ -66,7 +56,7 @@ public class CategoryActivation extends DisjunctiveActivation<CategoryNeuron> {
     public Stream<Activation> getCategoryInputs() {
         return inputLinks.values()
                 .stream()
-                .map(l -> l.getInput());
+                .map(Link::getInput);
     }
 
     public Activation getCategoryInput() {

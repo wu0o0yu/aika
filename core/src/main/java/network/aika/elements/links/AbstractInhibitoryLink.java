@@ -44,10 +44,6 @@ public abstract class AbstractInhibitoryLink<S extends AbstractInhibitorySynapse
     protected void initFields() {
     }
 
-    public void connectFields(NegativeFeedbackLink out) {
-
-    }
-
     @Override
     public void patternVisit(Visitor v) {
     }
@@ -55,6 +51,4 @@ public abstract class AbstractInhibitoryLink<S extends AbstractInhibitorySynapse
     @Override
     public void patternCatVisit(Visitor v) {
     }
-
-    public abstract Stream<InhibitoryLink> getInhibitoryLinks();
 }

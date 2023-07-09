@@ -17,10 +17,7 @@
 package network.aika.elements.activations;
 
 import network.aika.Thought;
-import network.aika.elements.links.AbstractInhibitoryLink;
-import network.aika.elements.links.InhibitoryCategoryLink;
-import network.aika.elements.links.InhibitoryLink;
-import network.aika.elements.links.NegativeFeedbackLink;
+import network.aika.elements.links.*;
 import network.aika.elements.neurons.InhibitoryNeuron;
 
 import java.util.List;
@@ -44,16 +41,58 @@ public class InhibitoryActivation extends DisjunctiveActivation<InhibitoryNeuron
         return true;
     }
 
-    public Stream<InhibitoryLink> getInhibitoryLinks() {
-        return getInputLinksByType(AbstractInhibitoryLink.class)
-                .flatMap(AbstractInhibitoryLink::getInhibitoryLinks);
+    public Stream<InhibitoryLink> getAllInhibitoryLinks() {
+        return getRelatedInhibitoryActivations()
+                .flatMap(InhibitoryActivation::getOwnInhibitoryLinks);
     }
 
-    public Stream<NegativeFeedbackLink> getNegativeFeedbackLinks() {
+    public Stream<InhibitoryLink> getOwnInhibitoryLinks() {
+        return getInputLinksByType(InhibitoryLink.class);
+    }
+
+    public Stream<NegativeFeedbackLink> getAllNegativeFeedbackLinks() {
+        return getRelatedInhibitoryActivations()
+                .flatMap(InhibitoryActivation::getOwnNegativeFeedbackLinks);
+    }
+
+    public Stream<NegativeFeedbackLink> getOwnNegativeFeedbackLinks() {
+        return getOutputLinksByType(NegativeFeedbackLink.class);
+    }
+
+    private Stream<InhibitoryActivation> getRelatedInhibitoryActivations() {
         return Stream.concat(
-                getOutputLinksByType(NegativeFeedbackLink.class),
-                getOutputLinksByType(InhibitoryCategoryLink.class)
-                        .flatMap(InhibitoryCategoryLink::getNegativeFeedbackLinks)
+                Stream.of(this),
+                isAbstract() ?
+                        getConcreteInhibitoryActivations() :
+                        getAbstractInhibitoryActivations()
+        );
+    }
+
+    private Stream<InhibitoryActivation> getConcreteInhibitoryActivations() {
+        return getInputLinksByType(InhibitoryCategoryInputLink.class)
+                .map(Link::getInput)
+                .flatMap(CategoryActivation::getCategoryInputs)
+                .map(act -> (InhibitoryActivation) act);
+    }
+
+    private Stream<InhibitoryActivation> getAbstractInhibitoryActivations() {
+        return getOutputLinksByType(InhibitoryCategoryLink.class)
+                .map(Link::getOutput)
+                .map(act -> (InhibitoryActivation) act.getTemplate());
+    }
+
+    public static void crossConnectFields(InhibitoryActivation concrInhibAct, InhibitoryActivation templateInhibAct) {
+        if(concrInhibAct == null || templateInhibAct == null)
+            return;
+
+        InhibitoryActivation.connectFields(
+                concrInhibAct.getOwnInhibitoryLinks(),
+                templateInhibAct.getOwnNegativeFeedbackLinks()
+        );
+
+        InhibitoryActivation.connectFields(
+                templateInhibAct.getOwnInhibitoryLinks(),
+                concrInhibAct.getOwnNegativeFeedbackLinks()
         );
     }
 

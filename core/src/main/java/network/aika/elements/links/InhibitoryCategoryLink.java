@@ -23,6 +23,8 @@ import network.aika.visitor.Visitor;
 
 import java.util.stream.Stream;
 
+import static network.aika.elements.activations.InhibitoryActivation.crossConnectFields;
+
 /**
  * @author Lukas Molzberger
  */
@@ -31,22 +33,10 @@ public class InhibitoryCategoryLink extends CategoryLink<InhibitoryCategorySynap
     public InhibitoryCategoryLink(InhibitoryCategorySynapse s, InhibitoryActivation input, CategoryActivation output) {
         super(s, input, output);
 
-        InhibitoryActivation.connectFields(
-                input.getInhibitoryLinks(),
-                output.getNegativeFeedbackLinks()
-        );
+        crossConnectFields(input, (InhibitoryActivation) output.getTemplate());
     }
 
     @Override
     public void patternCatVisit(Visitor v) {
-    }
-
-
-    public Stream<InhibitoryLink> getInhibitoryLinks() {
-        return input.getInhibitoryLinks();
-    }
-
-    public Stream<NegativeFeedbackLink> getNegativeFeedbackLinks() {
-        return output.getNegativeFeedbackLinks();
     }
 }

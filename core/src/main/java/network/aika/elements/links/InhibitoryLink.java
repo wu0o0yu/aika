@@ -44,17 +44,11 @@ public class InhibitoryLink extends AbstractInhibitoryLink<InhibitorySynapse, Bi
         super(inhibitorySynapse, input, output);
     }
 
-    @Override
     public void connectFields(NegativeFeedbackLink out) {
         if(isSelfRef(getInput(), out.getOutput()))
             return;
 
         linkAndConnect(getNet(), out.getInputValue());
-    }
-
-    @Override
-    public Stream<InhibitoryLink> getInhibitoryLinks() {
-        return Stream.of(this);
     }
 
     @Override
@@ -74,7 +68,7 @@ public class InhibitoryLink extends AbstractInhibitoryLink<InhibitorySynapse, Bi
 
         InhibitoryActivation.connectFields(
                 Stream.of(this),
-                output.getNegativeFeedbackLinks()
+                output.getAllNegativeFeedbackLinks()
         );
     }
 
