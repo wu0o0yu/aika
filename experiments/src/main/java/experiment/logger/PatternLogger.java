@@ -229,13 +229,21 @@ public class PatternLogger {
     }
 
     private static String getAllDominantBindingAct(Document doc) {
-        Stream<InputPatternLink> links = doc.getActivations().stream()
+        return doc.getActivations().stream()
                 .filter(TokenActivation.class::isInstance)
-                .flatMap(act -> act.getOutputLinksByType(InputPatternLink.class));
-        return links.map(l -> l.getOutput())
+                .map(TokenActivation.class::cast)
+                .filter(act -> !act.isAbstract())
+                .map(PatternLogger::getDominantBindingActLabel)
+                .collect(Collectors.joining(", "));
+    }
+
+    private static String getDominantBindingActLabel(TokenActivation tAct) {
+        return tAct.getOutputLinksByType(InputPatternLink.class).map(Link::getOutput)
+                .filter(act -> !act.isAbstract())
                 .filter(supprAct -> supprAct.getNet().getUpdatedValue() > 0.0)
                 .map(act -> act.getTokenPos() + "-" + act.getLabel())
-                .collect(Collectors.joining(", "));
+                .findFirst()
+                .orElse(tAct.getTokenPos() + "-BLANK");
     }
 
     private static String print(FieldOutput f) {
