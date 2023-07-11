@@ -33,7 +33,7 @@ import java.util.List;
  */
 public abstract class AbstractTemplateModel {
 
-    private final Logger log = LoggerFactory.getLogger(getClass());
+    private final Logger log = LoggerFactory.getLogger(AbstractTemplateModel.class);
 
     protected Model model;
 

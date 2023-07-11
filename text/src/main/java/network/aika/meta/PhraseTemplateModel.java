@@ -18,9 +18,11 @@ package network.aika.meta;
 
 import network.aika.Model;
 import network.aika.elements.activations.*;
-import network.aika.elements.neurons.BindingNeuron;
-import network.aika.elements.neurons.NeuronProvider;
+import network.aika.elements.neurons.*;
+import network.aika.elements.synapses.*;
 import network.aika.sign.Sign;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Comparator;
 import java.util.List;
@@ -32,22 +34,16 @@ import java.util.List;
  */
 public class PhraseTemplateModel extends AbstractTemplateModel {
 
-    protected NeuronProvider textSectionPatternN;
-
-    protected NeuronProvider textSectionPatternCategory;
-
-
-    protected NeuronProvider topicPatternN;
-
-    protected NeuronProvider topicPatternCategory;
-
-
-
+    TextSectionModel textSectionModel;
+    TopicModel topicModel;
 
     PatternActivation maxSurprisalAct = null;
 
     public PhraseTemplateModel(Model m) {
         super(m);
+
+        textSectionModel = new TextSectionModel(this);
+        topicModel = new TopicModel(this);
     }
 
     @Override
@@ -80,7 +76,11 @@ public class PhraseTemplateModel extends AbstractTemplateModel {
                 5,
                 -1
         );
+
+        textSectionModel.initTextSectionTemplates();
+        topicModel.initTopicTemplates();
     }
+
 
     private PatternActivation initMaxSurprisalTokenAct(List<TokenActivation> tokenActs) {
         return tokenActs.stream()
