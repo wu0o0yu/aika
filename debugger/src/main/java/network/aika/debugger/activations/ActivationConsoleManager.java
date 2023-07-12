@@ -36,6 +36,7 @@ import java.awt.*;
  */
 public class ActivationConsoleManager extends JSplitPane implements AbstractConsoleManager, EventListener {
 
+    private ActivationViewManager activationViewManager;
     private Document doc;
 
     private QueueConsole queueConsole;
@@ -201,6 +202,12 @@ public class ActivationConsoleManager extends JSplitPane implements AbstractCons
     }
 
     public void onActivationEvent(EventType et, Activation act) {
+        if(et == EventType.CREATE) // Token Pos is unknown at that time.
+            return;
+
+        if(activationViewManager.getTokenRange() != null && !activationViewManager.getTokenRange().within(act.getTokenPos()))
+            return;
+
         update(act);
     }
 
@@ -210,5 +217,9 @@ public class ActivationConsoleManager extends JSplitPane implements AbstractCons
 
     public Thought getThought() {
         return doc;
+    }
+
+    public void setActivationViewManager(ActivationViewManager activationViewManager) {
+        this.activationViewManager = activationViewManager;
     }
 }

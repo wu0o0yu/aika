@@ -1,15 +1,10 @@
 package network.aika.meta;
 
 import network.aika.Model;
-import network.aika.elements.neurons.ActivationFunction;
-import network.aika.elements.neurons.BindingNeuron;
-import network.aika.elements.neurons.NeuronProvider;
-import network.aika.elements.neurons.PatternNeuron;
+import network.aika.elements.neurons.*;
 import network.aika.elements.synapses.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static network.aika.meta.AbstractTemplateModel.PASSIVE_SYNAPSE_WEIGHT;
 
 public class TextSectionModel {
 
@@ -21,6 +16,8 @@ public class TextSectionModel {
 
     private final Logger log = LoggerFactory.getLogger(PhraseTemplateModel.class);
 
+    protected NeuronProvider textSectionRelationPT;
+    protected NeuronProvider textSectionRelationNT;
 
     protected NeuronProvider textSectionPatternN;
 
@@ -34,6 +31,12 @@ public class TextSectionModel {
 
     protected NeuronProvider textSectionPatternCategory;
 
+
+    protected double headlineInputPatternNetTarget = 5.0;
+
+    protected double headlineInputPatternValueTarget;
+
+
     public TextSectionModel(PhraseTemplateModel phraseModel) {
         this.phraseModel = phraseModel;
         model = phraseModel.getModel();
@@ -41,6 +44,12 @@ public class TextSectionModel {
 
     protected void initTextSectionTemplates() {
         log.info("Text-Section");
+
+        textSectionRelationPT = TokenPositionRelationNeuron.lookupRelation(model, -1, -300)
+                .getProvider(true);
+
+        textSectionRelationNT = TokenPositionRelationNeuron.lookupRelation(model, 300, 1)
+                .getProvider(true);
 
         double netTarget = 2.5;
         double valueTarget = ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT
@@ -56,29 +65,87 @@ public class TextSectionModel {
 
         phraseModel.abstractNeurons.add(textSectionHeadlineBN);
 
-        new PrimaryInhibitorySynapse()
-                .setWeight(PASSIVE_SYNAPSE_WEIGHT)
-                .init(inputToken.getNeuron(), inhibitoryN.getNeuron());
+        headlineInputPatternValueTarget = ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT
+                .f(headlineInputPatternNetTarget);
 
-        new InhibitorySynapse(Scope.INPUT)
-                .setWeight(1.0)
-                .init(textSectionHeadlineBN.getNeuron(), inhibitoryN.getNeuron());
+        //     new BindingCategoryInputSynapse()
+        new InputPatternSynapse()
+                .setWeight(10.0)
+                .init(phraseModel.patternCategory.getNeuron(), textSectionHeadlineBN.getNeuron())
+                .adjustBias(headlineInputPatternValueTarget);
 
-        new NegativeFeedbackSynapse()
-                .setWeight(getNegMargin(pos) * -netTarget)
-                .init(inhibitoryN.getNeuron(), bn);
+
+        textSectionBeginBN = new BindingNeuron()
+                .init(model, "Abstract Text-Section-Begin")
+                .getProvider(true);
+
+        headlineToSectionBeginRelation();
+
+
+        textSectionHintBN = new BindingNeuron()
+                .init(model, "Abstract Text-Section Hint")
+                .getProvider(true);
+
+        textSectionEndBN = new BindingNeuron()
+                .init(model, "Abstract Text-Section-End")
+                .getProvider(true);
+
+        sectionBeginToSectionEndRelation();
+        sectionHintRelations((BindingNeuron) textSectionBeginBN.getNeuron(), (LatentRelationNeuron) textSectionRelationPT.getNeuron());
+        sectionHintRelations((BindingNeuron) textSectionEndBN.getNeuron(), (LatentRelationNeuron) textSectionRelationNT.getNeuron());
+    }
+
+    private void headlineToSectionBeginRelation() {
+        double prevNetTarget = textSectionHeadlineBN.getNeuron().getBias().getValue();
+        double prevValueTarget = ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT
+                .f(prevNetTarget);
 
         new RelationInputSynapse()
                 .setWeight(5.0)
-                .init(relPT.getNeuron(), bn)
+                .init(phraseModel.relPT.getNeuron(), textSectionBeginBN.getNeuron())
                 .adjustBias();
 
         SamePatternSynapse spSyn = new SamePatternSynapse()
                 .setWeight(10.0)
-                .init(lastBN, bn)
+                .init(textSectionHeadlineBN.getNeuron(), textSectionBeginBN.getNeuron())
                 .adjustBias(prevValueTarget);
 
-        System.out.println("  " + spSyn + " targetNetContr:" + -spSyn.getSynapseBias().getValue());
+        log.info("  HeadlineToSectionBeginRelation:  " + spSyn + " targetNetContr:" + -spSyn.getSynapseBias().getValue());
     }
 
+    private void sectionBeginToSectionEndRelation() {
+        double prevNetTarget = textSectionBeginBN.getNeuron().getBias().getValue();
+        double prevValueTarget = ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT
+                .f(prevNetTarget);
+
+        new RelationInputSynapse()
+                .setWeight(5.0)
+                .init(textSectionRelationPT.getNeuron(), textSectionEndBN.getNeuron())
+                .adjustBias();
+
+        SamePatternSynapse spSyn = new SamePatternSynapse()
+                .setWeight(10.0)
+                .init(textSectionBeginBN.getNeuron(), textSectionEndBN.getNeuron())
+                .adjustBias(prevValueTarget);
+
+        log.info("  SectionBeginToSectionEndRelation:  " + spSyn + " targetNetContr:" + -spSyn.getSynapseBias().getValue());
+    }
+
+    private void sectionHintRelations(BindingNeuron fromBN, LatentRelationNeuron relN) {
+        double prevNetTarget = fromBN.getBias().getValue();
+        double prevValueTarget = ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT
+                .f(prevNetTarget);
+
+        new RelationInputSynapse()
+                .setWeight(5.0)
+                .init(relN, textSectionHintBN.getNeuron())
+                .adjustBias();
+
+        SamePatternSynapse spSyn = new SamePatternSynapse()
+                .setWeight(10.0)
+                .init(fromBN, textSectionHintBN.getNeuron())
+                .adjustBias(prevValueTarget);
+
+        log.info("  SectionHintRelations:  " + spSyn + " targetNetContr:" + -spSyn.getSynapseBias().getValue());
+    }
 }

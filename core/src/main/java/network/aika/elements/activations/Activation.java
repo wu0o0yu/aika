@@ -42,8 +42,7 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import static java.lang.Integer.MAX_VALUE;
-import static network.aika.callbacks.EventType.CREATE;
-import static network.aika.callbacks.EventType.UPDATE;
+import static network.aika.callbacks.EventType.*;
 import static network.aika.elements.activations.Timestamp.NOT_SET;
 import static network.aika.elements.neurons.Range.joinTokenPosition;
 import static network.aika.elements.neurons.Range.tokenPositionEquals;
@@ -89,8 +88,6 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
 
     protected Range range;
     protected Integer tokenPos;
-
-    protected Consumer<Integer> onTokenPosUpdate;
 
     public Activation(int id, Thought t, N n) {
         this.id = id;
@@ -313,18 +310,13 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
 
         this.range = newRange;
         this.tokenPos = newTokenPos;
-        if(onTokenPosUpdate != null)
-            onTokenPosUpdate.accept(newTokenPos);
+
+        thought.onElementEvent(TOKEN_POSITION, this);
     }
 
     protected void propagateRangeAndTokenPosition() {
-        outputLinks.values().forEach(l ->
-                l.propagateRangeOrTokenPos()
-        );
-    }
-
-    public void setOnTokenPosUpdate(Consumer<Integer> onTokenPosUpdate) {
-        this.onTokenPosUpdate = onTokenPosUpdate;
+        outputLinks.values()
+                .forEach(Link::propagateRangeOrTokenPos);
     }
 
     public Range getAbsoluteRange() {
@@ -514,6 +506,8 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
         ti.range = range;
         ti.isNewInstance = true;
         ti.fired = fired;
+
+        thought.onElementEvent(TOKEN_POSITION, ti);
 
         linkTemplateAndInstance(ti);
 

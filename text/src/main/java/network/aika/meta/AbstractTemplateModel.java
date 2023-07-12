@@ -228,28 +228,7 @@ public abstract class AbstractTemplateModel {
         if(lastPos == null || lastBN == null) {
             bn.setCallActivationCheckCallback(true);
         } else {
-            double prevNetTarget = lastBN.getBias().getValue();
-            double prevValueTarget = ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT
-                    .f(prevNetTarget);
-
-            if (pos > 0) {
-                new RelationInputSynapse()
-                        .setWeight(5.0)
-                        .init(relPT.getNeuron(), bn)
-                        .adjustBias();
-            } else {
-                new RelationInputSynapse()
-                        .setWeight(5.0)
-                        .init(relNT.getNeuron(), bn)
-                        .adjustBias();
-            }
-
-            SamePatternSynapse spSyn = new SamePatternSynapse()
-                    .setWeight(10.0)
-                    .init(lastBN, bn)
-                    .adjustBias(prevValueTarget);
-
-            System.out.println("  " + spSyn + " targetNetContr:" + -spSyn.getSynapseBias().getValue());
+            tokenToTokenRelation(pos, lastBN, bn);
         }
 
         PatternSynapse pSyn = new PatternSynapse()
@@ -284,6 +263,31 @@ public abstract class AbstractTemplateModel {
         log.info("");
 
         return bn;
+    }
+
+    protected void tokenToTokenRelation(int pos, BindingNeuron lastBN, BindingNeuron bn) {
+        double prevNetTarget = lastBN.getBias().getValue();
+        double prevValueTarget = ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT
+                .f(prevNetTarget);
+
+        if (pos > 0) {
+            new RelationInputSynapse()
+                    .setWeight(5.0)
+                    .init(relPT.getNeuron(), bn)
+                    .adjustBias();
+        } else {
+            new RelationInputSynapse()
+                    .setWeight(5.0)
+                    .init(relNT.getNeuron(), bn)
+                    .adjustBias();
+        }
+
+        SamePatternSynapse spSyn = new SamePatternSynapse()
+                .setWeight(10.0)
+                .init(lastBN, bn)
+                .adjustBias(prevValueTarget);
+
+        System.out.println("  " + spSyn + " targetNetContr:" + -spSyn.getSynapseBias().getValue());
     }
 
     protected BindingNeuron createWeakBindingNeuron(

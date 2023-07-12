@@ -54,6 +54,8 @@ public class ActivationViewManager extends AbstractViewManager<Activation, Activ
 
     private Document doc;
 
+    private TokenRange tokenRange;
+
     private ActivationConsoleManager consoleManager;
 
     private AIKADebugManager debugger;
@@ -64,7 +66,11 @@ public class ActivationViewManager extends AbstractViewManager<Activation, Activ
 
     public ActivationViewManager(Document doc, ActivationConsoleManager consoleManager, AIKADebugManager debugger) {
         super(doc.getModel());
-        this.consoleManager = consoleManager;
+
+        if(consoleManager != null) {
+            this.consoleManager = consoleManager;
+            consoleManager.setActivationViewManager(this);
+        }
         this.debugger = debugger;
 
         double width = 5 * STANDARD_DISTANCE_X;
@@ -87,6 +93,14 @@ public class ActivationViewManager extends AbstractViewManager<Activation, Activ
 
     public void unregister() {
         doc.removeEventListener(this);
+    }
+
+    public TokenRange getTokenRange() {
+        return tokenRange;
+    }
+
+    public void setTokenRange(TokenRange tokenRange) {
+        this.tokenRange = tokenRange;
     }
 
     public StepManager getStepManager() {
@@ -160,6 +174,12 @@ public class ActivationViewManager extends AbstractViewManager<Activation, Activ
     }
 
     public void onActivationEvent(EventType et, Activation act) {
+        if(et == EventType.CREATE) // Token Pos is unknown at that time.
+            return;
+
+        if(tokenRange != null && !tokenRange.within(act.getTokenPos()))
+            return;
+
         ActivationParticle p = graphManager.lookupParticle(act);
         p.processLayout(layoutState);
         p.onEvent(et);

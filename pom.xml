@@ -63,7 +63,7 @@
     </distributionManagement>
 
     <properties>
-        <revision>2.0.9-rc4</revision>
+        <revision>2.0.9-rc9</revision>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
@@ -252,13 +252,6 @@
                 <version>${commons-io.version}</version>
             </dependency>
 
-            <dependency>
-                <groupId>ch.qos.logback</groupId>
-                <artifactId>logback-classic</artifactId>
-                <version>${logback.version}</version>
-                <scope>test</scope>
-            </dependency>
-
             <!-- Logging -->
             <dependency>
                 <groupId>org.slf4j</groupId>
@@ -269,6 +262,13 @@
             <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-core</artifactId>
+                <version>${logback.version}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-classic</artifactId>
                 <version>${logback.version}</version>
                 <scope>test</scope>
             </dependency>

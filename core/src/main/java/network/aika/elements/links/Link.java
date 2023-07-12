@@ -240,7 +240,10 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
             return;
 
         if(input.getRange() != null || input.getTokenPos() != null)
-            output.updateRangeAndTokenPos(input.getRange(), input.getTokenPos());
+            output.updateRangeAndTokenPos(
+                    input.getRange(),
+                    input.getTokenPos()
+            );
     }
 
     public boolean isNegative() {

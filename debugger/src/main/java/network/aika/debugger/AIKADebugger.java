@@ -181,6 +181,19 @@ public class AIKADebugger extends JPanel implements AIKADebugManager {
         return debugger;
     }
 
+    public static AIKADebugger createAndShowGUI(Document doc, int fromTokenPos, int toTokenPos) {
+        AIKADebugger debugger = createAndShowGUI();
+        debugger.setDocument(doc);
+        debugger.setModel(doc.getModel());
+        debugger.setTokenRange(fromTokenPos, toTokenPos);
+
+        return debugger;
+    }
+
+    private void setTokenRange(int beginTokenPos, int toTokenPos) {
+        actViewManager.setTokenRange(new TokenRange(beginTokenPos, toTokenPos));
+    }
+
     public static AIKADebugger createAndShowGUI() {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -190,7 +203,7 @@ public class AIKADebugger extends JPanel implements AIKADebugManager {
         AIKADebugger d = new AIKADebugger();
 
         EventQueue.invokeLater(() -> {
-            //Create and set up the window.
+            // Create and set up the window.
             d.createMainFrame();
         });
 
@@ -205,7 +218,7 @@ public class AIKADebugger extends JPanel implements AIKADebugManager {
         ImageIcon logo = new ImageIcon(logoURL);
         f.setIconImage(logo.getImage());
 
-        //Add content to the window.
+        // Add content to the window.
         f.add(this, BorderLayout.CENTER);
         f.pack();
         f.setLocationByPlatform(true);

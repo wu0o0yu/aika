@@ -14,43 +14,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.tokenizer;
+package network.aika.debugger;
 
-
-import network.aika.meta.AbstractTemplateModel;
-import network.aika.parser.Context;
-import network.aika.text.Document;
 
 /**
- *
  * @author Lukas Molzberger
  */
-public class SimpleWordTokenizer implements Tokenizer {
+public class TokenRange {
 
-    private AbstractTemplateModel model;
+    private int begin;
 
-    public SimpleWordTokenizer(AbstractTemplateModel model) {
-        this.model = model;
+    private int end;
+
+    public TokenRange(int begin, int end) {
+        this.begin = begin;
+        this.end = end;
     }
 
-    @Override
-    public void tokenize(Document doc, Context context, TokenConsumer tokenConsumer) {
-        int i = 0;
-        int pos = 0;
+    public int getBegin() {
+        return begin;
+    }
 
-        for(String w: doc.getContent().split("[\\n\\r\\s]+")) {
-            int j = i + w.length();
+    public int getEnd() {
+        return end;
+    }
 
-            tokenConsumer.processToken(
-                    model.lookupInputToken(w),
-                    pos,
-                    i,
-                    j
-            );
-
-            pos++;
-
-            i = j + 1;
-        }
+    public boolean within(Integer tokenPos) {
+        return begin <= tokenPos && tokenPos < end;
     }
 }

@@ -31,9 +31,7 @@ public class BindingActivationParticle<E extends BindingActivation> extends Acti
     public BindingActivationParticle(E act, Node n, ActivationGraphManager gm) {
         super(act, n, gm);
 
-        act.setOnTokenPosUpdate(pos ->
-                processLayout(null)
-        );
+        processLayout(null);
     }
 
     @Override

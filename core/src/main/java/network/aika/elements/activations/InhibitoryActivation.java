@@ -31,11 +31,9 @@ import java.util.stream.Stream;
  */
 public class InhibitoryActivation extends DisjunctiveActivation<InhibitoryNeuron> {
 
-
     public InhibitoryActivation(int id, Thought t, InhibitoryNeuron neuron) {
         super(id, t, neuron);
     }
-
 
     @Override
     public boolean isActiveTemplateInstance() {

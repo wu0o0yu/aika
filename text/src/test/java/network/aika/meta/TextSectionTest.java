@@ -1,8 +1,12 @@
 package network.aika.meta;
 
 import network.aika.Model;
+import network.aika.debugger.AIKADebugger;
 import network.aika.elements.activations.Activation;
+import network.aika.parser.Context;
+import network.aika.parser.ParserPhase;
 import network.aika.parser.TrainingParser;
+import network.aika.text.Document;
 import network.aika.tokenizer.SimpleWordTokenizer;
 import network.aika.tokenizer.Tokenizer;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,7 +17,7 @@ import static network.aika.parser.ParserPhase.TRAINING;
 
 public class TextSectionTest extends TrainingParser {
 
-    private AbstractTemplateModel templateModel;
+    private PhraseTemplateModel templateModel;
     private Tokenizer tokenizer;
 
     private String exampleTxt = "(Senior) Java Softwareentwickler (m/w/d) Schulverwaltung\n" +
@@ -85,15 +89,26 @@ public class TextSectionTest extends TrainingParser {
     }
 
     @Override
+    protected Document initDocument(String txt, Context context, ParserPhase phase) {
+        Document doc = super.initDocument(txt, context, phase);
+        if(phase == TRAINING) {
+            AIKADebugger.createAndShowGUI(doc, 100, 150);
+        }
+
+        return doc;
+    }
+
+    @Override
     public boolean check(Activation iAct) {
         return true;
     }
 
     @Test
     public void testTextSections() {
-        process("a b", null, COUNTING);
+        log.info("Start");
+        process(exampleTxt, null, COUNTING);
         templateModel.initTemplates();
-        process("a b", null, TRAINING);
+        process(exampleTxt, null, TRAINING);
     }
 
     @Override

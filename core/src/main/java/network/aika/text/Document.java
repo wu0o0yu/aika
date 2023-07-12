@@ -141,7 +141,10 @@ public class Document extends Thought {
         StringBuilder sb = new StringBuilder();
         sb.append(super.toString());
         sb.append(" Content: ");
-        sb.append(content.substring(0, Math.min(content.length(), 100)));
+        sb.append(
+                content.substring(0, Math.min(content.length(), 100))
+                        .replaceAll("[\\n\\r\\s]+", " ")
+        );
         return sb.toString();
     }
 }
