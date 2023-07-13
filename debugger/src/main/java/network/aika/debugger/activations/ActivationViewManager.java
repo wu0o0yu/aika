@@ -175,8 +175,11 @@ public class ActivationViewManager extends AbstractViewManager<Activation, Activ
     }
 
     public void onActivationEvent(EventType et, Activation act) {
-        if(et == EventType.CREATE) // Token Pos is unknown at that time.
+//        if(et == EventType.CREATE) // Token Pos is unknown at that time.
+//            return; // The Same Pattern Link does not propagate the token position on initialisation.
+        if(et == EventType.TOKEN_POSITION) // TMP fix
             return;
+
 
         if(!within(tokenRange, act))
             return;

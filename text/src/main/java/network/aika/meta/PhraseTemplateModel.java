@@ -37,6 +37,8 @@ public class PhraseTemplateModel extends AbstractTemplateModel {
     TextSectionModel textSectionModel;
     TopicModel topicModel;
 
+    NeuronProvider upperCaseN;
+
     PatternActivation maxSurprisalAct = null;
 
     public PhraseTemplateModel(Model m) {
@@ -47,8 +49,25 @@ public class PhraseTemplateModel extends AbstractTemplateModel {
     }
 
     @Override
+    protected void initInputCategoryNeuron() {
+        super.initInputCategoryNeuron();
+
+        upperCaseN = new PatternCategoryNeuron()
+                .init(model, "Upper Case")
+                .getProvider(true);
+    }
+
+    @Override
     public String getPatternType() {
         return "Phrase";
+    }
+
+    public TextSectionModel getTextSectionModel() {
+        return textSectionModel;
+    }
+
+    public TopicModel getTopicModel() {
+        return topicModel;
     }
 
     @Override
