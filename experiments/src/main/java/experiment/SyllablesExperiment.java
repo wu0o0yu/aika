@@ -140,7 +140,7 @@ public class SyllablesExperiment extends TrainingParser {
         if(txt.equalsIgnoreCase("kleider")) {
 //            debugger = AIKADebugger.createAndShowGUI(doc);
         }
-        if(doc.getId() == 48953l) {
+        if(doc.getId() == 49289l) {
             debugger = AIKADebugger.createAndShowGUI(doc);
         }
 

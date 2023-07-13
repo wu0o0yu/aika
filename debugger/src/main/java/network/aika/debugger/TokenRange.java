@@ -17,6 +17,9 @@
 package network.aika.debugger;
 
 
+import network.aika.elements.activations.Activation;
+import network.aika.elements.links.Link;
+
 /**
  * @author Lukas Molzberger
  */
@@ -41,5 +44,20 @@ public class TokenRange {
 
     public boolean within(Integer tokenPos) {
         return begin <= tokenPos && tokenPos < end;
+    }
+
+    public static boolean within(TokenRange tokenRange, Activation act) {
+        if(tokenRange == null)
+            return true;
+
+        return tokenRange.within(act.getTokenPos());
+    }
+
+    public static boolean within(TokenRange tokenRange, Link l) {
+        if(tokenRange == null)
+            return true;
+
+        return tokenRange.within(l.getInput().getTokenPos()) &&
+                tokenRange.within(l.getOutput().getTokenPos());
     }
 }

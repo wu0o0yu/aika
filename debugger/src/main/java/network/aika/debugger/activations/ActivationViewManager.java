@@ -42,6 +42,7 @@ import java.awt.*;
 
 import static network.aika.debugger.AbstractGraphManager.STANDARD_DISTANCE_X;
 import static network.aika.debugger.AbstractGraphManager.STANDARD_DISTANCE_Y;
+import static network.aika.debugger.TokenRange.within;
 import static network.aika.debugger.stepmanager.StepManager.When.*;
 import static network.aika.utils.Utils.doubleToString;
 
@@ -177,7 +178,7 @@ public class ActivationViewManager extends AbstractViewManager<Activation, Activ
         if(et == EventType.CREATE) // Token Pos is unknown at that time.
             return;
 
-        if(tokenRange != null && !tokenRange.within(act.getTokenPos()))
+        if(!within(tokenRange, act))
             return;
 
         ActivationParticle p = graphManager.lookupParticle(act);
@@ -191,6 +192,9 @@ public class ActivationViewManager extends AbstractViewManager<Activation, Activ
     }
 
     public void onLinkEvent(EventType et, Link l) {
+        if(!within(tokenRange, l))
+            return;
+
         Edge e = onLinkEvent(l);
         if(e == null)
             return;

@@ -66,9 +66,8 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
             }
         }
 
-        getThought().onElementEvent(CREATE, this);
-
         propagateRangeOrTokenPos();
+        getThought().onElementEvent(CREATE, this);
     }
 
     public void addInputLinkingStep() {

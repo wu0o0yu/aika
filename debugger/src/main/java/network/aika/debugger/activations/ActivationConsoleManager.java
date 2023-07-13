@@ -21,6 +21,7 @@ import network.aika.callbacks.EventListener;
 import network.aika.callbacks.EventType;
 import network.aika.debugger.AbstractConsoleManager;
 import network.aika.debugger.ElementPanel;
+import network.aika.debugger.TokenRange;
 import network.aika.elements.Element;
 import network.aika.elements.activations.Activation;
 import network.aika.elements.links.Link;
@@ -29,6 +30,8 @@ import network.aika.text.Document;
 
 import javax.swing.*;
 import java.awt.*;
+
+import static network.aika.debugger.TokenRange.within;
 
 
 /**
@@ -205,13 +208,16 @@ public class ActivationConsoleManager extends JSplitPane implements AbstractCons
         if(et == EventType.CREATE) // Token Pos is unknown at that time.
             return;
 
-        if(activationViewManager.getTokenRange() != null && !activationViewManager.getTokenRange().within(act.getTokenPos()))
+        if(!within(activationViewManager.getTokenRange(), act))
             return;
 
         update(act);
     }
 
     public void onLinkEvent(EventType et, Link l) {
+        if(!within(activationViewManager.getTokenRange(), l))
+            return;
+
         update(l);
     }
 
