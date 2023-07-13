@@ -57,6 +57,7 @@ public abstract class TrainingParser extends Parser implements ActivationCheckCa
 
         try {
             infer(doc, context, phase);
+            addTargets(doc, context);
             anneal(doc);
             train(doc);
         } catch(Exception e) {
@@ -66,6 +67,10 @@ public abstract class TrainingParser extends Parser implements ActivationCheckCa
         }
 
         return doc;
+    }
+
+    protected void addTargets(Document doc, Context context) {
+
     }
 
     protected void train(Document doc) {

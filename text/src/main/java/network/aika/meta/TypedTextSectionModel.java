@@ -20,8 +20,12 @@ import network.aika.elements.neurons.*;
 import network.aika.elements.synapses.InputPatternSynapse;
 import network.aika.elements.synapses.RelationInputSynapse;
 import network.aika.elements.synapses.SamePatternSynapse;
+import network.aika.text.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Set;
+import java.util.stream.Collectors;
 
 
 /**
@@ -50,6 +54,14 @@ public class TypedTextSectionModel extends TextSectionModel {
 
     public TypedTextSectionModel(PhraseTemplateModel phraseModel) {
         super(phraseModel);
+    }
+
+    public void addTargetTSHeadline(Document doc, Set<String> headlineLabels, int begin, int end) {
+        log.info(doc.getContent() + " : " + headlineLabels.stream().collect(Collectors.joining(", ")));
+    }
+
+    public void addTargetTextSections(Document doc, Set<String> tsLabels) {
+        log.info(doc.getContent() + " : " + tsLabels.stream().collect(Collectors.joining(", ")));
     }
 
     protected void initTextSectionTemplates() {

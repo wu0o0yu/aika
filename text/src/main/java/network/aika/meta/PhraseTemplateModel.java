@@ -34,7 +34,7 @@ import java.util.List;
  */
 public class PhraseTemplateModel extends AbstractTemplateModel {
 
-    TextSectionModel textSectionModel;
+    TypedTextSectionModel textSectionModel;
     TopicModel topicModel;
 
     NeuronProvider upperCaseN;
@@ -44,7 +44,7 @@ public class PhraseTemplateModel extends AbstractTemplateModel {
     public PhraseTemplateModel(Model m) {
         super(m);
 
-        textSectionModel = new TextSectionModel(this);
+        textSectionModel = new TypedTextSectionModel(this);
         topicModel = new TopicModel(this);
     }
 
@@ -62,7 +62,7 @@ public class PhraseTemplateModel extends AbstractTemplateModel {
         return "Phrase";
     }
 
-    public TextSectionModel getTextSectionModel() {
+    public TypedTextSectionModel getTextSectionModel() {
         return textSectionModel;
     }
 
