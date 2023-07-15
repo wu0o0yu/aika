@@ -30,21 +30,21 @@ import network.aika.visitor.linking.LinkingOperator;
 /**
  * @author Lukas Molzberger
  */
-public class RelationLinkingVisitor extends BindingVisitor {
+public class RelationBindingVisitor extends BindingVisitor {
 
     protected RelationInputSynapse relation;
     protected Direction relationDir;
     protected TokenActivation downOrigin;
     protected TokenActivation upOrigin;
 
-    public RelationLinkingVisitor(Thought t, LinkingOperator operator, RelationInputSynapse rel, Direction relationDir) {
+    public RelationBindingVisitor(Thought t, LinkingOperator operator, RelationInputSynapse rel, Direction relationDir) {
         super(t, operator);
 
         this.relation = rel;
         this.relationDir = relationDir;
     }
 
-    protected RelationLinkingVisitor(RelationLinkingVisitor parent, TokenActivation downOrigin, TokenActivation upOrigin) {
+    protected RelationBindingVisitor(RelationBindingVisitor parent, TokenActivation downOrigin, TokenActivation upOrigin) {
         super(parent, downOrigin);
         this.downOrigin = downOrigin;
         this.upOrigin = upOrigin;
@@ -61,6 +61,7 @@ public class RelationLinkingVisitor extends BindingVisitor {
         return relationDir;
     }
 
+    @Override
     public void expandRelations(TokenActivation origin, int depth) {
         getRelation().getInput()
                 .evaluateLatentRelation(origin, relationDir)
@@ -72,7 +73,7 @@ public class RelationLinkingVisitor extends BindingVisitor {
     private void up(TokenActivation origin, TokenActivation relOrigin, int depth) {
         logUp(origin, depth);
 
-        new RelationLinkingVisitor(this, origin, relOrigin)
+        new RelationBindingVisitor(this, origin, relOrigin)
                 .visit(relOrigin, null, depth);
     }
 

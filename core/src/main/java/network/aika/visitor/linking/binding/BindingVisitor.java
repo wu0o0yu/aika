@@ -46,7 +46,7 @@ public class BindingVisitor extends LinkingVisitor<PatternActivation> {
                 .visit(origin, null, depth);
     }
 
-    public void expandRelations(TokenActivation origin) {
+    public void expandRelations(TokenActivation origin, int depth) {
     }
 
     public void check(Link lastLink, Activation act) {

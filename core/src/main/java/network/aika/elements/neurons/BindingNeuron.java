@@ -22,7 +22,7 @@ import network.aika.elements.activations.BindingActivation;
 import network.aika.elements.synapses.*;
 import network.aika.visitor.linking.LinkingOperator;
 import network.aika.visitor.linking.binding.BindingVisitor;
-import network.aika.visitor.linking.binding.RelationLinkingVisitor;
+import network.aika.visitor.linking.binding.RelationBindingVisitor;
 
 import java.util.List;
 
@@ -54,7 +54,7 @@ public class BindingNeuron extends ConjunctiveNeuron<BindingActivation> {
                 .orElse(null);
 
         BindingVisitor v = rel != null ?
-                new RelationLinkingVisitor(t, c, rel, c.getRelationDir(syn.getScope())) :
+                new RelationBindingVisitor(t, c, rel, c.getRelationDir(syn.getScope())) :
                 new BindingVisitor(t, c);
 
         v.start(act);

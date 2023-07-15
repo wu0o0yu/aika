@@ -70,7 +70,7 @@ public class TokenActivation extends PatternActivation {
         super.bindingVisit(v, lastLink, depth);
 
         if(v.getDirection().isDown())
-            v.expandRelations(this);
+            v.expandRelations(this, depth);
     }
 
     public boolean isInput() {
