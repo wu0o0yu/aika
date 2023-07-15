@@ -22,12 +22,12 @@ import network.aika.elements.neurons.Range;
 import network.aika.elements.synapses.Synapse;
 import network.aika.fields.AbstractFunction;
 import network.aika.elements.synapses.PatternSynapse;
-import network.aika.fields.Field;
 import network.aika.fields.FieldOutput;
 import network.aika.fields.MultiInputField;
 import network.aika.sign.Sign;
 import network.aika.steps.link.LinkCounting;
-import network.aika.visitor.Visitor;
+import network.aika.visitor.linking.binding.BindingVisitor;
+import network.aika.visitor.linking.inhibitory.InhibitoryVisitor;
 
 import static network.aika.fields.ConstantField.ZERO;
 import static network.aika.fields.FieldLink.linkAndConnect;
@@ -124,10 +124,10 @@ public class PatternLink extends ConjunctiveLink<PatternSynapse, BindingActivati
     }
 
     @Override
-    public void bindingVisit(Visitor v) {
+    public void bindingVisit(BindingVisitor v, int depth) {
     }
 
     @Override
-    public void inhibVisit(Visitor v) {
+    public void inhibVisit(InhibitoryVisitor v, int depth) {
     }
 }

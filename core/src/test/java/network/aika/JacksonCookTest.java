@@ -132,8 +132,8 @@ public class JacksonCookTest {
                 .setWeight(10.0)
                 .init(cookProfessionBN, professionCN);
 
-        addInhibitoryLoop(new InhibitoryNeuron().init(m, "I-jackson"), false, jacksonForenameBN, jacksonCityBN);
-        addInhibitoryLoop(new InhibitoryNeuron().init(m, "I-cook"), false, cookSurnameBN, cookProfessionBN);
+        addInhibitoryLoop(new InhibitoryNeuron(Scope.SAME).init(m, "I-jackson"), false, jacksonForenameBN, jacksonCityBN);
+        addInhibitoryLoop(new InhibitoryNeuron(Scope.SAME).init(m, "I-cook"), false, cookSurnameBN, cookProfessionBN);
 
         setBias(jacksonJCBN, 2.0);
         setBias(jacksonForenameBN, 2.0);

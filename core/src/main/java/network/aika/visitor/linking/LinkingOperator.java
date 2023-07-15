@@ -17,11 +17,10 @@
 package network.aika.visitor.linking;
 
 import network.aika.Thought;
-import network.aika.direction.Direction;
 import network.aika.elements.synapses.Synapse;
 import network.aika.elements.activations.Activation;
 import network.aika.elements.links.Link;
-import network.aika.elements.synapses.Scope;
+import network.aika.visitor.Operator;
 
 import java.util.stream.Stream;
 
@@ -30,7 +29,7 @@ import static network.aika.elements.synapses.Synapse.latentActivationExists;
 /**
  * @author Lukas Molzberger
  */
-public abstract class LinkingOperator {
+public abstract class LinkingOperator implements Operator {
 
     protected Activation fromAct;
 
@@ -40,10 +39,6 @@ public abstract class LinkingOperator {
         this.fromAct = fromAct;
         this.syn = syn;
     }
-
-    public abstract Direction getRelationDir(Scope fromScope);
-
-    public abstract void check(LinkingCallback v, Link lastLink, Activation act);
 
     public void link(Activation bsA, Synapse synA, Link linkA, Synapse synB, Stream<Activation> bsStream) {
         bsStream

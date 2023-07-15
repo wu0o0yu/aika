@@ -19,7 +19,7 @@ package network.aika.elements.neurons;
 import network.aika.elements.activations.Activation;
 import network.aika.elements.synapses.Synapse;
 import network.aika.visitor.linking.LinkingOperator;
-import network.aika.visitor.linking.pattern.PatternCategoryDownVisitor;
+import network.aika.visitor.linking.pattern.PatternCategoryVisitor;
 
 /**
  * @author Lukas Molzberger
@@ -28,7 +28,7 @@ public class PatternCategoryNeuron extends CategoryNeuron {
 
     @Override
     public void startVisitor(LinkingOperator c, Activation act, Synapse syn) {
-        new PatternCategoryDownVisitor(act.getThought(), c)
+        new PatternCategoryVisitor(act.getThought(), c)
                 .start(act);
     }
 }

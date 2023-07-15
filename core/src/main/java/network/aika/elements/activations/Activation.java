@@ -29,16 +29,15 @@ import network.aika.elements.neurons.Range;
 import network.aika.elements.synapses.CategoryInputSynapse;
 import network.aika.fields.*;
 import network.aika.elements.synapses.Synapse;
-import network.aika.visitor.DownVisitor;
-import network.aika.visitor.linking.pattern.PatternCategoryDownVisitor;
-import network.aika.visitor.linking.pattern.PatternCategoryUpVisitor;
-import network.aika.visitor.selfref.SelfRefDownVisitor;
-import network.aika.visitor.UpVisitor;
+import network.aika.visitor.Visitor;
 import network.aika.steps.activation.Counting;
 import network.aika.steps.activation.LinkingOut;
+import network.aika.visitor.linking.binding.BindingVisitor;
+import network.aika.visitor.linking.inhibitory.InhibitoryVisitor;
+import network.aika.visitor.linking.pattern.PatternCategoryVisitor;
+import network.aika.visitor.linking.pattern.PatternVisitor;
 
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import static java.lang.Integer.MAX_VALUE;
@@ -169,55 +168,24 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
         net.setValue(v);
     }
 
-    public boolean isSelfRef(BindingActivation oAct) {
-        SelfRefDownVisitor v = new SelfRefDownVisitor(oAct);
-        v.start(this);
-        return v.isSelfRef();
-    }
-
-    public static boolean isSelfRef(BindingActivation in, BindingActivation out) {
-        return in.isSelfRef(out) ||
-                out.isSelfRef(in);
-    }
-
-    public void bindingVisitDown(DownVisitor v, Link lastLink) {
-        v.next(this);
-    }
-
-    public void bindingVisitUp(UpVisitor v, Link lastLink) {
+    public void bindingVisit(BindingVisitor v, Link lastLink, int depth) {
         v.check(lastLink, this);
-        v.next(this);
+        v.next(this, depth);
     }
 
-    public void patternVisitDown(DownVisitor v, Link lastLink) {
-        v.next(this);
-    }
-
-    public void patternVisitUp(UpVisitor v, Link lastLink) {
+    public void patternVisit(PatternVisitor v, Link lastLink, int depth) {
         v.check(lastLink, this);
-        v.next(this);
+        v.next(this, depth);
     }
 
-    public void inhibVisitDown(DownVisitor v, Link lastLink) {
-        v.next(this);
-    }
-
-    public void inhibVisitUp(UpVisitor v, Link lastLink) {
+    public void inhibVisit(InhibitoryVisitor v, Link lastLink, int depth) {
         v.check(lastLink, this);
-        v.next(this);
+        v.next(this, depth);
     }
 
-    public void patternCatVisitDown(PatternCategoryDownVisitor v, Link lastLink) {
-        v.next(this);
-    }
-
-    public void patternCatVisitUp(PatternCategoryUpVisitor v, Link lastLink) {
+    public void patternCatVisit(PatternCategoryVisitor v, Link lastLink, int depth) {
         v.check(lastLink, this);
-        v.next(this);
-    }
-
-    public void selfRefVisitDown(DownVisitor v, Link lastLink) {
-        v.next(this);
+        v.next(this, depth);
     }
 
     protected void connectGradientFields() {

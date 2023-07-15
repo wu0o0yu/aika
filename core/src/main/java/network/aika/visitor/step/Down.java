@@ -14,28 +14,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.visitor.linking;
+package network.aika.visitor.step;
 
 import network.aika.elements.activations.Activation;
 import network.aika.elements.links.Link;
-import network.aika.visitor.UpVisitor;
+import network.aika.visitor.Visitor;
 
 /**
  * @author Lukas Molzberger
  */
-public abstract class LinkingUpVisitor<T extends Activation> extends UpVisitor implements LinkingCallback {
+public class Down implements Step {
 
-    protected LinkingOperator operator;
-
-    protected T origin;
-
-    protected LinkingUpVisitor(LinkingDownVisitor parent, T origin) {
-        super(parent);
-        this.origin = origin;
-        this.operator = parent.operator;
+    public void next(Visitor v, Activation<?> act, int depth) {
+        act.getInputLinks()
+                .forEach(l -> v.visit(l, depth));
     }
 
-    public void check(Link lastLink, Activation act) {
-        operator.check(this, lastLink, act);
+    public void next(Visitor v, Link<?, ?, ?> l, int depth) {
+        if(l.getInput() != null)
+            v.visit(l.getInput(), l, depth);
+    }
+
+    public boolean isDown() {
+        return true;
+    }
+
+    public boolean isUp() {
+        return false;
+    }
+
+    public String toString() {
+        return "DOWN";
     }
 }

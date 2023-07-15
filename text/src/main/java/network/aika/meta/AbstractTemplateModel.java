@@ -17,6 +17,7 @@
 package network.aika.meta;
 
 import network.aika.Model;
+import network.aika.Scope;
 import network.aika.elements.activations.Activation;
 import network.aika.elements.activations.TokenActivation;
 import network.aika.elements.neurons.*;
@@ -109,11 +110,11 @@ public abstract class AbstractTemplateModel {
                 .init(model, getPatternType() + " Category")
                 .getProvider(true);
 
-        inhibitoryN =new InhibitoryNeuron()
+        inhibitoryN = new InhibitoryNeuron(Scope.SAME)
                 .init(model, "I")
                 .getProvider(true);
 
-        inhibCat = new InhibitoryCategoryNeuron()
+        inhibCat = new InhibitoryCategoryNeuron(Scope.SAME)
                 .init(model, "Inhib. Category")
                 .getProvider(true);
 
@@ -213,10 +214,6 @@ public abstract class AbstractTemplateModel {
 
         abstractNeurons.add(bn.getProvider());
 
-        new PrimaryInhibitorySynapse()
-                .setWeight(PASSIVE_SYNAPSE_WEIGHT)
-                .init(inputToken.getNeuron(), inhibitoryN.getNeuron());
-
         new InhibitorySynapse(Scope.INPUT)
                 .setWeight(1.0)
                 .init(bn, inhibitoryN.getNeuron());
@@ -311,10 +308,6 @@ public abstract class AbstractTemplateModel {
                 .init(model, "Abstract (W) Pos:" + pos);
 
         abstractNeurons.add(bn.getProvider());
-
-        new PrimaryInhibitorySynapse()
-                .setWeight(PASSIVE_SYNAPSE_WEIGHT)
-                .init(inputToken.getNeuron(), inhibitoryN.getNeuron());
 
         new InhibitorySynapse(Scope.INPUT)
                 .setWeight(1.0)

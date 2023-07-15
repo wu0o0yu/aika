@@ -19,6 +19,7 @@ package network.aika.elements.links;
 import network.aika.elements.activations.*;
 import network.aika.elements.synapses.*;
 import network.aika.visitor.Visitor;
+import network.aika.visitor.linking.pattern.PatternCategoryVisitor;
 
 import java.util.stream.Stream;
 
@@ -28,7 +29,7 @@ import static network.aika.elements.activations.InhibitoryActivation.crossConnec
 /**
  * @author Lukas Molzberger
  */
-public class InhibitoryCategoryInputLink extends AbstractInhibitoryLink<InhibitoryCategoryInputSynapse, CategoryActivation> implements CategoryInputLink {
+public class InhibitoryCategoryInputLink extends DisjunctiveLink<InhibitoryCategoryInputSynapse, CategoryActivation, InhibitoryActivation> implements CategoryInputLink {
 
     public InhibitoryCategoryInputLink(InhibitoryCategoryInputSynapse s, CategoryActivation input, InhibitoryActivation output) {
         super(s, input, output);
@@ -45,7 +46,7 @@ public class InhibitoryCategoryInputLink extends AbstractInhibitoryLink<Inhibito
     }
 
     @Override
-    public void patternCatVisit(Visitor v) {
+    public void patternCatVisit(PatternCategoryVisitor v, int depth) {
     }
 
     @Override

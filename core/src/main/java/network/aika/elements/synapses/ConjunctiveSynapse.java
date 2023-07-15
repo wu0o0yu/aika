@@ -17,6 +17,7 @@
 package network.aika.elements.synapses;
 
 import network.aika.Model;
+import network.aika.Scope;
 import network.aika.Thought;
 import network.aika.direction.Direction;
 import network.aika.elements.neurons.Neuron;
@@ -46,14 +47,7 @@ import static network.aika.utils.Utils.TOLERANCE;
  * @author Lukas Molzberger
  */
 public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends Neuron, O extends ConjunctiveNeuron<OA>, L extends Link<S, IA, OA>, IA extends Activation<?>, OA extends ConjunctiveActivation> extends
-        Synapse<
-                S,
-                I,
-                O,
-                L,
-                IA,
-                OA
-                >
+        Synapse<S, I, O, L, IA, OA>
 {
 
     protected MultiInputField synapseBias = (MultiInputField) new QueueSumField(this, TRAINING, "synapseBias", TOLERANCE)

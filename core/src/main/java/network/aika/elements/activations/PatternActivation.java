@@ -17,14 +17,14 @@
 package network.aika.elements.activations;
 
 import network.aika.Thought;
-import network.aika.elements.links.InputPatternLink;
 import network.aika.elements.links.Link;
-import network.aika.elements.synapses.Scope;
+import network.aika.Scope;
 import network.aika.fields.*;
 import network.aika.elements.neurons.PatternNeuron;
-import network.aika.visitor.DownVisitor;
+import network.aika.visitor.linking.binding.BindingVisitor;
+import network.aika.visitor.linking.inhibitory.InhibitoryVisitor;
 import network.aika.sign.Sign;
-import network.aika.visitor.linking.pattern.PatternCategoryDownVisitor;
+import network.aika.visitor.linking.pattern.PatternCategoryVisitor;
 
 import static network.aika.fields.Fields.*;
 import static network.aika.utils.Utils.TOLERANCE;
@@ -79,31 +79,26 @@ public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
     }
 
     @Override
-    public void selfRefVisitDown(DownVisitor v, Link lastLink) {
-        v.up(this);
+    public void bindingVisit(BindingVisitor v, Link lastLink, int depth) {
+        super.bindingVisit(v, lastLink, depth);
+
+        v.up(this, depth);
     }
 
     @Override
-    public void bindingVisitDown(DownVisitor v, Link lastLink) {
-        super.bindingVisitDown(v, lastLink);
-
-        v.up(this);
-    }
-
-    @Override
-    public void inhibVisitDown(DownVisitor v, Link lastLink) {
+    public void inhibVisit(InhibitoryVisitor v, Link lastLink, int depth) {
         if(lastLink == null)
-            super.inhibVisitDown(v, lastLink);
+            super.inhibVisit(v, lastLink, depth);
 
-        v.up(this);
+        v.up(this, depth);
     }
 
     @Override
-    public void patternCatVisitDown(PatternCategoryDownVisitor v, Link lastLink) {
-        if(lastLink != null && lastLink.getSynapse().getScope() == Scope.INPUT)
-            v.up(this);
+    public void patternCatVisit(PatternCategoryVisitor v, Link lastLink, int depth) {
+        if(v.getDirection().isDown() && lastLink != null && lastLink.getSynapse().getScope() == Scope.INPUT)
+            v.up(this, depth);
         else
-            super.patternCatVisitDown(v, lastLink);
+            super.patternCatVisit(v, lastLink, depth);
     }
 
     public double getSurprisal(Sign sign) {

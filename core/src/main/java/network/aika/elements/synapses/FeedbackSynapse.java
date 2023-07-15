@@ -16,6 +16,7 @@
  */
 package network.aika.elements.synapses;
 
+import network.aika.Scope;
 import network.aika.Thought;
 import network.aika.elements.activations.Activation;
 import network.aika.elements.links.BindingNeuronLink;

@@ -17,6 +17,7 @@
 package network.aika.elements.synapses;
 
 import network.aika.Model;
+import network.aika.Scope;
 import network.aika.Thought;
 import network.aika.callbacks.ActivationCheckCallback;
 import network.aika.elements.activations.Activation;

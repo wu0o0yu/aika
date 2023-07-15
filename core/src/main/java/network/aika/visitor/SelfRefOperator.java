@@ -14,23 +14,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.visitor.linking;
+package network.aika.visitor;
 
-import network.aika.Thought;
+import network.aika.direction.Direction;
 import network.aika.elements.activations.Activation;
-import network.aika.visitor.DownVisitor;
-
+import network.aika.elements.links.Link;
+import network.aika.Scope;
+import network.aika.visitor.linking.LinkingVisitor;
 
 /**
  * @author Lukas Molzberger
  */
-public abstract class LinkingDownVisitor<T extends Activation> extends DownVisitor<T> {
+public class SelfRefOperator implements Operator {
 
-    protected LinkingOperator operator;
+    private Activation target;
 
-    public LinkingDownVisitor(Thought t, LinkingOperator operator) {
-        super(t);
+    public SelfRefOperator(Activation target) {
+        this.target = target;
+    }
 
-        this.operator = operator;
+    @Override
+    public Direction getRelationDir(Scope fromScope) {
+        return null;
+    }
+
+    @Override
+    public void check(LinkingVisitor v, Link lastLink, Activation act) {
+
+    }
+
+    public boolean isSelfRef() {
+        return false;
     }
 }

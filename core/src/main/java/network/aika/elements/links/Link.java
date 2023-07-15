@@ -20,11 +20,14 @@ import network.aika.Thought;
 import network.aika.elements.Element;
 import network.aika.elements.activations.Activation;
 import network.aika.elements.activations.Timestamp;
+import network.aika.Scope;
 import network.aika.fields.*;
 import network.aika.elements.synapses.Synapse;
-import network.aika.visitor.Visitor;
-import network.aika.visitor.selfref.SelfRefDownVisitor;
 import network.aika.steps.link.LinkingIn;
+import network.aika.visitor.linking.binding.BindingVisitor;
+import network.aika.visitor.linking.inhibitory.InhibitoryVisitor;
+import network.aika.visitor.linking.pattern.PatternCategoryVisitor;
+import network.aika.visitor.linking.pattern.PatternVisitor;
 
 import static network.aika.callbacks.EventType.CREATE;
 import static network.aika.fields.FieldLink.linkAndConnect;
@@ -74,24 +77,25 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
         LinkingIn.add(this);
     }
 
-    public void selfRefVisit(SelfRefDownVisitor v) {
-        v.next(this);
+
+    public void bindingVisit(BindingVisitor v, int depth) {
+        v.next(this, depth);
     }
 
-    public void bindingVisit(Visitor v) {
-        v.next(this);
+    public void patternVisit(PatternVisitor v, int depth) {
+        v.next(this, depth);
     }
 
-    public void patternVisit(Visitor v) {
-        v.next(this);
+    public void inhibVisit(InhibitoryVisitor v, int depth) {
+        Scope s = synapse.getScope();
+        if(s != null && s != v.getIdentityRef())
+            return;
+
+        v.next(this, depth);
     }
 
-    public void inhibVisit(Visitor v) {
-        v.next(this);
-    }
-
-    public void patternCatVisit(Visitor v) {
-        v.next(this);
+    public void patternCatVisit(PatternCategoryVisitor v, int depth) {
+        v.next(this, depth);
     }
 
     protected void connectGradientFields() {

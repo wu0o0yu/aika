@@ -21,23 +21,25 @@ import network.aika.elements.activations.Activation;
 import network.aika.elements.activations.BindingActivation;
 import network.aika.elements.activations.PatternActivation;
 import network.aika.elements.links.Link;
-import network.aika.visitor.linking.LinkingDownVisitor;
-import network.aika.visitor.linking.LinkingOperator;
-import network.aika.visitor.linking.inhibitory.InhibitoryUpVisitor;
+import network.aika.Scope;
+import network.aika.visitor.Operator;
+import network.aika.visitor.linking.LinkingVisitor;
 
 /**
  * @author Lukas Molzberger
  */
-public class PatternCategoryDownVisitor extends LinkingDownVisitor<PatternActivation> {
+public class PatternCategoryVisitor extends LinkingVisitor<PatternActivation> {
 
     private BindingActivation refAct;
 
-    public PatternCategoryDownVisitor(Thought t, LinkingOperator operator) {
+    public PatternCategoryVisitor(Thought t, Operator operator) {
         super(t, operator);
     }
 
-    public BindingActivation getReferenceAct() {
-        return refAct;
+
+    protected PatternCategoryVisitor(PatternCategoryVisitor parent, PatternActivation origin) {
+        super(parent, origin);
+        this.refAct = parent.refAct;
     }
 
     public void setReferenceAct(BindingActivation refAct) {
@@ -45,16 +47,36 @@ public class PatternCategoryDownVisitor extends LinkingDownVisitor<PatternActiva
     }
 
     @Override
-    public void up(PatternActivation origin) {
-        new PatternCategoryUpVisitor(this, origin)
-                .visitUp(origin, null);
+    public void up(PatternActivation origin, int depth) {
+        logUp(origin, depth);
+
+        new PatternCategoryVisitor(this, origin)
+                .visit(origin, null, depth);
     }
 
-    protected void visitDown(Link l) {
-        l.patternCatVisit(this);
+    public BindingActivation getReferenceAct() {
+        return refAct;
     }
 
-    protected void visitDown(Activation act, Link l) {
-        act.patternCatVisitDown(this, l);
+    public void check(Link lastLink, Activation act) {
+        operator.check(this, lastLink, act);
+    }
+
+    public boolean compatible(Scope from, Scope to) {
+        if(origin == null)
+            return false;
+
+        return from == to;
+    }
+
+    public void createRelation(Link l) {
+    }
+
+    public void visit(Link l, int depth) {
+        l.patternCatVisit(this, depth);
+    }
+
+    public void visit(Activation act, Link l, int depth) {
+        act.patternCatVisit(this, l, depth);
     }
 }

@@ -20,6 +20,8 @@ import network.aika.elements.activations.CategoryActivation;
 import network.aika.elements.activations.InhibitoryActivation;
 import network.aika.elements.synapses.InhibitoryCategorySynapse;
 import network.aika.visitor.Visitor;
+import network.aika.visitor.linking.pattern.PatternCategoryVisitor;
+import network.aika.visitor.linking.pattern.PatternVisitor;
 
 import java.util.stream.Stream;
 
@@ -37,6 +39,6 @@ public class InhibitoryCategoryLink extends CategoryLink<InhibitoryCategorySynap
     }
 
     @Override
-    public void patternCatVisit(Visitor v) {
+    public void patternCatVisit(PatternCategoryVisitor v, int depth) {
     }
 }

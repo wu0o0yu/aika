@@ -16,24 +16,40 @@
  */
 package network.aika.elements.synapses;
 
+import network.aika.Model;
+import network.aika.Scope;
 import network.aika.elements.activations.BindingActivation;
 import network.aika.elements.activations.InhibitoryActivation;
 import network.aika.elements.links.InhibitoryLink;
 import network.aika.elements.neurons.BindingNeuron;
 import network.aika.elements.neurons.InhibitoryNeuron;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+
 /**
  *
  * @author Lukas Molzberger
  */
-public class InhibitorySynapse extends AbstractInhibitorySynapse<InhibitorySynapse, BindingNeuron, InhibitoryLink, BindingActivation> {
+public class InhibitorySynapse extends DisjunctiveSynapse<
+        InhibitorySynapse,
+        BindingNeuron,
+        InhibitoryNeuron,
+        InhibitoryLink,
+        BindingActivation,
+        InhibitoryActivation
+        > {
+
+    private Scope type;
 
     public InhibitorySynapse() {
-        super();
+        super(null);
     }
 
     public InhibitorySynapse(Scope type) {
-        super(type);
+        this();
+        this.type = type;
     }
 
     @Override
@@ -46,5 +62,27 @@ public class InhibitorySynapse extends AbstractInhibitorySynapse<InhibitorySynap
         InhibitorySynapse s = new InhibitorySynapse(getType());
         s.initFromTemplate(input, output, this);
         return s;
+    }
+
+
+    public Scope getType() {
+        return type;
+    }
+
+    @Override
+    public void write(DataOutput out) throws IOException {
+        super.write(out);
+
+        out.writeBoolean(type != null);
+        if(type != null)
+            out.writeInt(type.ordinal());
+    }
+
+    @Override
+    public void readFields(DataInput in, Model m) throws IOException {
+        super.readFields(in, m);
+
+        if(in.readBoolean())
+            type = Scope.values()[in.readInt()];
     }
 }

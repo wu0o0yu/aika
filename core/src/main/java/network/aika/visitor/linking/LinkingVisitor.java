@@ -14,54 +14,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.visitor;
+package network.aika.visitor.linking;
 
 import network.aika.Thought;
 import network.aika.elements.activations.Activation;
 import network.aika.elements.links.Link;
-import network.aika.elements.activations.TokenActivation;
+import network.aika.Scope;
+import network.aika.visitor.Operator;
+import network.aika.visitor.Visitor;
+
 
 /**
  * @author Lukas Molzberger
  */
-public abstract class DownVisitor<T extends Activation> extends Visitor {
+public abstract class LinkingVisitor<T extends Activation> extends Visitor<T> {
 
-    public DownVisitor(Thought t) {
-        super(t);
+    public LinkingVisitor(Thought t, Operator operator) {
+        super(t, operator);
     }
+
+    protected LinkingVisitor(LinkingVisitor<T> parent, T origin) {
+        super(parent, origin);
+    }
+
+    public abstract boolean compatible(Scope from, Scope to);
+
+    public abstract void createRelation(Link l);
 
     public void check(Link lastLink, Activation act) {
-        // Nothing to do
-    }
-
-    public void start(Activation<?> act) {
-        visitDown(act, null);
-    }
-
-    public void next(Activation<?> act) {
-        act.getInputLinks()
-                .forEach(l -> visitDown(l));
-    }
-
-    public void next(Link<?, ?, ?> l) {
-        if(l.getInput() != null)
-            visitDown(l.getInput(), l);
-    }
-
-    protected abstract void visitDown(Link l);
-
-    protected abstract void visitDown(Activation act, Link l);
-
-    public abstract void up(T origin);
-
-    public void expandRelations(TokenActivation tAct) {
-    }
-
-    public boolean isDown() {
-        return true;
-    }
-
-    public boolean isUp() {
-        return false;
+        if(direction.isUp())
+            operator.check(this, lastLink, act);
     }
 }

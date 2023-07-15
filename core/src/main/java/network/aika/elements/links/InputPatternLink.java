@@ -22,6 +22,7 @@ import network.aika.elements.synapses.InputPatternSynapse;
 import network.aika.fields.AbstractFunction;
 import network.aika.fields.Fields;
 import network.aika.visitor.Visitor;
+import network.aika.visitor.linking.pattern.PatternVisitor;
 
 /**
  * @author Lukas Molzberger
@@ -47,6 +48,6 @@ public class InputPatternLink extends BindingNeuronLink<InputPatternSynapse, Pat
     }
 
     @Override
-    public void patternVisit(Visitor v) {
+    public void patternVisit(PatternVisitor v, int depth) {
     }
 }

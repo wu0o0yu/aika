@@ -21,6 +21,7 @@ import network.aika.elements.activations.InhibitoryActivation;
 import network.aika.fields.*;
 import network.aika.elements.synapses.NegativeFeedbackSynapse;
 import network.aika.visitor.Visitor;
+import network.aika.visitor.linking.binding.BindingVisitor;
 
 import java.util.stream.Stream;
 
@@ -69,7 +70,7 @@ public class NegativeFeedbackLink extends FeedbackLink<NegativeFeedbackSynapse, 
     }
 
     @Override
-    public void bindingVisit(Visitor v) {
+    public void bindingVisit(BindingVisitor v, int depth) {
         // don't allow negative feedback links to create new links; i.d. do nothing
     }
 

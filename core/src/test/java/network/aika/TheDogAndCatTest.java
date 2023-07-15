@@ -37,13 +37,13 @@ public class TheDogAndCatTest {
     public void testTheDogAndTheCat()  {
         Model m = new Model();
 
-        InhibitoryNeuron inhibNThe = new InhibitoryNeuron()
+        InhibitoryNeuron inhibNThe = new InhibitoryNeuron(Scope.SAME)
                 .init(m, "I-the");
 
-        InhibitoryNeuron inhibNCat = new InhibitoryNeuron()
+        InhibitoryNeuron inhibNCat = new InhibitoryNeuron(Scope.SAME)
                 .init(m, "I-cat");
 
-        InhibitoryNeuron inhibNDog = new InhibitoryNeuron()
+        InhibitoryNeuron inhibNDog = new InhibitoryNeuron(Scope.SAME)
                 .init(m, "I-dog");
 
         initPatternTheCat(m, inhibNThe, inhibNCat, 3);

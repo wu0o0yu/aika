@@ -18,31 +18,56 @@ package network.aika.visitor.linking.binding;
 
 import network.aika.Thought;
 import network.aika.elements.activations.Activation;
+import network.aika.elements.activations.TokenActivation;
 import network.aika.elements.links.Link;
 import network.aika.elements.activations.PatternActivation;
-import network.aika.visitor.linking.LinkingDownVisitor;
-import network.aika.visitor.linking.LinkingOperator;
+import network.aika.Scope;
+import network.aika.visitor.Operator;
+import network.aika.visitor.linking.LinkingVisitor;
 
 /**
  * @author Lukas Molzberger
  */
-public class BindingDownVisitor extends LinkingDownVisitor<PatternActivation> {
+public class BindingVisitor extends LinkingVisitor<PatternActivation> {
 
-    public BindingDownVisitor(Thought t, LinkingOperator operator) {
+    public BindingVisitor(Thought t, Operator operator) {
         super(t, operator);
     }
 
+    public BindingVisitor(BindingVisitor parent, PatternActivation origin) {
+        super(parent, origin);
+    }
+
     @Override
-    public void up(PatternActivation origin) {
-        new BindingUpVisitor(this, origin)
-                .visitUp(origin, null);
+    public void up(PatternActivation origin, int depth) {
+        logUp(origin, depth);
+
+        new BindingVisitor(this, origin)
+                .visit(origin, null, depth);
     }
 
-    protected void visitDown(Link l) {
-        l.bindingVisit(this);
+    public void expandRelations(TokenActivation origin) {
     }
 
-    protected void visitDown(Activation act, Link l) {
-        act.bindingVisitDown(this, l);
+    public void check(Link lastLink, Activation act) {
+        operator.check(this, lastLink, act);
+    }
+
+    public boolean compatible(Scope from, Scope to) {
+        if(origin == null)
+            return false;
+
+        return from == to;
+    }
+
+    public void createRelation(Link l) {
+    }
+
+    public void visit(Link l, int depth) {
+        l.bindingVisit(this, depth);
+    }
+
+    public void visit(Activation act, Link l, int depth) {
+        act.bindingVisit(this, l, depth);
     }
 }

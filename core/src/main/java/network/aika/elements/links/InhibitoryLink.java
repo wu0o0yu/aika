@@ -19,14 +19,17 @@ package network.aika.elements.links;
 import network.aika.elements.activations.BindingActivation;
 import network.aika.elements.activations.InhibitoryActivation;
 import network.aika.elements.synapses.InhibitorySynapse;
+import network.aika.Scope;
 import network.aika.fields.Field;
 import network.aika.fields.FieldOutput;
 import network.aika.fields.Fields;
 import network.aika.fields.QueueSumField;
+import network.aika.visitor.linking.pattern.PatternCategoryVisitor;
+import network.aika.visitor.linking.pattern.PatternVisitor;
 
 import java.util.stream.Stream;
 
-import static network.aika.elements.activations.Activation.isSelfRef;
+import static network.aika.elements.activations.BindingActivation.isSelfRef;
 import static network.aika.fields.FieldLink.linkAndConnect;
 import static network.aika.steps.Phase.NEGATIVE_FEEDBACK;
 import static network.aika.utils.Utils.TOLERANCE;
@@ -34,7 +37,7 @@ import static network.aika.utils.Utils.TOLERANCE;
 /**
  * @author Lukas Molzberger
  */
-public class InhibitoryLink extends AbstractInhibitoryLink<InhibitorySynapse, BindingActivation> {
+public class InhibitoryLink extends DisjunctiveLink<InhibitorySynapse, BindingActivation, InhibitoryActivation> {
 
     protected FieldOutput value;
 
@@ -42,17 +45,7 @@ public class InhibitoryLink extends AbstractInhibitoryLink<InhibitorySynapse, Bi
 
     public InhibitoryLink(InhibitorySynapse inhibitorySynapse, BindingActivation input, InhibitoryActivation output) {
         super(inhibitorySynapse, input, output);
-    }
 
-    public void connectFields(NegativeFeedbackLink out) {
-        if(isSelfRef(getInput(), out.getOutput()))
-            return;
-
-        linkAndConnect(getNet(), out.getInputValue());
-    }
-
-    @Override
-    protected void initFields() {
         net = new QueueSumField(this, NEGATIVE_FEEDBACK, "net", null);
         linkAndConnect(weightedInput, net);
         linkAndConnect(output.getNeuron().getBias(), net)
@@ -70,6 +63,23 @@ public class InhibitoryLink extends AbstractInhibitoryLink<InhibitorySynapse, Bi
                 Stream.of(this),
                 output.getAllNegativeFeedbackLinks()
         );
+    }
+
+    @Override
+    public void patternVisit(PatternVisitor v, int depth) {
+    }
+
+    @Override
+    public void patternCatVisit(PatternCategoryVisitor v, int depth) {
+    }
+
+    public void connectFields(NegativeFeedbackLink out) {
+        Scope identityRef = getOutput().getNeuron().getIdentityReference();
+
+        if(isSelfRef(getInput(), out.getOutput(), identityRef))
+            return;
+
+        linkAndConnect(getNet(), out.getInputValue());
     }
 
     @Override

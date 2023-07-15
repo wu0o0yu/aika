@@ -19,7 +19,7 @@ package network.aika.elements.neurons;
 import network.aika.elements.activations.Activation;
 import network.aika.elements.synapses.Synapse;
 import network.aika.visitor.linking.LinkingOperator;
-import network.aika.visitor.linking.binding.BindingDownVisitor;
+import network.aika.visitor.linking.binding.BindingVisitor;
 
 /**
  * @author Lukas Molzberger
@@ -28,7 +28,7 @@ public class BindingCategoryNeuron extends CategoryNeuron {
 
     @Override
     public void startVisitor(LinkingOperator c, Activation act, Synapse syn) {
-        new BindingDownVisitor(act.getThought(), c)
+        new BindingVisitor(act.getThought(), c)
                 .start(act);
     }
 }

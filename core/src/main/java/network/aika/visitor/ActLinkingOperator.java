@@ -20,9 +20,9 @@ import network.aika.direction.Direction;
 import network.aika.elements.synapses.Synapse;
 import network.aika.elements.activations.Activation;
 import network.aika.elements.links.Link;
-import network.aika.elements.synapses.Scope;
-import network.aika.visitor.linking.LinkingCallback;
+import network.aika.Scope;
 import network.aika.visitor.linking.LinkingOperator;
+import network.aika.visitor.linking.LinkingVisitor;
 
 
 /**
@@ -47,7 +47,7 @@ public class ActLinkingOperator extends LinkingOperator {
     }
 
     @Override
-    public void check(LinkingCallback v, Link lastLink, Activation act) {
+    public void check(LinkingVisitor v, Link lastLink, Activation act) {
         if(act.getNeuron() != syn.getInput())
             return;
 

@@ -20,8 +20,10 @@ import network.aika.elements.activations.Activation;
 import network.aika.elements.activations.BindingActivation;
 import network.aika.elements.synapses.FeedbackSynapse;
 import network.aika.visitor.Visitor;
-import network.aika.visitor.selfref.SelfRefDownVisitor;
-
+import network.aika.visitor.linking.binding.BindingVisitor;
+import network.aika.visitor.linking.inhibitory.InhibitoryVisitor;
+import network.aika.visitor.linking.pattern.PatternCategoryVisitor;
+import network.aika.visitor.linking.pattern.PatternVisitor;
 
 /**
  * @author Lukas Molzberger
@@ -40,35 +42,27 @@ public abstract class FeedbackLink<S extends FeedbackSynapse, IA extends Activat
     }
 
     @Override
-    public void selfRefVisit(SelfRefDownVisitor v) {
+    public void bindingVisit(BindingVisitor v, int depth) {
         if(checkVisited(v))
             return;
 
-        super.selfRefVisit(v);
+        super.bindingVisit(v, depth);
     }
 
     @Override
-    public void bindingVisit(Visitor v) {
+    public void patternVisit(PatternVisitor v, int depth) {
         if(checkVisited(v))
             return;
 
-        super.bindingVisit(v);
+        super.patternVisit(v, depth);
     }
 
     @Override
-    public void patternVisit(Visitor v) {
-        if(checkVisited(v))
-            return;
-
-        super.patternVisit(v);
+    public void inhibVisit(InhibitoryVisitor v, int depth) {
     }
 
     @Override
-    public void inhibVisit(Visitor v) {
-    }
-
-    @Override
-    public void patternCatVisit(Visitor v) {
+    public void patternCatVisit(PatternCategoryVisitor v, int depth) {
     }
 
     private boolean checkVisited(Visitor v) {

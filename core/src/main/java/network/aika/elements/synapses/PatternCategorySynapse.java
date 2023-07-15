@@ -16,13 +16,11 @@
  */
 package network.aika.elements.synapses;
 
-import network.aika.elements.activations.Activation;
+import network.aika.Scope;
 import network.aika.elements.activations.CategoryActivation;
 import network.aika.elements.activations.PatternActivation;
 import network.aika.elements.links.PatternCategoryLink;
 import network.aika.elements.neurons.PatternNeuron;
-import network.aika.visitor.linking.LinkingOperator;
-import network.aika.visitor.linking.pattern.PatternCategoryDownVisitor;
 
 /**
  *

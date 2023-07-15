@@ -21,11 +21,13 @@ import network.aika.elements.links.InputPatternLink;
 import network.aika.elements.links.Link;
 import network.aika.elements.links.PositiveFeedbackLink;
 import network.aika.elements.synapses.PositiveFeedbackSynapse;
+import network.aika.Scope;
 import network.aika.fields.*;
 import network.aika.elements.neurons.BindingNeuron;
-import network.aika.visitor.DownVisitor;
-import network.aika.visitor.linking.pattern.PatternCategoryDownVisitor;
-import network.aika.visitor.linking.pattern.PatternCategoryUpVisitor;
+import network.aika.visitor.SelfRefOperator;
+import network.aika.visitor.linking.inhibitory.InhibitoryVisitor;
+import network.aika.visitor.linking.pattern.PatternCategoryVisitor;
+import network.aika.visitor.linking.pattern.PatternVisitor;
 
 import java.util.Objects;
 import java.util.stream.Stream;
@@ -73,31 +75,37 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
         super.connectWeightUpdate();
     }
 
-    @Override
-    public void patternVisitDown(DownVisitor v, Link lastLink) {
-        super.patternVisitDown(v, lastLink);
-        v.up(this);
+    public static boolean isSelfRef(BindingActivation in, BindingActivation out, Scope identityRef) {
+        return in.isSelfRef(out, identityRef) ||
+                out.isSelfRef(in, identityRef);
+    }
+
+    private boolean isSelfRef(BindingActivation out, Scope identityRef) {
+        SelfRefOperator op = new SelfRefOperator(out);
+        new InhibitoryVisitor(thought, op, identityRef).start(this);
+        return op.isSelfRef();
     }
 
     @Override
-    public void patternCatVisitDown(PatternCategoryDownVisitor v, Link lastLink) {
-        v.setReferenceAct(this);
-        super.patternCatVisitDown(v, lastLink);
+    public void patternVisit(PatternVisitor v, Link lastLink, int depth) {
+        super.patternVisit(v, lastLink, depth);
+        v.up(this, depth);
     }
 
     @Override
-    public void patternCatVisitUp(PatternCategoryUpVisitor v, Link lastLink) {
-        CategoryActivation cAct = getCategoryActivation();
-        CategoryActivation refCAct = v.getReferenceAct().getCategoryActivation();
+    public void patternCatVisit(PatternCategoryVisitor v, Link lastLink, int depth) {
+        if(v.getDirection().isDown()) {
+            v.setReferenceAct(this);
+            super.patternCatVisit(v, lastLink, depth);
+        } else {
+            CategoryActivation cAct = getCategoryActivation();
+            CategoryActivation refCAct = v.getReferenceAct().getCategoryActivation();
 
-        if(cAct != null && cAct == refCAct)
-            super.patternCatVisitUp(v, lastLink);
+            if(cAct != null && cAct == refCAct)
+                super.patternCatVisit(v, lastLink, depth);
+        }
     }
 
-    @Override
-    public void selfRefVisitDown(DownVisitor v, Link lastLink) {
-        v.up(this);
-    }
 
     @Override
     protected void initDummyLinks() {

@@ -25,7 +25,7 @@ import network.aika.sign.Sign;
 import network.aika.utils.Bound;
 import network.aika.utils.Utils;
 import network.aika.visitor.linking.LinkingOperator;
-import network.aika.visitor.linking.pattern.PatternDownVisitor;
+import network.aika.visitor.linking.pattern.PatternVisitor;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -59,7 +59,7 @@ public class PatternNeuron extends ConjunctiveNeuron<PatternActivation> {
 
     @Override
     public void startVisitor(LinkingOperator c, Activation act, Synapse syn) {
-        new PatternDownVisitor(act.getThought(), c)
+        new PatternVisitor(act.getThought(), c)
                 .start(act);
     }
 

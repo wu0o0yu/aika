@@ -16,18 +16,35 @@
  */
 package network.aika.elements.neurons;
 
+import network.aika.Model;
+import network.aika.Scope;
 import network.aika.Thought;
 import network.aika.elements.activations.Activation;
 import network.aika.elements.activations.InhibitoryActivation;
 import network.aika.elements.synapses.*;
 import network.aika.visitor.linking.LinkingOperator;
-import network.aika.visitor.linking.inhibitory.InhibitoryDownVisitor;
+import network.aika.visitor.linking.inhibitory.InhibitoryVisitor;
+
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 
 /**
  *
  * @author Lukas Molzberger
  */
 public class InhibitoryNeuron extends DisjunctiveNeuron<InhibitoryActivation> {
+
+
+    private Scope identityReference;
+
+    public InhibitoryNeuron(Scope identityReference) {
+        this.identityReference = identityReference;
+    }
+
+    public Scope getIdentityReference() {
+        return identityReference;
+    }
 
     @Override
     public InhibitoryActivation createActivation(Thought t) {
@@ -41,7 +58,7 @@ public class InhibitoryNeuron extends DisjunctiveNeuron<InhibitoryActivation> {
 
     @Override
     public void startVisitor(LinkingOperator c, Activation act, Synapse syn) {
-        new InhibitoryDownVisitor(act.getThought(), c)
+        new InhibitoryVisitor(act.getThought(), c, identityReference.getInverted())
                 .start(act);
     }
 
@@ -63,5 +80,19 @@ public class InhibitoryNeuron extends DisjunctiveNeuron<InhibitoryActivation> {
     @Override
     public boolean isTrainingAllowed() {
         return false;
+    }
+
+    @Override
+    public void write(DataOutput out) throws IOException {
+        super.write(out);
+
+        out.writeInt(identityReference.ordinal());
+    }
+
+    @Override
+    public void readFields(DataInput in, Model m) throws Exception {
+        super.readFields(in, m);
+
+        identityReference = Scope.values()[in.readInt()];
     }
 }

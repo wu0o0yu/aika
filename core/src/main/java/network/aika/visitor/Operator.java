@@ -14,35 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.visitor.linking.pattern;
+package network.aika.visitor;
 
-import network.aika.Thought;
+import network.aika.direction.Direction;
 import network.aika.elements.activations.Activation;
-import network.aika.elements.activations.BindingActivation;
 import network.aika.elements.links.Link;
-import network.aika.visitor.linking.LinkingDownVisitor;
-import network.aika.visitor.linking.LinkingOperator;
+import network.aika.Scope;
+import network.aika.visitor.linking.LinkingVisitor;
 
 /**
  * @author Lukas Molzberger
  */
-public class PatternDownVisitor extends LinkingDownVisitor<BindingActivation> {
+public interface Operator {
 
-    public PatternDownVisitor(Thought t, LinkingOperator operator) {
-        super(t, operator);
-    }
+    Direction getRelationDir(Scope fromScope);
 
-    @Override
-    public void up(BindingActivation origin) {
-        new PatternUpVisitor(this, origin)
-                .visitUp(origin, null);
-    }
+    void check(LinkingVisitor v, Link lastLink, Activation act);
 
-    protected void visitDown(Link l) {
-        l.patternVisit(this);
-    }
-
-    protected void visitDown(Activation act, Link l) {
-        act.patternVisitDown(this, l);
-    }
 }

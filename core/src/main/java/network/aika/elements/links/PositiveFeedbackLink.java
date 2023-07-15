@@ -21,7 +21,9 @@ import network.aika.elements.activations.PatternActivation;
 import network.aika.elements.synapses.PositiveFeedbackSynapse;
 import network.aika.exceptions.InvalidRelinkingException;
 import network.aika.fields.*;
-import network.aika.visitor.Visitor;
+import network.aika.visitor.linking.binding.BindingVisitor;
+import network.aika.visitor.linking.inhibitory.InhibitoryVisitor;
+import network.aika.visitor.linking.pattern.PatternVisitor;
 
 import static network.aika.callbacks.EventType.CREATE;
 import static network.aika.fields.FieldLink.linkAndConnect;
@@ -100,16 +102,16 @@ public class PositiveFeedbackLink extends FeedbackLink<PositiveFeedbackSynapse, 
     }
 
     @Override
-    public void bindingVisit(Visitor v) {
-        if(v.isDown())
-            super.bindingVisit(v);
+    public void bindingVisit(BindingVisitor v, int depth) {
+        if(v.getDirection().isDown())
+            super.bindingVisit(v, depth);
     }
 
     @Override
-    public void patternVisit(Visitor v) {
+    public void patternVisit(PatternVisitor v, int depth) {
     }
 
     @Override
-    public void inhibVisit(Visitor v) {
+    public void inhibVisit(InhibitoryVisitor v, int depth) {
     }
 }

@@ -14,41 +14,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.visitor.selfref;
+package network.aika;
 
-import network.aika.elements.activations.Activation;
-import network.aika.elements.activations.BindingActivation;
-import network.aika.elements.links.Link;
-import network.aika.visitor.DownVisitor;
+import network.aika.direction.Direction;
 
 /**
+ *
  * @author Lukas Molzberger
  */
-public class SelfRefDownVisitor extends DownVisitor<BindingActivation> {
+public enum Scope {
+    INPUT(Direction.OUTPUT),
+    SAME(Direction.INPUT);
 
-    BindingActivation oAct;
-
-    boolean isSelfRef;
-
-    public SelfRefDownVisitor(BindingActivation oAct) {
-        super(oAct.getThought());
-        this.oAct = oAct;
+    static {
+        INPUT.inverted = SAME;
+        SAME.inverted = INPUT;
     }
 
-    public boolean isSelfRef() {
-        return isSelfRef;
+    private Direction relationDir;
+
+    private Scope inverted;
+
+    Scope(Direction relationDir) {
+        this.relationDir = relationDir;
     }
 
-    @Override
-    public void up(BindingActivation origin) {
-        isSelfRef = origin == oAct;
+    public Direction getRelationDir() {
+        return relationDir;
     }
 
-    protected void visitDown(Link l) {
-        l.selfRefVisit(this);
-    }
-
-    protected void visitDown(Activation act, Link l) {
-        act.selfRefVisitDown(this, l);
+    public Scope getInverted() {
+        return inverted;
     }
 }

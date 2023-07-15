@@ -14,44 +14,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.visitor.linking.binding;
+package network.aika.visitor.step;
 
 import network.aika.elements.activations.Activation;
 import network.aika.elements.links.Link;
-import network.aika.elements.activations.PatternActivation;
-import network.aika.elements.synapses.Scope;
-import network.aika.visitor.linking.LinkingUpVisitor;
+import network.aika.visitor.Visitor;
 
 /**
  * @author Lukas Molzberger
  */
-public class BindingUpVisitor extends LinkingUpVisitor<PatternActivation> {
+public class Up implements Step {
 
-    protected BindingUpVisitor(BindingDownVisitor parent, PatternActivation origin) {
-        super(parent, origin);
+    public void next(Visitor v, Activation<?> act, int depth) {
+        act.getOutputLinks()
+                .forEach(l -> v.visit(l, depth));
     }
 
-    public void check(Link lastLink, Activation act) {
-        operator.check(this, lastLink, act);
+    public void next(Visitor v, Link<?, ?, ?> l, int depth) {
+        v.visit(l.getOutput(), l, depth);
     }
 
-    public boolean compatible(Scope from, Scope to) {
-        if(origin == null)
-            return false;
-
-        return from == to;
+    public boolean isDown() {
+        return false;
     }
 
-    public void createRelation(Link l) {
+    public boolean isUp() {
+        return true;
     }
 
-    @Override
-    protected void visitUp(Link l) {
-        l.bindingVisit(this);
-    }
-
-    @Override
-    public void visitUp(Activation act, Link l) {
-        act.bindingVisitUp(this, l);
+    public String toString() {
+        return "UP";
     }
 }

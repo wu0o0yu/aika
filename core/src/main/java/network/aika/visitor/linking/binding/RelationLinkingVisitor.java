@@ -16,34 +16,66 @@
  */
 package network.aika.visitor.linking.binding;
 
+import network.aika.Thought;
 import network.aika.direction.Direction;
 import network.aika.elements.activations.BindingActivation;
 import network.aika.elements.activations.LatentRelationActivation;
-import network.aika.elements.links.Link;
 import network.aika.elements.activations.PatternActivation;
 import network.aika.elements.activations.TokenActivation;
+import network.aika.elements.links.Link;
 import network.aika.elements.synapses.RelationInputSynapse;
-import network.aika.elements.synapses.Scope;
+import network.aika.Scope;
+import network.aika.visitor.linking.LinkingOperator;
 
 /**
  * @author Lukas Molzberger
  */
-public class RelationLinkingUpVisitor extends BindingUpVisitor {
+public class RelationLinkingVisitor extends BindingVisitor {
 
     protected RelationInputSynapse relation;
-
+    protected Direction relationDir;
     protected TokenActivation downOrigin;
     protected TokenActivation upOrigin;
 
-    protected Direction relationDir;
+    public RelationLinkingVisitor(Thought t, LinkingOperator operator, RelationInputSynapse rel, Direction relationDir) {
+        super(t, operator);
 
-    protected RelationLinkingUpVisitor(RelationLinkingDownVisitor parent, TokenActivation downOrigin, TokenActivation upOrigin) {
+        this.relation = rel;
+        this.relationDir = relationDir;
+    }
+
+    protected RelationLinkingVisitor(RelationLinkingVisitor parent, TokenActivation downOrigin, TokenActivation upOrigin) {
         super(parent, downOrigin);
         this.downOrigin = downOrigin;
         this.upOrigin = upOrigin;
         this.relation = parent.relation;
         this.relationDir = parent.relationDir;
     }
+
+
+    public RelationInputSynapse getRelation() {
+        return relation;
+    }
+
+    public Direction getRelationDir() {
+        return relationDir;
+    }
+
+    public void expandRelations(TokenActivation origin, int depth) {
+        getRelation().getInput()
+                .evaluateLatentRelation(origin, relationDir)
+                .forEach(relTokenAct ->
+                        up(origin, relTokenAct, depth)
+                );
+    }
+
+    private void up(TokenActivation origin, TokenActivation relOrigin, int depth) {
+        logUp(origin, depth);
+
+        new RelationLinkingVisitor(this, origin, relOrigin)
+                .visit(relOrigin, null, depth);
+    }
+
 
     public PatternActivation getDownOrigin() {
         return downOrigin;

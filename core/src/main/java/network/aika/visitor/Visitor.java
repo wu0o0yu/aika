@@ -19,25 +19,61 @@ package network.aika.visitor;
 import network.aika.Thought;
 import network.aika.elements.activations.Activation;
 import network.aika.elements.links.Link;
+import network.aika.visitor.step.Down;
+import network.aika.visitor.step.Step;
+import network.aika.visitor.step.Up;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import static network.aika.utils.Utils.depthToSpace;
 
 /**
  * @author Lukas Molzberger
  */
-public abstract class Visitor {
+public abstract class Visitor<T extends Activation> {
+
+    private final Logger log = LoggerFactory.getLogger(Visitor.class);
 
     private long v;
 
-    public Visitor(Thought t) {
+    protected T origin;
+
+    protected Step direction;
+
+    protected Operator operator;
+
+    public Visitor(Thought t, Operator operator) {
         this.v = t.getNewVisitorId();
+
+        if(log.isDebugEnabled())
+            log.debug(depthToSpace(0) + "Start:" + getClass().getSimpleName() + " " + operator.getClass().getSimpleName());
+
+        this.operator = operator;
+        direction = new Down();
     }
 
-    protected Visitor(Visitor parent) {
+    protected Visitor(Visitor<T> parent, T origin) {
         this.v = parent.v;
+        this.origin = origin;
+        this.operator = parent.operator;
+
+        direction = new Up();
     }
 
-    public abstract void next(Activation<?> act);
+    public void start(Activation<?> act) {
+        visit(act, null, 0);
+    }
 
-    public abstract void next(Link<?, ?, ?> l);
+    public abstract void up(T origin, int depth);
+
+    public void logUp(T origin, int depth) {
+        if(log.isDebugEnabled())
+            log.debug(depthToSpace(depth) + origin.getClass().getSimpleName() + " " + origin.getId() + " " + origin.getLabel());
+    }
+
+    public Step getDirection() {
+        return direction;
+    }
 
     public long getV() {
         return v;
@@ -45,7 +81,22 @@ public abstract class Visitor {
 
     public abstract void check(Link lastLink, Activation act);
 
-    public abstract boolean isDown();
 
-    public abstract boolean isUp();
+    public abstract void visit(Link l, int depth);
+
+    public abstract void visit(Activation act, Link l, int depth);
+
+    public void next(Activation<?> act, int depth) {
+        if(log.isDebugEnabled())
+            log.debug(depthToSpace(depth) + direction + " " + act.getClass().getSimpleName() + " " + act.getId() + " " + act.getLabel());
+
+        direction.next(this, act, depth + 1);
+    }
+
+    public void next(Link<?, ?, ?> l, int depth) {
+        if(log.isDebugEnabled())
+            log.debug(depthToSpace(depth) + direction + " " + l.getClass().getSimpleName() + " " + l.getInput().getId() + " " + l.getOutput().getId());
+
+        direction.next(this, l, depth);
+    }
 }

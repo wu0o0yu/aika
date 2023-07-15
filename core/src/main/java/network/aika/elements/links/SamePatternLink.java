@@ -18,7 +18,10 @@ package network.aika.elements.links;
 
 import network.aika.elements.activations.BindingActivation;
 import network.aika.elements.synapses.SamePatternSynapse;
-import network.aika.visitor.Visitor;
+import network.aika.visitor.linking.binding.BindingVisitor;
+import network.aika.visitor.linking.inhibitory.InhibitoryVisitor;
+import network.aika.visitor.linking.pattern.PatternCategoryVisitor;
+import network.aika.visitor.linking.pattern.PatternVisitor;
 
 /**
  * @author Lukas Molzberger
@@ -34,20 +37,20 @@ public class SamePatternLink extends BindingNeuronLink<SamePatternSynapse, Bindi
     }
 
     @Override
-    public void bindingVisit(Visitor v) {
+    public void bindingVisit(BindingVisitor v, int depth) {
     }
 
     @Override
-    public void patternVisit(Visitor v) {
-        if(v.isDown())
-            v.next(this);
+    public void patternVisit(PatternVisitor v, int depth) {
+        if(v.getDirection().isDown())
+            v.next(this, depth);
     }
 
     @Override
-    public void inhibVisit(Visitor v) {
+    public void inhibVisit(InhibitoryVisitor v, int depth) {
     }
 
     @Override
-    public void patternCatVisit(Visitor v) {
+    public void patternCatVisit(PatternCategoryVisitor v, int depth) {
     }
 }

@@ -48,7 +48,7 @@ import org.junit.jupiter.api.Test;
 import java.util.SortedSet;
 
 import static network.aika.TestUtils.*;
-import static network.aika.elements.synapses.Scope.INPUT;
+import static network.aika.Scope.INPUT;
 import static network.aika.steps.Phase.INFERENCE;
 import static network.aika.steps.keys.QueueKey.MAX_ROUND;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -67,7 +67,7 @@ public class MutualExclusionTest {
         BindingNeuron na = new BindingNeuron().init(m, "A");
         BindingNeuron nb = new BindingNeuron().init(m, "B");
         BindingNeuron nc = new BindingNeuron().init(m, "C");
-        InhibitoryNeuron inhib = new InhibitoryNeuron().init(m, "I");
+        InhibitoryNeuron inhib = new InhibitoryNeuron(Scope.SAME).init(m, "I");
 
         new InputPatternSynapse()
                 .setWeight(10.0)
@@ -143,7 +143,7 @@ public class MutualExclusionTest {
         TokenNeuron in = new TokenNeuron().init(m, "I");
         BindingNeuron na = new BindingNeuron().init(m, "A");
         BindingNeuron nb = new BindingNeuron().init(m, "B");
-        InhibitoryNeuron inhib =new InhibitoryNeuron().init(m, "I");
+        InhibitoryNeuron inhib =new InhibitoryNeuron(Scope.SAME).init(m, "I");
 
         new InputPatternSynapse()
                 .setWeight(10.0)

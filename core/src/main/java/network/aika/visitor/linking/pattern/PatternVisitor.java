@@ -14,22 +14,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.visitor.linking.inhibitory;
+package network.aika.visitor.linking.pattern;
 
+import network.aika.Thought;
 import network.aika.elements.activations.Activation;
+import network.aika.elements.activations.BindingActivation;
 import network.aika.elements.links.Link;
-import network.aika.elements.activations.PatternActivation;
-import network.aika.elements.synapses.Scope;
-import network.aika.visitor.linking.LinkingUpVisitor;
+import network.aika.Scope;
+import network.aika.visitor.Operator;
+import network.aika.visitor.linking.LinkingVisitor;
 
 /**
  * @author Lukas Molzberger
  */
-public class InhibitoryUpVisitor extends LinkingUpVisitor<PatternActivation> {
+public class PatternVisitor extends LinkingVisitor<BindingActivation> {
 
+    public PatternVisitor(Thought t, Operator operator) {
+        super(t, operator);
+    }
 
-    protected InhibitoryUpVisitor(InhibitoryDownVisitor parent, PatternActivation origin) {
+    protected PatternVisitor(PatternVisitor parent, BindingActivation origin) {
         super(parent, origin);
+    }
+
+    @Override
+    public void up(BindingActivation origin, int depth) {
+        logUp(origin, depth);
+
+        new PatternVisitor(this, origin)
+                .visit(origin, null, depth);
     }
 
     public void check(Link lastLink, Activation act) {
@@ -46,13 +59,11 @@ public class InhibitoryUpVisitor extends LinkingUpVisitor<PatternActivation> {
     public void createRelation(Link l) {
     }
 
-    @Override
-    protected void visitUp(Link l) {
-        l.inhibVisit(this);
+    public void visit(Link l, int depth) {
+        l.patternVisit(this, depth);
     }
 
-    @Override
-    public void visitUp(Activation act, Link l) {
-        act.inhibVisitUp(this, l);
+    public void visit(Activation act, Link l, int depth) {
+        act.patternVisit(this, l, depth);
     }
 }

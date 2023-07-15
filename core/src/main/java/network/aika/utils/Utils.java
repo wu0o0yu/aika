@@ -96,4 +96,12 @@ public class Utils {
     public static String roundToString(int r) {
         return r == MAX_ROUND ? "MAX" : "" + r;
     }
+
+    public static String depthToSpace(int depth) {
+        StringBuilder sb = new StringBuilder();
+        for(int i = 0; i < depth; i++) {
+            sb.append("  ");
+        }
+        return sb.toString();
+    }
 }
