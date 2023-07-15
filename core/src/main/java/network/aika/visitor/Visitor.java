@@ -26,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static network.aika.utils.Utils.depthToSpace;
+import static network.aika.utils.Utils.idToString;
 
 /**
  * @author Lukas Molzberger
@@ -100,7 +101,7 @@ public abstract class Visitor<T extends Activation> {
 
     public void next(Link<?, ?, ?> l, int depth) {
         if(log.isDebugEnabled())
-            log.debug(depthToSpace(depth) + direction + " " + l.getClass().getSimpleName() + " " + l.getInput().getId() + " " + l.getOutput().getId());
+            log.debug(depthToSpace(depth) + direction + " " + l.getClass().getSimpleName() + " " + idToString(l.getInput()) + " " + idToString(l.getOutput()));
 
         direction.next(this, l, depth);
     }

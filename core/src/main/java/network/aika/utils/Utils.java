@@ -17,6 +17,8 @@
 package network.aika.utils;
 
 
+import network.aika.elements.activations.Activation;
+
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -103,5 +105,9 @@ public class Utils {
             sb.append("  ");
         }
         return sb.toString();
+    }
+
+    public static String idToString(Activation act) {
+        return act != null ? "" + act.getId() : "--";
     }
 }
