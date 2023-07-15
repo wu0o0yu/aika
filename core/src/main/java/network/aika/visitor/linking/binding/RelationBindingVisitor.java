@@ -71,8 +71,6 @@ public class RelationBindingVisitor extends BindingVisitor {
     }
 
     private void up(TokenActivation origin, TokenActivation relOrigin, int depth) {
-        logUp(origin, depth);
-
         new RelationBindingVisitor(this, origin, relOrigin)
                 .visit(relOrigin, null, depth);
     }

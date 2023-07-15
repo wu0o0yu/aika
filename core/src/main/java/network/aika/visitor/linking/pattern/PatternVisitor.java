@@ -38,9 +38,7 @@ public class PatternVisitor extends LinkingVisitor<BindingActivation> {
     }
 
     @Override
-    public void up(BindingActivation origin, int depth) {
-        logUp(origin, depth);
-
+    public void nextUp(BindingActivation origin, int depth) {
         new PatternVisitor(this, origin)
                 .visit(origin, null, depth);
     }

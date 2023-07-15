@@ -64,11 +64,16 @@ public abstract class Visitor<T extends Activation> {
         visit(act, null, 0);
     }
 
-    public abstract void up(T origin, int depth);
+    public abstract void nextUp(T origin, int depth);
 
-    public void logUp(T origin, int depth) {
+    public void up(T origin, int depth) {
+        if(direction.isUp())
+            return;
+
         if(log.isDebugEnabled())
             log.debug(depthToSpace(depth) + origin.getClass().getSimpleName() + " " + origin.getId() + " " + origin.getLabel());
+
+        nextUp(origin, depth);
     }
 
     public Step getDirection() {

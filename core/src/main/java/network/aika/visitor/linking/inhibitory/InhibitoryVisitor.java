@@ -48,9 +48,7 @@ public class InhibitoryVisitor extends LinkingVisitor<PatternActivation> {
     }
 
     @Override
-    public void up(PatternActivation origin, int depth) {
-        logUp(origin, depth);
-
+    public void nextUp(PatternActivation origin, int depth) {
         new InhibitoryVisitor(this, origin, identityRef)
                 .visit(origin, null, depth);
     }
