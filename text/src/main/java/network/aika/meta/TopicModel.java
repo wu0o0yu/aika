@@ -30,14 +30,11 @@ import java.util.stream.Collectors;
  * @author Lukas Molzberger
  */
 public class TopicModel {
-    private final Logger log = LoggerFactory.getLogger(TopicModel.class);
-
+    private static final Logger log = LoggerFactory.getLogger(TopicModel.class);
 
     private PhraseTemplateModel phraseModel;
 
-
     protected Model model;
-
 
     protected NeuronProvider topicPatternN;
 

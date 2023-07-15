@@ -32,7 +32,7 @@ import static network.aika.utils.Utils.depthToSpace;
  */
 public abstract class Visitor<T extends Activation> {
 
-    private final Logger log = LoggerFactory.getLogger(Visitor.class);
+    private static final Logger log = LoggerFactory.getLogger(Visitor.class);
 
     private long v;
 

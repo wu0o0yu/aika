@@ -66,11 +66,11 @@ public class NeuronProvider implements Comparable<NeuronProvider> {
         this.neuron = n;
     }
 
-    public Neuron getNeuron() {
+    public <N extends Neuron> N getNeuron() {
         if (neuron == null)
             reactivate();
 
-        return neuron;
+        return (N) neuron;
     }
 
     public void setNeuron(Neuron<?> n) {

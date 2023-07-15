@@ -178,7 +178,7 @@ public class NeuronViewManager extends AbstractViewManager<Neuron, NeuronGraphMa
         Collection<Neuron> neurons = getModel()
                 .getActiveNeurons()
                 .stream()
-                .map(p -> p.getNeuron())
+                .<Neuron>map(p -> p.getNeuron())
                 .toList();
         return neurons;
     }

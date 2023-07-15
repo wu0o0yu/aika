@@ -16,6 +16,7 @@
  */
 package network.aika.meta;
 
+import network.aika.Scope;
 import network.aika.elements.neurons.*;
 import network.aika.elements.synapses.InputPatternSynapse;
 import network.aika.elements.synapses.RelationInputSynapse;
@@ -27,6 +28,8 @@ import org.slf4j.LoggerFactory;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static network.aika.meta.NetworkUtils.addNegativeFeedbackLoop;
+
 
 /**
  *
@@ -34,18 +37,19 @@ import java.util.stream.Collectors;
  */
 public class TypedTextSectionModel extends TextSectionModel {
 
-    private final Logger log = LoggerFactory.getLogger(TypedTextSectionModel.class);
+    private static final Logger log = LoggerFactory.getLogger(TypedTextSectionModel.class);
 
     protected NeuronProvider textSectionHeadlineBN;
 
-    protected NeuronProvider textSectionBeginBN;
-
     protected NeuronProvider textSectionHintBN;
-
-    protected NeuronProvider textSectionEndBN;
 
     protected NeuronProvider textSectionPatternCategory;
 
+    protected NeuronProvider tsBeginInhibitoryN;
+
+    protected NeuronProvider tsEndInhibitoryN;
+
+    protected NeuronProvider tsInhibitoryN;
 
     protected double headlineInputPatternNetTarget = 5.0;
 
@@ -65,7 +69,13 @@ public class TypedTextSectionModel extends TextSectionModel {
     }
 
     protected void initTextSectionTemplates() {
-        log.info("Text-Section");
+        super.initTextSectionTemplates();
+
+        log.info("Typed Text-Section");
+
+        textSectionHintBN = new BindingNeuron()
+                .init(model, "Abstract Text-Section-Hint")
+                .getProvider(true);
 
         double netTarget = 2.5;
         double valueTarget = ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT
@@ -94,8 +104,53 @@ public class TypedTextSectionModel extends TextSectionModel {
                 .init(model, "Abstract Text-Section Hint")
                 .getProvider(true);
 
-        sectionHintRelations((BindingNeuron) textSectionBeginBN.getNeuron(), (LatentRelationNeuron) textSectionRelationPT.getNeuron());
-        sectionHintRelations((BindingNeuron) textSectionEndBN.getNeuron(), (LatentRelationNeuron) textSectionRelationNT.getNeuron());
+        sectionHintRelations(textSectionBeginBN.getNeuron(), textSectionRelationPT.getNeuron());
+        sectionHintRelations(textSectionEndBN.getNeuron(), textSectionRelationNT.getNeuron());
+
+
+
+        tsBeginInhibitoryN = new InhibitoryNeuron(Scope.INPUT)
+                .init(model, "I TS Begin")
+                .getProvider(true);
+
+
+        addNegativeFeedbackLoop(
+                textSectionBeginBN.getNeuron(),
+                tsBeginInhibitoryN.getNeuron(),
+                NEG_MARGIN_TS_BEGIN * -netTarget
+        );
+
+        tsEndInhibitoryN = new InhibitoryNeuron(Scope.INPUT)
+                .init(model, "I TS End")
+                .getProvider(true);
+
+        addNegativeFeedbackLoop(
+                textSectionEndBN.getNeuron(),
+                tsBeginInhibitoryN.getNeuron(),
+                NEG_MARGIN_TS_END * -netTarget
+        );
+
+        tsInhibitoryN = new InhibitoryNeuron(Scope.SAME)
+                .init(model, "I TS")
+                .getProvider(true);
+
+        addNegativeFeedbackLoop(
+                textSectionHintBN.getNeuron(),
+                tsInhibitoryN.getNeuron(),
+                NEG_MARGIN_TS * -netTarget
+        );
+
+        addNegativeFeedbackLoop(
+                textSectionBeginBN.getNeuron(),
+                tsInhibitoryN.getNeuron(),
+                NEG_MARGIN_TS * -netTarget
+        );
+
+        addNegativeFeedbackLoop(
+                textSectionEndBN.getNeuron(),
+                tsInhibitoryN.getNeuron(),
+                NEG_MARGIN_TS * -netTarget
+        );
     }
 
     private void headlineToSectionBeginRelation() {

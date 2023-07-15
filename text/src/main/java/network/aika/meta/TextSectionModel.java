@@ -17,6 +17,7 @@
 package network.aika.meta;
 
 import network.aika.Model;
+import network.aika.Scope;
 import network.aika.elements.activations.PatternActivation;
 import network.aika.elements.activations.TokenActivation;
 import network.aika.elements.neurons.*;
@@ -25,13 +26,20 @@ import network.aika.text.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static network.aika.meta.NetworkUtils.addNegativeFeedbackLoop;
+
 /**
  *
  * @author Lukas Molzberger
  */
 public class TextSectionModel {
 
-    private final Logger log = LoggerFactory.getLogger(TextSectionModel.class);
+    private static final Logger log = LoggerFactory.getLogger(TextSectionModel.class);
+
+    protected static double NEG_MARGIN_TS_BEGIN = 1.1;
+    protected static double NEG_MARGIN_TS_END = 1.1;
+
+    protected static double NEG_MARGIN_TS = 1.1;
 
     protected PhraseTemplateModel phraseModel;
 
@@ -48,7 +56,6 @@ public class TextSectionModel {
     protected NeuronProvider textSectionEndBN;
 
     protected NeuronProvider textSectionPatternCategory;
-
 
 
     public TextSectionModel(PhraseTemplateModel phraseModel) {

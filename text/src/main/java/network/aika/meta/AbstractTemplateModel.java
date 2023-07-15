@@ -28,13 +28,16 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
+import static network.aika.meta.NetworkUtils.addNegativeFeedbackLoop;
+import static network.aika.meta.NetworkUtils.addPositiveFeedbackLoop;
+
 /**
  *
  * @author Lukas Molzberger
  */
 public abstract class AbstractTemplateModel {
 
-    private final Logger log = LoggerFactory.getLogger(AbstractTemplateModel.class);
+    private static final Logger log = LoggerFactory.getLogger(AbstractTemplateModel.class);
 
     protected Model model;
 
@@ -201,10 +204,8 @@ public abstract class AbstractTemplateModel {
             BindingNeuron lastBN
     ) {
         double netTarget = 2.5;
-        double valueTarget = ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT
-                .f(netTarget);
 
-        log.info("Strong Binding-Neuron: netTarget:" + netTarget + " valueTarget:" + valueTarget);
+        log.info("Strong Binding-Neuron: netTarget:" + netTarget);
 
         CategoryNeuron catN = new BindingCategoryNeuron()
                 .init(model, "Cat. Pos:" + pos);
@@ -214,13 +215,11 @@ public abstract class AbstractTemplateModel {
 
         abstractNeurons.add(bn.getProvider());
 
-        new InhibitorySynapse(Scope.INPUT)
-                .setWeight(1.0)
-                .init(bn, inhibitoryN.getNeuron());
-
-        new NegativeFeedbackSynapse()
-                .setWeight(getNegMargin(pos) * -netTarget)
-                .init(inhibitoryN.getNeuron(), bn);
+        addNegativeFeedbackLoop(
+                bn,
+                inhibitoryN.getNeuron(),
+                getNegMargin(pos) * -netTarget
+        );
 
         if(lastPos == null || lastBN == null) {
             bn.setCallActivationCheckCallback(true);
@@ -228,22 +227,15 @@ public abstract class AbstractTemplateModel {
             tokenToTokenRelation(pos, lastBN, bn);
         }
 
-        PatternSynapse pSyn = new PatternSynapse()
-                .setWeight(2.5)
-                .setOptional(isOptional)
-                .init(bn, patternN.getNeuron())
-                .adjustBias(valueTarget);
-
-        System.out.println("  " + pSyn + " targetNetContr:" + -pSyn.getSynapseBias().getValue());
-
-
-        PositiveFeedbackSynapse posFeedSyn = new PositiveFeedbackSynapse()
-                .setWeight(POS_MARGIN * (netTarget / patternValueTarget))
-                .init(patternN.getNeuron(), bn)
-                .adjustBias(patternValueTarget);
-
-        System.out.println("  " + posFeedSyn + " targetNetContr:" + -posFeedSyn.getSynapseBias().getValue());
-
+        addPositiveFeedbackLoop(
+                bn,
+                patternN.getNeuron(),
+                2.5,
+                patternValueTarget,
+                netTarget,
+                0.0,
+                isOptional
+        );
 
         new InputPatternSynapse()
                 .setWeight(10.0)
@@ -309,14 +301,12 @@ public abstract class AbstractTemplateModel {
 
         abstractNeurons.add(bn.getProvider());
 
-        new InhibitorySynapse(Scope.INPUT)
-                .setWeight(1.0)
-                .init(bn, inhibitoryN.getNeuron());
+        addNegativeFeedbackLoop(
+                bn,
+                inhibitoryN.getNeuron(),
+                getNegMargin(pos) * -netTarget
+        );
 
-        new NegativeFeedbackSynapse()
-                .setWeight(getNegMargin(pos) * -netTarget)
-                .init(inhibitoryN.getNeuron(), bn)
-                .adjustBias();
 
         if (pos > 0) {
             new RelationInputSynapse()
@@ -341,18 +331,15 @@ public abstract class AbstractTemplateModel {
 
         log.info("  " + spSyn + " targetNetContr:" + -spSyn.getSynapseBias().getValue());
 
-        new PatternSynapse()
-                .setWeight(0.5)
-                .setOptional(true)
-                .init(bn, patternN.getNeuron())
-                .adjustBias(valueTarget + weakInputMargin);
-
-        PositiveFeedbackSynapse posFeedSyn = new PositiveFeedbackSynapse()
-                .setWeight(POS_MARGIN * (netTarget / patternValueTarget))
-                .init(patternN.getNeuron(), bn)
-                .adjustBias(patternValueTarget);
-
-        log.info("  " + posFeedSyn + " targetNetContr:" + -posFeedSyn.getSynapseBias().getValue());
+        addPositiveFeedbackLoop(
+                bn,
+                patternN.getNeuron(),
+                0.5,
+                patternValueTarget,
+                netTarget,
+                weakInputMargin,
+                true
+        );
 
         new InputPatternSynapse()
                 .setWeight(10.0)
@@ -370,7 +357,7 @@ public abstract class AbstractTemplateModel {
 
     public TokenNeuron lookupInputToken(String label) {
         return model.lookupNeuronByLabel(label, l -> {
-                    TokenNeuron inputTokenN = (TokenNeuron) inputToken.getNeuron();
+                    TokenNeuron inputTokenN = inputToken.getNeuron();
                     TokenNeuron n = inputTokenN.instantiateTemplate()
                             .init(model, label);
 
