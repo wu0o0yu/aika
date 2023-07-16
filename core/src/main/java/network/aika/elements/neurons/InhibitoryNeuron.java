@@ -35,7 +35,6 @@ import java.io.IOException;
  */
 public class InhibitoryNeuron extends DisjunctiveNeuron<InhibitoryActivation> {
 
-
     private Scope identityReference;
 
     public InhibitoryNeuron(Scope identityReference) {
@@ -44,6 +43,13 @@ public class InhibitoryNeuron extends DisjunctiveNeuron<InhibitoryActivation> {
 
     public Scope getIdentityReference() {
         return identityReference;
+    }
+
+    @Override
+    public InhibitoryNeuron instantiateTemplate() {
+        InhibitoryNeuron n = new InhibitoryNeuron(identityReference);
+        n.initFromTemplate(this);
+        return n;
     }
 
     @Override

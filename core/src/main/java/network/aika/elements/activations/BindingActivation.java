@@ -76,6 +76,9 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
     }
 
     public boolean isSelfRef(BindingActivation out, Scope identityRef) {
+        if(this == out)
+            return true;
+
         SelfRefOperator op = new SelfRefOperator(out);
         new InhibitoryVisitor(thought, op, identityRef).start(this);
         return op.isSelfRef();

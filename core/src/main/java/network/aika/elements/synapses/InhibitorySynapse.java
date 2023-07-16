@@ -64,7 +64,6 @@ public class InhibitorySynapse extends DisjunctiveSynapse<
         return s;
     }
 
-
     public Scope getType() {
         return type;
     }
