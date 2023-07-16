@@ -80,13 +80,13 @@ public class GradientTest {
 
         processDoc(m, doc);
 
-        PatternNeuron nA = (PatternNeuron) m.getNeuronByLabel("A");
+        PatternNeuron nA = m.getNeuronByLabel("A");
         setStatistic(nA, 53.0,299,899l);
 
-        PatternNeuron nB = (PatternNeuron) m.getNeuronByLabel("B");
+        PatternNeuron nB = m.getNeuronByLabel("B");
         setStatistic(nB, 10.0, 121, 739l);
 
-        PatternNeuron nC = (PatternNeuron) m.getNeuronByLabel("C");
+        PatternNeuron nC = m.getNeuronByLabel("C");
         setStatistic(nC, 30.0, 234, 867l);
 
         doc.postProcessing();
@@ -112,10 +112,10 @@ public class GradientTest {
         );
         processDoc(m, doc1);
 
-        PatternNeuron nA = (PatternNeuron) m.getNeuronByLabel("A");
+        PatternNeuron nA = m.getNeuronByLabel("A");
         setStatistic(nA, 53.0, 299, 899l);
 
-        PatternNeuron nB = (PatternNeuron) m.getNeuronByLabel("B");
+        PatternNeuron nB = m.getNeuronByLabel("B");
         setStatistic(nB, 10.0, 121, 739l);
 
         doc1.postProcessing();
@@ -130,7 +130,7 @@ public class GradientTest {
         );
         processDoc(m, doc2);
 
-        PatternNeuron nC = (PatternNeuron) m.getNeuronByLabel("C");
+        PatternNeuron nC = m.getNeuronByLabel("C");
         setStatistic(nC, 30.0, 234, 867l);
 
         doc2.postProcessing();

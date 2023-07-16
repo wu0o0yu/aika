@@ -18,6 +18,8 @@ package network.aika;
 
 import network.aika.text.Document;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Random;
 
@@ -29,6 +31,9 @@ import static network.aika.TestUtils.getConfig;
  * @author Lukas Molzberger
  */
 public class SimplePhraseTest {
+
+    private static final Logger log = LoggerFactory.getLogger(SimplePhraseTest.class);
+
 
     public String[] phrases = new String[]{
             "der Hund",
@@ -74,7 +79,7 @@ public class SimplePhraseTest {
             doc.postProcessing();
             doc.updateModel();
 
-            System.out.println(doc);
+            log.info("" + doc);
         }
     }
 }

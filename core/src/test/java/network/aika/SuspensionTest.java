@@ -46,7 +46,6 @@ import static network.aika.elements.neurons.SuspensionMode.SAVE;
  */
 public class SuspensionTest {
 
-
     @Test
     public void testSuspendInputNeuron() {
         Model m = new Model(new DummySuspensionCallback());
@@ -69,9 +68,6 @@ public class SuspensionTest {
         Assertions.assertEquals(INPUT, sStrong.getStoredAt());
         Assertions.assertEquals(OUTPUT, sWeak.getStoredAt());
 
-        sStrong = null;
-        sWeak = null;
-
         inStrong.suspend(SAVE);
         inWeak.suspend(SAVE);
         out.suspend(SAVE);
@@ -86,7 +82,7 @@ public class SuspensionTest {
 
         Document doc = new Document(m, "test");
         doc.setConfig(c);
-        doc.addToken((TokenNeuron) inStrong.getNeuron(), 0, 0, 4);
+        doc.addToken(inStrong.getNeuron(), 0, 0, 4);
     }
 
 

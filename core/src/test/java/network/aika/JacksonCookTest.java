@@ -44,12 +44,17 @@ public class JacksonCookTest {
 
         LatentRelationNeuron relPT = TokenPositionRelationNeuron.lookupRelation(m, -1, -1);
 
-        BindingNeuron forenameBN = new BindingNeuron().init(m, "forename (person name)");
-        BindingNeuron surnameBN = new BindingNeuron().init(m, "surname (person name)");
+        BindingNeuron forenameBN = new BindingNeuron()
+                .init(m, "forename (person name)");
+        BindingNeuron surnameBN = new BindingNeuron()
+                .init(m, "surname (person name)");
 
 
-        BindingNeuron jacksonForenameBN = forenameBN.instantiateTemplate().init(m, "jackson (forename)");
-        BindingNeuron jacksonJCBN = jacksonForenameBN.instantiateTemplate().init(m, "jackson (jackson cook)");
+        BindingNeuron jacksonForenameBN = forenameBN.instantiateTemplate()
+                .init(m, "jackson (forename)");
+
+        BindingNeuron jacksonJCBN = jacksonForenameBN.instantiateTemplate()
+                .init(m, "jackson (jackson cook)");
         new InputPatternSynapse()
                 .setWeight(10.0)
                 .init(jacksonIN, jacksonJCBN)
@@ -132,8 +137,18 @@ public class JacksonCookTest {
                 .setWeight(10.0)
                 .init(cookProfessionBN, professionCN);
 
-        addInhibitoryLoop(new InhibitoryNeuron(Scope.SAME).init(m, "I-jackson"), false, jacksonForenameBN, jacksonCityBN);
-        addInhibitoryLoop(new InhibitoryNeuron(Scope.SAME).init(m, "I-cook"), false, cookSurnameBN, cookProfessionBN);
+        addInhibitoryLoop(
+                new InhibitoryNeuron(Scope.SAME).init(m, "I-jackson"),
+                false,
+                jacksonForenameBN,
+                jacksonCityBN
+        );
+        addInhibitoryLoop(
+                new InhibitoryNeuron(Scope.SAME).init(m, "I-cook"),
+                false,
+                cookSurnameBN,
+                cookProfessionBN
+        );
 
         setBias(jacksonJCBN, 2.0);
         setBias(jacksonForenameBN, 2.0);
@@ -163,10 +178,20 @@ public class JacksonCookTest {
         setBias(forenameBN, 2.0);
         setBias(surnameBN, 2.0);
 
-        PatternNeuron jacksonCookPattern = initPatternLoop(m, "jackson cook", jacksonJCBN, cookJCBN);
+        PatternNeuron jacksonCookPattern = initPatternLoop(
+                m,
+                "jackson cook",
+                jacksonJCBN,
+                cookJCBN
+        );
         setBias(jacksonCookPattern, 3.0);
 
-        PatternNeuron personNamePattern = initPatternLoop(m, "person name", forenameBN, surnameBN);
+        PatternNeuron personNamePattern = initPatternLoop(
+                m,
+                "person name",
+                forenameBN,
+                surnameBN
+        );
         setBias(personNamePattern, 3.0);
 
         Document doc = new Document(m, "Jackson Cook");
