@@ -14,32 +14,42 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.visitor.linking.pattern;
+package network.aika.visitor.inhibitory;
 
 import network.aika.Thought;
 import network.aika.elements.activations.Activation;
-import network.aika.elements.activations.BindingActivation;
 import network.aika.elements.links.Link;
+import network.aika.elements.activations.PatternActivation;
 import network.aika.Scope;
-import network.aika.visitor.Operator;
-import network.aika.visitor.linking.LinkingVisitor;
+import network.aika.visitor.operator.Operator;
+import network.aika.visitor.LinkingVisitor;
 
 /**
  * @author Lukas Molzberger
  */
-public class PatternVisitor extends LinkingVisitor<BindingActivation> {
+public class InhibitoryVisitor extends LinkingVisitor<PatternActivation> {
 
-    public PatternVisitor(Thought t, Operator operator) {
+    private Scope identityRef;
+
+    public InhibitoryVisitor(Thought t, Operator operator, Scope identityRef) {
         super(t, operator);
+
+        this.identityRef = identityRef;
     }
 
-    protected PatternVisitor(PatternVisitor parent, BindingActivation origin) {
+    protected InhibitoryVisitor(InhibitoryVisitor parent, PatternActivation origin, Scope identityRef) {
         super(parent, origin);
+
+        this.identityRef = identityRef;
+    }
+
+    public Scope getIdentityRef() {
+        return identityRef;
     }
 
     @Override
-    public void nextUp(BindingActivation origin, int depth) {
-        new PatternVisitor(this, origin)
+    public void nextUp(PatternActivation origin, int depth) {
+        new InhibitoryVisitor(this, origin, identityRef)
                 .visit(origin, null, depth);
     }
 
@@ -58,10 +68,10 @@ public class PatternVisitor extends LinkingVisitor<BindingActivation> {
     }
 
     public void visit(Link l, int depth) {
-        l.patternVisit(this, depth);
+        l.inhibVisit(this, depth);
     }
 
     public void visit(Activation act, Link l, int depth) {
-        act.patternVisit(this, l, depth);
+        act.inhibVisit(this, l, depth);
     }
 }

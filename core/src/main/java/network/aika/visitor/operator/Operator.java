@@ -14,36 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.visitor;
+package network.aika.visitor.operator;
 
 import network.aika.direction.Direction;
 import network.aika.elements.activations.Activation;
 import network.aika.elements.links.Link;
 import network.aika.Scope;
-import network.aika.visitor.linking.LinkingVisitor;
+import network.aika.visitor.LinkingVisitor;
 
 /**
  * @author Lukas Molzberger
  */
-public class SelfRefOperator implements Operator {
+public interface Operator {
 
-    private Activation target;
+    Direction getRelationDir(Scope fromScope);
 
-    public SelfRefOperator(Activation target) {
-        this.target = target;
-    }
+    void check(LinkingVisitor v, Link lastLink, Activation act);
 
-    @Override
-    public Direction getRelationDir(Scope fromScope) {
-        return null;
-    }
-
-    @Override
-    public void check(LinkingVisitor v, Link lastLink, Activation act) {
-
-    }
-
-    public boolean isSelfRef() {
-        return false;
-    }
 }

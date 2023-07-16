@@ -20,8 +20,7 @@ import network.aika.elements.activations.BindingActivation;
 import network.aika.elements.activations.InhibitoryActivation;
 import network.aika.fields.*;
 import network.aika.elements.synapses.NegativeFeedbackSynapse;
-import network.aika.visitor.Visitor;
-import network.aika.visitor.linking.binding.BindingVisitor;
+import network.aika.visitor.binding.BindingVisitor;
 
 import java.util.stream.Stream;
 

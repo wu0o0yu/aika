@@ -24,12 +24,11 @@ import network.aika.fields.Field;
 import network.aika.fields.FieldOutput;
 import network.aika.fields.Fields;
 import network.aika.fields.QueueSumField;
-import network.aika.visitor.linking.pattern.PatternCategoryVisitor;
-import network.aika.visitor.linking.pattern.PatternVisitor;
+import network.aika.visitor.pattern.PatternCategoryVisitor;
+import network.aika.visitor.pattern.PatternVisitor;
 
 import java.util.stream.Stream;
 
-import static network.aika.elements.activations.BindingActivation.isSelfRef;
 import static network.aika.fields.FieldLink.linkAndConnect;
 import static network.aika.steps.Phase.NEGATIVE_FEEDBACK;
 import static network.aika.utils.Utils.TOLERANCE;
@@ -76,7 +75,7 @@ public class InhibitoryLink extends DisjunctiveLink<InhibitorySynapse, BindingAc
     public void connectFields(NegativeFeedbackLink out) {
         Scope identityRef = getOutput().getNeuron().getIdentityReference();
 
-        if(isSelfRef(getInput(), out.getOutput(), identityRef))
+        if(getInput().isSelfRef(out.getOutput(), identityRef))
             return;
 
         linkAndConnect(getNet(), out.getInputValue());

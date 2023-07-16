@@ -21,10 +21,10 @@ import network.aika.elements.links.Link;
 import network.aika.Scope;
 import network.aika.fields.*;
 import network.aika.elements.neurons.PatternNeuron;
-import network.aika.visitor.linking.binding.BindingVisitor;
-import network.aika.visitor.linking.inhibitory.InhibitoryVisitor;
+import network.aika.visitor.binding.BindingVisitor;
+import network.aika.visitor.inhibitory.InhibitoryVisitor;
 import network.aika.sign.Sign;
-import network.aika.visitor.linking.pattern.PatternCategoryVisitor;
+import network.aika.visitor.pattern.PatternCategoryVisitor;
 
 import static network.aika.fields.Fields.*;
 import static network.aika.utils.Utils.TOLERANCE;

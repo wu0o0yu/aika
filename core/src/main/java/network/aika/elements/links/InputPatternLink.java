@@ -21,8 +21,7 @@ import network.aika.elements.activations.PatternActivation;
 import network.aika.elements.synapses.InputPatternSynapse;
 import network.aika.fields.AbstractFunction;
 import network.aika.fields.Fields;
-import network.aika.visitor.Visitor;
-import network.aika.visitor.linking.pattern.PatternVisitor;
+import network.aika.visitor.pattern.PatternVisitor;
 
 /**
  * @author Lukas Molzberger

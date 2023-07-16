@@ -26,11 +26,11 @@ import network.aika.elements.Element;
 import network.aika.elements.links.Link;
 import network.aika.elements.activations.Timestamp;
 import network.aika.elements.synapses.Synapse;
-import network.aika.visitor.ActLinkingOperator;
-import network.aika.visitor.LinkLinkingOperator;
+import network.aika.visitor.operator.ActLinkingOperator;
+import network.aika.visitor.operator.LinkLinkingOperator;
 import network.aika.steps.activation.Save;
 import network.aika.utils.Writable;
-import network.aika.visitor.linking.LinkingOperator;
+import network.aika.visitor.operator.LinkingOperator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

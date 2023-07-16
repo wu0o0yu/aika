@@ -20,9 +20,9 @@ import network.aika.Thought;
 import network.aika.elements.activations.Activation;
 import network.aika.elements.activations.BindingActivation;
 import network.aika.elements.synapses.*;
-import network.aika.visitor.linking.LinkingOperator;
-import network.aika.visitor.linking.binding.BindingVisitor;
-import network.aika.visitor.linking.binding.RelationBindingVisitor;
+import network.aika.visitor.operator.LinkingOperator;
+import network.aika.visitor.binding.BindingVisitor;
+import network.aika.visitor.binding.RelationBindingVisitor;
 
 import java.util.List;
 

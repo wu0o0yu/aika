@@ -14,54 +14,44 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.visitor;
+package network.aika.visitor.operator;
 
 import network.aika.direction.Direction;
 import network.aika.elements.synapses.Synapse;
 import network.aika.elements.activations.Activation;
 import network.aika.elements.links.Link;
 import network.aika.Scope;
-import network.aika.visitor.linking.LinkingOperator;
-import network.aika.visitor.linking.LinkingVisitor;
-
+import network.aika.visitor.LinkingVisitor;
 
 /**
  * @author Lukas Molzberger
  */
-public class ActLinkingOperator extends LinkingOperator {
+public class LinkLinkingOperator extends LinkingOperator {
 
-    private Scope toScope;
-    private Synapse synA;
-    private Link linkA;
 
-    public ActLinkingOperator(Activation fromAct, Synapse synA, Link linkA, Synapse synB) {
-        super(fromAct, synB);
-        this.synA = synA;
-        this.linkA = linkA;
-        this.toScope = synA.getScope();
+    public LinkLinkingOperator(Activation fromAct, Synapse syn) {
+        super(fromAct, syn);
     }
 
     @Override
     public Direction getRelationDir(Scope fromScope) {
-        return fromScope.getRelationDir();
+        return fromScope.getRelationDir().invert();
     }
 
     @Override
-    public void check(LinkingVisitor v, Link lastLink, Activation act) {
-        if(act.getNeuron() != syn.getInput())
+    public void check(LinkingVisitor v, Link l, Activation act) {
+        if(l == null)
+            return;
+
+        if(act.getNeuron() != syn.getOutput())
             return;
 
         if(act == fromAct)
             return;
 
-        if(!v.compatible(syn.getScope(), toScope))
+        if(!v.compatible(syn.getScope(), l.getSynapse().getScope()))
             return;
 
-        if(!syn.checkLinkingEvent(act))
-                return;
-
-        Link l = link(fromAct, synA, linkA, act, syn);
-        if(l != null)
-            v.createRelation(l);
+        link(l.getInput(), l.getSynapse(), l, fromAct, syn);
     }
 }

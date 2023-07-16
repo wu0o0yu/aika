@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.visitor.linking.binding;
+package network.aika.visitor.binding;
 
 import network.aika.Thought;
 import network.aika.direction.Direction;
@@ -25,7 +25,7 @@ import network.aika.elements.activations.TokenActivation;
 import network.aika.elements.links.Link;
 import network.aika.elements.synapses.RelationInputSynapse;
 import network.aika.Scope;
-import network.aika.visitor.linking.LinkingOperator;
+import network.aika.visitor.operator.LinkingOperator;
 
 /**
  * @author Lukas Molzberger

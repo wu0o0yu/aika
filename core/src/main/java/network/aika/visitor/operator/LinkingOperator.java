@@ -14,13 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.visitor.linking;
+package network.aika.visitor.operator;
 
 import network.aika.Thought;
 import network.aika.elements.synapses.Synapse;
 import network.aika.elements.activations.Activation;
 import network.aika.elements.links.Link;
-import network.aika.visitor.Operator;
+import network.aika.visitor.operator.Operator;
 
 import java.util.stream.Stream;
 

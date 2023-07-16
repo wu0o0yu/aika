@@ -26,8 +26,8 @@ import network.aika.fields.FieldOutput;
 import network.aika.fields.MultiInputField;
 import network.aika.sign.Sign;
 import network.aika.steps.link.LinkCounting;
-import network.aika.visitor.linking.binding.BindingVisitor;
-import network.aika.visitor.linking.inhibitory.InhibitoryVisitor;
+import network.aika.visitor.binding.BindingVisitor;
+import network.aika.visitor.inhibitory.InhibitoryVisitor;
 
 import static network.aika.fields.ConstantField.ZERO;
 import static network.aika.fields.FieldLink.linkAndConnect;

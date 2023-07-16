@@ -101,9 +101,8 @@ public class Utils {
 
     public static String depthToSpace(int depth) {
         StringBuilder sb = new StringBuilder();
-        for(int i = 0; i < depth; i++) {
-            sb.append("  ");
-        }
+        for(int i = 0; i < depth; i++)
+            sb.append(" ");
         return sb.toString();
     }
 

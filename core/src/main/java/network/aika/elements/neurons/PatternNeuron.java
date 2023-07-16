@@ -24,8 +24,8 @@ import network.aika.elements.synapses.*;
 import network.aika.sign.Sign;
 import network.aika.utils.Bound;
 import network.aika.utils.Utils;
-import network.aika.visitor.linking.LinkingOperator;
-import network.aika.visitor.linking.pattern.PatternVisitor;
+import network.aika.visitor.operator.LinkingOperator;
+import network.aika.visitor.pattern.PatternVisitor;
 
 import java.io.DataInput;
 import java.io.DataOutput;

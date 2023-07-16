@@ -29,13 +29,12 @@ import network.aika.elements.neurons.Range;
 import network.aika.elements.synapses.CategoryInputSynapse;
 import network.aika.fields.*;
 import network.aika.elements.synapses.Synapse;
-import network.aika.visitor.Visitor;
 import network.aika.steps.activation.Counting;
 import network.aika.steps.activation.LinkingOut;
-import network.aika.visitor.linking.binding.BindingVisitor;
-import network.aika.visitor.linking.inhibitory.InhibitoryVisitor;
-import network.aika.visitor.linking.pattern.PatternCategoryVisitor;
-import network.aika.visitor.linking.pattern.PatternVisitor;
+import network.aika.visitor.binding.BindingVisitor;
+import network.aika.visitor.inhibitory.InhibitoryVisitor;
+import network.aika.visitor.pattern.PatternCategoryVisitor;
+import network.aika.visitor.pattern.PatternVisitor;
 
 import java.util.*;
 import java.util.stream.Stream;

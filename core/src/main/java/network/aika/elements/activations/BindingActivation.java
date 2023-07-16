@@ -24,10 +24,10 @@ import network.aika.elements.synapses.PositiveFeedbackSynapse;
 import network.aika.Scope;
 import network.aika.fields.*;
 import network.aika.elements.neurons.BindingNeuron;
-import network.aika.visitor.SelfRefOperator;
-import network.aika.visitor.linking.inhibitory.InhibitoryVisitor;
-import network.aika.visitor.linking.pattern.PatternCategoryVisitor;
-import network.aika.visitor.linking.pattern.PatternVisitor;
+import network.aika.visitor.operator.SelfRefOperator;
+import network.aika.visitor.inhibitory.InhibitoryVisitor;
+import network.aika.visitor.pattern.PatternCategoryVisitor;
+import network.aika.visitor.pattern.PatternVisitor;
 
 import java.util.Objects;
 import java.util.stream.Stream;
@@ -75,12 +75,7 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
         super.connectWeightUpdate();
     }
 
-    public static boolean isSelfRef(BindingActivation in, BindingActivation out, Scope identityRef) {
-        return in.isSelfRef(out, identityRef) ||
-                out.isSelfRef(in, identityRef);
-    }
-
-    private boolean isSelfRef(BindingActivation out, Scope identityRef) {
+    public boolean isSelfRef(BindingActivation out, Scope identityRef) {
         SelfRefOperator op = new SelfRefOperator(out);
         new InhibitoryVisitor(thought, op, identityRef).start(this);
         return op.isSelfRef();

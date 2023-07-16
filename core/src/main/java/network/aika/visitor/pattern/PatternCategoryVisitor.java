@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.visitor.linking.pattern;
+package network.aika.visitor.pattern;
 
 import network.aika.Thought;
 import network.aika.elements.activations.Activation;
@@ -22,8 +22,8 @@ import network.aika.elements.activations.BindingActivation;
 import network.aika.elements.activations.PatternActivation;
 import network.aika.elements.links.Link;
 import network.aika.Scope;
-import network.aika.visitor.Operator;
-import network.aika.visitor.linking.LinkingVisitor;
+import network.aika.visitor.operator.Operator;
+import network.aika.visitor.LinkingVisitor;
 
 /**
  * @author Lukas Molzberger

@@ -18,9 +18,8 @@ package network.aika.elements.links;
 
 import network.aika.elements.activations.BindingActivation;
 import network.aika.elements.synapses.RelationInputSynapse;
-import network.aika.visitor.Visitor;
-import network.aika.visitor.linking.pattern.PatternCategoryVisitor;
-import network.aika.visitor.linking.pattern.PatternVisitor;
+import network.aika.visitor.pattern.PatternCategoryVisitor;
+import network.aika.visitor.pattern.PatternVisitor;
 
 /**
  * @author Lukas Molzberger

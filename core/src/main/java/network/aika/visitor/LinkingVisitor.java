@@ -16,43 +16,32 @@
  */
 package network.aika.visitor;
 
-import network.aika.direction.Direction;
-import network.aika.elements.synapses.Synapse;
+import network.aika.Thought;
 import network.aika.elements.activations.Activation;
 import network.aika.elements.links.Link;
 import network.aika.Scope;
-import network.aika.visitor.linking.LinkingOperator;
-import network.aika.visitor.linking.LinkingVisitor;
+import network.aika.visitor.operator.Operator;
+
 
 /**
  * @author Lukas Molzberger
  */
-public class LinkLinkingOperator extends LinkingOperator {
+public abstract class LinkingVisitor<T extends Activation> extends Visitor<T> {
 
-
-    public LinkLinkingOperator(Activation fromAct, Synapse syn) {
-        super(fromAct, syn);
+    public LinkingVisitor(Thought t, Operator operator) {
+        super(t, operator);
     }
 
-    @Override
-    public Direction getRelationDir(Scope fromScope) {
-        return fromScope.getRelationDir().invert();
+    protected LinkingVisitor(LinkingVisitor<T> parent, T origin) {
+        super(parent, origin);
     }
 
-    @Override
-    public void check(LinkingVisitor v, Link l, Activation act) {
-        if(l == null)
-            return;
+    public abstract boolean compatible(Scope from, Scope to);
 
-        if(act.getNeuron() != syn.getOutput())
-            return;
+    public abstract void createRelation(Link l);
 
-        if(act == fromAct)
-            return;
-
-        if(!v.compatible(syn.getScope(), l.getSynapse().getScope()))
-            return;
-
-        link(l.getInput(), l.getSynapse(), l, fromAct, syn);
+    public void check(Link lastLink, Activation act) {
+        if(direction.isUp())
+            operator.check(this, lastLink, act);
     }
 }

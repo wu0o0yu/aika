@@ -21,9 +21,7 @@ import network.aika.elements.links.Link;
 import network.aika.elements.neurons.Range;
 import network.aika.elements.neurons.LatentRelationNeuron;
 import network.aika.elements.neurons.TokenNeuron;
-import network.aika.visitor.Visitor;
-import network.aika.visitor.linking.binding.BindingVisitor;
-import network.aika.visitor.step.Down;
+import network.aika.visitor.binding.BindingVisitor;
 import network.aika.text.Document;
 
 import java.util.Comparator;

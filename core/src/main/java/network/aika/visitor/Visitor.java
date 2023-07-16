@@ -19,6 +19,7 @@ package network.aika.visitor;
 import network.aika.Thought;
 import network.aika.elements.activations.Activation;
 import network.aika.elements.links.Link;
+import network.aika.visitor.operator.Operator;
 import network.aika.visitor.step.Down;
 import network.aika.visitor.step.Step;
 import network.aika.visitor.step.Up;
@@ -103,6 +104,6 @@ public abstract class Visitor<T extends Activation> {
         if(log.isDebugEnabled())
             log.debug(depthToSpace(depth) + direction + " " + l.getClass().getSimpleName() + " " + idToString(l.getInput()) + " " + idToString(l.getOutput()));
 
-        direction.next(this, l, depth);
+        direction.next(this, l, depth + 1);
     }
 }

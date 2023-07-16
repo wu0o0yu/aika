@@ -20,10 +20,10 @@ import network.aika.elements.activations.Activation;
 import network.aika.elements.activations.BindingActivation;
 import network.aika.elements.synapses.FeedbackSynapse;
 import network.aika.visitor.Visitor;
-import network.aika.visitor.linking.binding.BindingVisitor;
-import network.aika.visitor.linking.inhibitory.InhibitoryVisitor;
-import network.aika.visitor.linking.pattern.PatternCategoryVisitor;
-import network.aika.visitor.linking.pattern.PatternVisitor;
+import network.aika.visitor.binding.BindingVisitor;
+import network.aika.visitor.inhibitory.InhibitoryVisitor;
+import network.aika.visitor.pattern.PatternCategoryVisitor;
+import network.aika.visitor.pattern.PatternVisitor;
 
 /**
  * @author Lukas Molzberger

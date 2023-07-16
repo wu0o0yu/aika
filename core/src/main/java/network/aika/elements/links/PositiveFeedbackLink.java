@@ -21,9 +21,9 @@ import network.aika.elements.activations.PatternActivation;
 import network.aika.elements.synapses.PositiveFeedbackSynapse;
 import network.aika.exceptions.InvalidRelinkingException;
 import network.aika.fields.*;
-import network.aika.visitor.linking.binding.BindingVisitor;
-import network.aika.visitor.linking.inhibitory.InhibitoryVisitor;
-import network.aika.visitor.linking.pattern.PatternVisitor;
+import network.aika.visitor.binding.BindingVisitor;
+import network.aika.visitor.inhibitory.InhibitoryVisitor;
+import network.aika.visitor.pattern.PatternVisitor;
 
 import static network.aika.callbacks.EventType.CREATE;
 import static network.aika.fields.FieldLink.linkAndConnect;
