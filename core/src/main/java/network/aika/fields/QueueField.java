@@ -16,26 +16,23 @@
  */
 package network.aika.fields;
 
-import java.util.Collection;
+
+import network.aika.callbacks.FieldObserver;
+import network.aika.steps.FieldStep;
 
 /**
+ *
  * @author Lukas Molzberger
  */
-public interface FieldInput extends UpdateListener {
+public interface QueueField extends FieldOutput {
 
-    String getLabel();
+    void setValue(double v);
 
-    void addInput(FieldLink fl);
+    void addObserver(FieldObserver observer);
 
-    void removeInput(FieldLink fl);
+    void removeObserver(FieldObserver observer);
 
-    Collection<FieldLink> getInputs();
-
-    void connectInputs(boolean initialize);
-
-    void disconnectAndUnlinkInputs(boolean deinitialize);
-
-    int getNextArg();
+    void process(FieldStep step);
 
     FieldObject getReference();
 }

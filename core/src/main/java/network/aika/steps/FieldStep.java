@@ -18,7 +18,7 @@ package network.aika.steps;
 
 import network.aika.Thought;
 import network.aika.elements.activations.Timestamp;
-import network.aika.fields.IQueueField;
+import network.aika.fields.QueueField;
 import network.aika.elements.Element;
 import network.aika.steps.keys.FieldQueueKey;
 import network.aika.utils.Utils;
@@ -32,7 +32,7 @@ import static network.aika.utils.Utils.*;
  */
 public class FieldStep<E extends Element> extends Step<E> {
 
-    private IQueueField field;
+    private QueueField field;
 
     private Phase phase;
 
@@ -43,7 +43,7 @@ public class FieldStep<E extends Element> extends Step<E> {
     private double delta = 0.0;
 
 
-    public FieldStep(E e, Phase p, int round, IQueueField qf) {
+    public FieldStep(E e, Phase p, int round, QueueField qf) {
         super(e);
         this.phase = p;
         this.round = p.isDelayed() ?
@@ -107,7 +107,7 @@ public class FieldStep<E extends Element> extends Step<E> {
         return delta;
     }
 
-    public IQueueField getField() {
+    public QueueField getField() {
         return field;
     }
 

@@ -17,7 +17,6 @@
 package network.aika.fields;
 
 import network.aika.Model;
-import network.aika.callbacks.UpdateListener;
 import network.aika.utils.Utils;
 import network.aika.utils.Writable;
 

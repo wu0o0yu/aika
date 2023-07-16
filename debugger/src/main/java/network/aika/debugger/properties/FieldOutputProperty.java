@@ -16,10 +16,10 @@
  */
 package network.aika.debugger.properties;
 
-import network.aika.callbacks.UpdateListener;
+import network.aika.fields.UpdateListener;
 import network.aika.fields.AbstractFieldLink;
 import network.aika.fields.FieldOutput;
-import network.aika.fields.IQueueField;
+import network.aika.fields.QueueField;
 import network.aika.fields.ListenerFieldLink;
 
 import javax.swing.*;
@@ -49,8 +49,8 @@ public class FieldOutputProperty<F extends FieldOutput> extends AbstractProperty
     protected JFormattedTextField currentValueField;
 
     public static FieldOutputProperty createFieldProperty(Container parent, FieldOutput f, boolean showReference, Boolean isConnected, Boolean isPropagateUpdates) {
-        if(f instanceof IQueueField) {
-            return new QueueFieldProperty(parent, (IQueueField) f, showReference, isConnected, isPropagateUpdates);
+        if(f instanceof QueueField) {
+            return new QueueFieldProperty(parent, (QueueField) f, showReference, isConnected, isPropagateUpdates);
         } else {
             return new FieldOutputProperty(parent, f, showReference, isConnected, isPropagateUpdates);
         }

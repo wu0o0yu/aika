@@ -28,11 +28,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-
 /**
+ *
  * @author Lukas Molzberger
  */
-public class QueueSumField extends MultiInputField implements IQueueField {
+public class QueueSumField extends MultiInputField implements QueueField {
 
     private Phase phase;
 

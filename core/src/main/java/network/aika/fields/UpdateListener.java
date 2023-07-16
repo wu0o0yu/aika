@@ -14,9 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.callbacks;
-
-import network.aika.fields.AbstractFieldLink;
+package network.aika.fields;
 
 /**
  * @author Lukas Molzberger
