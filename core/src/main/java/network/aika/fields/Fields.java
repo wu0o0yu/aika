@@ -84,24 +84,6 @@ public class Fields {
         return mul;
     }
 
-    public static Division div(FieldObject ref, String label, FieldOutput in1, FieldOutput in2) {
-        if(in1 == null || in2 == null)
-            return null;
-
-        Division div = new Division(ref, label);
-        link(in1, 0, div);
-        link(in2, 1, div);
-        div.connectInputs(true);
-
-        return div;
-    }
-
-    public static Division div(FieldObject ref, String label, FieldOutput in1, FieldOutput in2, FieldInput... out) {
-        Division div = div(ref, label, in1, in2);
-        linkAndConnectAll(div, out);
-        return div;
-    }
-
     public static FieldFunction func(FieldObject ref, String label, Double tolerance, FieldOutput in, DoubleFunction<Double> f) {
         if(in == null)
             return null;
