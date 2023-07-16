@@ -93,10 +93,11 @@ public abstract class Visitor<T extends Activation> {
 
     public abstract void visit(Activation act, Link l, int depth);
 
-    public void next(Activation<?> act, int depth) {
+    public void next(Activation<?> act, Link lastLink, int depth) {
         if(log.isDebugEnabled())
             log.debug(depthToSpace(depth) + direction + " " + act.getClass().getSimpleName() + " " + act.getId() + " " + act.getLabel());
 
+        check(lastLink, act);
         direction.next(this, act, depth + 1);
     }
 

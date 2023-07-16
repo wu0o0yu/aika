@@ -168,23 +168,19 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
     }
 
     public void bindingVisit(BindingVisitor v, Link lastLink, int depth) {
-        v.check(lastLink, this);
-        v.next(this, depth);
+        v.next(this, lastLink, depth);
     }
 
     public void patternVisit(PatternVisitor v, Link lastLink, int depth) {
-        v.check(lastLink, this);
-        v.next(this, depth);
+        v.next(this, lastLink, depth);
     }
 
     public void inhibVisit(InhibitoryVisitor v, Link lastLink, int depth) {
-        v.check(lastLink, this);
-        v.next(this, depth);
+        v.next(this, lastLink, depth);
     }
 
     public void patternCatVisit(PatternCategoryVisitor v, Link lastLink, int depth) {
-        v.check(lastLink, this);
-        v.next(this, depth);
+        v.next(this, lastLink, depth);
     }
 
     protected void connectGradientFields() {
