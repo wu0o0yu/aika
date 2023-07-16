@@ -12,10 +12,18 @@ import network.aika.tokenizer.Tokenizer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.Set;
+
 import static network.aika.parser.ParserPhase.COUNTING;
 import static network.aika.parser.ParserPhase.TRAINING;
 
 public class TextSectionTest extends TrainingParser {
+
+    String tasksHeadline = "Your Tasks";
+    String requirementsHeadline = "Your Profile";
+
+    String headlineTargetString;
+    String headlineTargetLabel;
 
     private PhraseTemplateModel templateModel;
     private Tokenizer tokenizer;
@@ -24,10 +32,10 @@ public class TextSectionTest extends TrainingParser {
             " \n" +
             "Bla bla \n" +
             "\n" +
-            "Your Tasks\n" +
+            tasksHeadline + "\n" +
             "Bla programming testing bla \n" +
             "\n" +
-            "Your Profile\n" +
+            requirementsHeadline + "\n" +
             "Bla java solr bla \n" +
             "\n";
 
@@ -55,15 +63,42 @@ public class TextSectionTest extends TrainingParser {
 
     @Override
     public boolean check(Activation iAct) {
-        return true;
+        return true; // TODO
     }
 
     @Test
     public void testTextSections() {
         log.info("Start");
+
+        process(tasksHeadline, null, COUNTING);
+        process(requirementsHeadline, null, COUNTING);
         process(exampleTxt, null, COUNTING);
+
         templateModel.initTemplates();
+
+        headlineTargetLabel = "Task-HL";
+        headlineTargetString = tasksHeadline;
+        process(tasksHeadline, null, TRAINING);
+
+        headlineTargetLabel = "Requi.-HL";
+        headlineTargetString = requirementsHeadline;
+        process(requirementsHeadline, null, TRAINING);
+
+        headlineTargetString = null;
         process(exampleTxt, null, TRAINING);
+    }
+
+    @Override
+    protected void addTargets(Document doc, Context context) {
+        if(headlineTargetString != null) {
+            templateModel.getTextSectionModel()
+                    .addTargetTSHeadline(
+                            doc,
+                            Set.of(headlineTargetLabel),
+                            0,
+                            doc.length()
+                    );
+        }
     }
 
     @Override
@@ -75,5 +110,4 @@ public class TextSectionTest extends TrainingParser {
     public Tokenizer getTokenizer() {
         return tokenizer;
     }
-
 }
