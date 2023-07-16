@@ -52,13 +52,20 @@ public class RelationBindingVisitor extends BindingVisitor {
         this.relationDir = parent.relationDir;
     }
 
-
     public RelationInputSynapse getRelation() {
         return relation;
     }
 
     public Direction getRelationDir() {
         return relationDir;
+    }
+
+    public PatternActivation getDownOrigin() {
+        return downOrigin;
+    }
+
+    public TokenActivation getUpOrigin() {
+        return upOrigin;
     }
 
     @Override
@@ -73,15 +80,6 @@ public class RelationBindingVisitor extends BindingVisitor {
     private void up(TokenActivation origin, TokenActivation relOrigin, int depth) {
         new RelationBindingVisitor(this, origin, relOrigin)
                 .visit(relOrigin, null, depth);
-    }
-
-
-    public PatternActivation getDownOrigin() {
-        return downOrigin;
-    }
-
-    public TokenActivation getUpOrigin() {
-        return upOrigin;
     }
 
     @Override

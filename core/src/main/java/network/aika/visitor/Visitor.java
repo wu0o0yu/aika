@@ -66,16 +66,17 @@ public abstract class Visitor<T extends Activation> {
         visit(act, null, 0);
     }
 
-    public abstract void nextUp(T origin, int depth);
+    public abstract void upIntern(T origin, int depth);
 
     public void up(T origin, int depth) {
         if(direction.isUp())
             return;
 
-        if(log.isDebugEnabled())
+        if(log.isDebugEnabled()) {
+            log.debug("");
             log.debug(depthToSpace(depth) + origin.getClass().getSimpleName() + " " + origin.getId() + " " + origin.getLabel());
-
-        nextUp(origin, depth);
+        }
+        upIntern(origin, depth);
     }
 
     public Step getDirection() {
@@ -87,7 +88,6 @@ public abstract class Visitor<T extends Activation> {
     }
 
     public abstract void check(Link lastLink, Activation act);
-
 
     public abstract void visit(Link l, int depth);
 

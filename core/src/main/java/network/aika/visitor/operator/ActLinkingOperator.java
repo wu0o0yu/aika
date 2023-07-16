@@ -47,20 +47,20 @@ public class ActLinkingOperator extends LinkingOperator {
 
     @Override
     public void check(LinkingVisitor v, Link lastLink, Activation act) {
-        if(act.getNeuron() != syn.getInput())
+        if (act.getNeuron() != syn.getInput())
             return;
 
-        if(act == fromAct)
+        if (act == fromAct)
             return;
 
-        if(!v.compatible(syn.getScope(), toScope))
+        if (!v.compatible(syn.getScope(), toScope))
             return;
 
-        if(!syn.checkLinkingEvent(act))
-                return;
+        if (!syn.checkLinkingEvent(act))
+            return;
 
         Link l = link(fromAct, synA, linkA, act, syn);
-        if(l != null)
+        if (l != null)
             v.createRelation(l);
     }
 }

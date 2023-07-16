@@ -36,12 +36,18 @@ public abstract class LinkingVisitor<T extends Activation> extends Visitor<T> {
         super(parent, origin);
     }
 
-    public abstract boolean compatible(Scope from, Scope to);
-
-    public abstract void createRelation(Link l);
-
     public void check(Link lastLink, Activation act) {
         if(direction.isUp())
             operator.check(this, lastLink, act);
+    }
+
+    public boolean compatible(Scope from, Scope to) {
+        if(origin == null)
+            return false;
+
+        return from == to;
+    }
+
+    public void createRelation(Link l) {
     }
 }

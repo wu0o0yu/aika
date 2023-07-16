@@ -38,23 +38,9 @@ public class PatternVisitor extends LinkingVisitor<BindingActivation> {
     }
 
     @Override
-    public void nextUp(BindingActivation origin, int depth) {
+    public void upIntern(BindingActivation origin, int depth) {
         new PatternVisitor(this, origin)
                 .visit(origin, null, depth);
-    }
-
-    public void check(Link lastLink, Activation act) {
-        operator.check(this, lastLink, act);
-    }
-
-    public boolean compatible(Scope from, Scope to) {
-        if(origin == null)
-            return false;
-
-        return from == to;
-    }
-
-    public void createRelation(Link l) {
     }
 
     public void visit(Link l, int depth) {

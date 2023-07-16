@@ -22,6 +22,7 @@ import network.aika.elements.activations.Activation;
 import network.aika.elements.links.Link;
 import network.aika.Scope;
 import network.aika.visitor.LinkingVisitor;
+import network.aika.visitor.Visitor;
 
 /**
  * @author Lukas Molzberger

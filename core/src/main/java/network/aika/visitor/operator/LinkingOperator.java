@@ -52,7 +52,7 @@ public abstract class LinkingOperator implements Operator {
     public Link link(Activation actA, Synapse synA, Link linkA, Activation actB, Synapse synB) {
         Activation oAct;
         if (linkA == null) {
-            if(latentActivationExists(synA, synB, actA, actB))
+            if (latentActivationExists(synA, synB, actA, actB))
                 return null;
 
             Thought t = actA.getThought();
@@ -63,7 +63,7 @@ public abstract class LinkingOperator implements Operator {
             oAct = linkA.getOutput();
 
             Link l = synB.checkExistingLink(actB, oAct);
-            if(l != null)
+            if (l != null)
                 return l;
         }
 
