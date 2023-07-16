@@ -28,7 +28,6 @@ import network.aika.visitor.Visitor;
  */
 public interface Operator {
 
-    Direction getRelationDir(Scope fromScope);
 
     void check(LinkingVisitor v, Link lastLink, Activation act);
 

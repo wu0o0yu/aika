@@ -30,21 +30,19 @@ public class SelfRefOperator implements Operator {
 
     private Activation target;
 
+    private boolean isSelfRef;
+
     public SelfRefOperator(Activation target) {
         this.target = target;
     }
 
     @Override
-    public Direction getRelationDir(Scope fromScope) {
-        return null;
-    }
-
-    @Override
     public void check(LinkingVisitor v, Link lastLink, Activation act) {
-
+        if(act == target)
+            isSelfRef = true;
     }
 
     public boolean isSelfRef() {
-        return false;
+        return isSelfRef;
     }
 }

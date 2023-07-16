@@ -16,7 +16,9 @@
  */
 package network.aika.visitor.operator;
 
+import network.aika.Scope;
 import network.aika.Thought;
+import network.aika.direction.Direction;
 import network.aika.elements.synapses.Synapse;
 import network.aika.elements.activations.Activation;
 import network.aika.elements.links.Link;
@@ -39,6 +41,8 @@ public abstract class LinkingOperator implements Operator {
         this.fromAct = fromAct;
         this.syn = syn;
     }
+
+    public abstract Direction getRelationDir(Scope fromScope);
 
     public void link(Activation bsA, Synapse synA, Link linkA, Synapse synB, Stream<Activation> bsStream) {
         bsStream
