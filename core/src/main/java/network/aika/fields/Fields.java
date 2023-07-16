@@ -48,24 +48,6 @@ public class Fields {
         return add;
     }
 
-    public static Subtraction sub(FieldObject ref, String label, FieldOutput in1, FieldOutput in2) {
-        if(in1 == null || in2 == null)
-            return null;
-
-        Subtraction sub = new Subtraction(ref, label);
-        link(in1, 0, sub);
-        link(in2, 1, sub);
-        sub.connectInputs(true);
-
-        return sub;
-    }
-
-    public static Subtraction sub(FieldObject ref, String label, FieldOutput in1, FieldOutput in2, FieldInput... out) {
-        Subtraction sub = sub(ref, label, in1, in2);
-        linkAndConnectAll(sub, out);
-        return sub;
-    }
-
     public static Multiplication mul(FieldObject ref, String label, FieldOutput in1, FieldOutput in2) {
         if(in1 == null || in2 == null)
             return null;
