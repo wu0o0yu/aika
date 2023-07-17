@@ -73,6 +73,35 @@ public abstract class AbstractTemplateModel {
         model = m;
     }
 
+    public NeuronProvider getInputTokenCategory() {
+        return inputTokenCategory;
+    }
+
+    public NeuronProvider getRelationPreviousToken() {
+        return relPT;
+    }
+
+    public NeuronProvider getRelationNextToken() {
+        return relNT;
+    }
+
+    public NeuronProvider getInhibitoryNeuron() {
+        return inhibitoryN;
+    }
+
+    public NeuronProvider getInhibitoryCategory() {
+        return inhibCat;
+    }
+
+    public NeuronProvider getPatternNeuron() {
+        return patternN;
+    }
+
+    public NeuronProvider getPatternCategory() {
+        return patternCategory;
+    }
+
+
     protected void initInputCategoryNeuron() {
         inputTokenCategory = new PatternCategoryNeuron()
                 .init(model, "Input Token Category")
