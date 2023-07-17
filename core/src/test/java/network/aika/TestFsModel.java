@@ -44,6 +44,8 @@ public class TestFsModel {
 
             doc.postProcessing();
             doc.updateModel();
+
+            doc.disconnect();
         }
 
 
@@ -52,6 +54,8 @@ public class TestFsModel {
 
             doc.postProcessing();
             doc.updateModel();
+
+            doc.disconnect();
         }
 
         m.close();

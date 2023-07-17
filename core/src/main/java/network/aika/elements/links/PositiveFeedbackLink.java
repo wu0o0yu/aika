@@ -51,7 +51,7 @@ public class PositiveFeedbackLink extends FeedbackLink<PositiveFeedbackSynapse, 
     public void relinkInput(PatternActivation in) {
         if(input != null) {
             if(input != in) {
-                throw new InvalidRelinkingException(input, in);
+                throw new InvalidRelinkingException(output, input, in);
             }
             return;
         }

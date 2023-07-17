@@ -21,6 +21,8 @@ import network.aika.elements.synapses.InputPatternSynapse;
 import network.aika.elements.neurons.TokenNeuron;
 import network.aika.text.Document;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static network.aika.TestUtils.*;
 
@@ -29,6 +31,8 @@ import static network.aika.TestUtils.*;
  * @author Lukas Molzberger
  */
 public class PropagateTest {
+
+    private static final Logger log = LoggerFactory.getLogger(PropagateTest.class);
 
     @Test
     public void testPropagation() {
@@ -48,6 +52,8 @@ public class PropagateTest {
         Document doc = new Document(m, "test");
         doc.setConfig(c);
         doc.addToken(in, 0, 0, 4);
-        System.out.println(doc);
+        log.info("" + doc);
+
+        doc.disconnect();
     }
 }

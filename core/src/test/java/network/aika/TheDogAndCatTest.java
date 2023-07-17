@@ -59,8 +59,9 @@ public class TheDogAndCatTest {
 
         processTokens(m, doc, List.of("the", "dog", "and", "the", "cat"));
 
-
         doc.postProcessing();
         doc.updateModel();
+
+        doc.disconnect();
     }
 }

@@ -16,13 +16,15 @@
  */
 package network.aika.exceptions;
 
+import static java.lang.String.format;
+
 /**
  *
  * @author Lukas Molzberger
  */
 public class MissingNeuronException extends RuntimeException {
 
-    public MissingNeuronException(String message) {
-        super(message);
+    public MissingNeuronException(Long id, String modelLabel) {
+        super(format("Neuron with id [%s] is missing in model label %s.", id, modelLabel));
     }
 }

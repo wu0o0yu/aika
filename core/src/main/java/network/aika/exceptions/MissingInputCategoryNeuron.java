@@ -16,9 +16,7 @@
  */
 package network.aika.exceptions;
 
-import network.aika.elements.activations.Activation;
-import network.aika.elements.activations.BindingActivation;
-import network.aika.elements.activations.PatternActivation;
+import network.aika.elements.neurons.Neuron;
 
 import static java.lang.String.format;
 
@@ -26,15 +24,11 @@ import static java.lang.String.format;
  *
  * @author Lukas Molzberger
  */
-public class InvalidRelinkingException extends RuntimeException {
+public class MissingInputCategoryNeuron extends RuntimeException {
 
-
-    public InvalidRelinkingException(BindingActivation bAct, PatternActivation oldAct, PatternActivation newAct) {
-        super(format("Attempt to replace the pattern act [%s] with pattern act [%s] linked to the binding act [%s]. (%s) ",
-                oldAct.getId(),
-                newAct.getId(),
-                bAct.getId(),
-                oldAct.getThought().toString())
+    public MissingInputCategoryNeuron(Neuron templateN) {
+        super(format("The template neuron [%s] can not be instantiated due to missing its input category neuron.",
+                templateN.toKeyString())
         );
     }
 }

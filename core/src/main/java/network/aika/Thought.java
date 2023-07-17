@@ -24,6 +24,7 @@ import network.aika.callbacks.InstantiationCallback;
 import network.aika.elements.activations.Activation;
 import network.aika.elements.Element;
 import network.aika.elements.activations.Timestamp;
+import network.aika.exceptions.PreviousThoughtNotDisconnected;
 import network.aika.fields.*;
 import network.aika.elements.neurons.PreActivation;
 import network.aika.elements.neurons.NeuronProvider;
@@ -87,7 +88,9 @@ public abstract class Thought implements Element {
         annealing = new InputField(this, "anneal", 0.0);
         feedbackTrigger = new QueueSumField(this, FEEDBACK_TRIGGER, "feedback trigger", 0.0);
 
-        assert m.getCurrentThought() == null;
+        if(m.getCurrentThought() != null) {
+            throw new PreviousThoughtNotDisconnected(m.getCurrentThought(), this);
+        }
         m.setCurrentThought(this);
     }
 

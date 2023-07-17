@@ -16,9 +16,7 @@
  */
 package network.aika.exceptions;
 
-import network.aika.elements.activations.Activation;
-import network.aika.elements.activations.BindingActivation;
-import network.aika.elements.activations.PatternActivation;
+import network.aika.Thought;
 
 import static java.lang.String.format;
 
@@ -26,15 +24,9 @@ import static java.lang.String.format;
  *
  * @author Lukas Molzberger
  */
-public class InvalidRelinkingException extends RuntimeException {
+public class PreviousThoughtNotDisconnected extends RuntimeException {
 
-
-    public InvalidRelinkingException(BindingActivation bAct, PatternActivation oldAct, PatternActivation newAct) {
-        super(format("Attempt to replace the pattern act [%s] with pattern act [%s] linked to the binding act [%s]. (%s) ",
-                oldAct.getId(),
-                newAct.getId(),
-                bAct.getId(),
-                oldAct.getThought().toString())
-        );
+    public PreviousThoughtNotDisconnected(Thought oldThought, Thought newThought) {
+        super(format("The new thought [%s] can not be processed until the old thought [%s] is disconnected.", newThought.getId(), oldThought.getId()));
     }
 }

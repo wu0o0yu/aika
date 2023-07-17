@@ -80,6 +80,8 @@ public class SimplePhraseTest {
             doc.updateModel();
 
             log.info("" + doc);
+
+            doc.disconnect();
         }
     }
 }

@@ -58,5 +58,7 @@ public class TheCatTest {
 
         doc.postProcessing();
         doc.updateModel();
+
+        doc.disconnect();
     }
 }

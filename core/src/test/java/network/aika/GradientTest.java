@@ -59,8 +59,7 @@ public class GradientTest {
         processDoc(m, doc);
 
         doc.postProcessing();
-
-        System.out.println();
+        doc.disconnect();
     }
 
 
@@ -91,8 +90,7 @@ public class GradientTest {
 
         doc.postProcessing();
         doc.updateModel();
-
-        System.out.println();
+        doc.disconnect();
     }
 
 
@@ -120,6 +118,7 @@ public class GradientTest {
 
         doc1.postProcessing();
         doc1.updateModel();
+        doc1.disconnect();
 
         Document doc2 = new Document(m, "A C ");
         doc2.setConfig(
@@ -135,6 +134,7 @@ public class GradientTest {
 
         doc2.postProcessing();
         doc2.updateModel();
+        doc2.disconnect();
 
         System.out.println();
     }

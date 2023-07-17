@@ -44,6 +44,8 @@ import network.aika.elements.synapses.InputPatternSynapse;
 import network.aika.elements.synapses.NegativeFeedbackSynapse;
 import network.aika.text.Document;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.SortedSet;
 
@@ -58,6 +60,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Lukas Molzberger
  */
 public class MutualExclusionTest {
+
+    private static final Logger log = LoggerFactory.getLogger(MutualExclusionTest.class);
 
     @Test
     public void testPropagation() {
@@ -127,12 +131,14 @@ public class MutualExclusionTest {
         doc.postProcessing();
         doc.updateModel();
 
-        System.out.println(doc);
+        log.info("" + doc);
 
         SortedSet<BindingActivation> nbActs = nb.getActivations(doc);
         Activation nbAct = nbActs.stream().findFirst().orElse(null);
 
         assertTrue(nbAct.getValue().getValue() > 0.38);
+
+        doc.disconnect();
     }
 
 
@@ -200,7 +206,7 @@ public class MutualExclusionTest {
         doc.postProcessing();
         doc.updateModel();
 
-        System.out.println(doc);
-        System.out.println();
+        log.info("" + doc);
+        doc.disconnect();
     }
 }

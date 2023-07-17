@@ -31,6 +31,8 @@ import static network.aika.TestUtils.*;
  */
 public class JacksonCookTest {
 
+    protected static double PASSIVE_SYNAPSE_WEIGHT = 0.0;
+
     @Test
     public void testJacksonCook()  {
         setupJacksonCookTest();
@@ -50,11 +52,27 @@ public class JacksonCookTest {
                 .init(m, "surname (person name)");
 
 
+        BindingCategoryNeuron forenameBNCat = new BindingCategoryNeuron()
+                .init(m, "Forename Category");
+
+        new BindingCategoryInputSynapse()
+                .setWeight(PASSIVE_SYNAPSE_WEIGHT)
+                .init(forenameBNCat, forenameBN);
+
+        BindingCategoryNeuron surnameBNCat = new BindingCategoryNeuron()
+                .init(m, "Forename Category");
+
+        new BindingCategoryInputSynapse()
+                .setWeight(PASSIVE_SYNAPSE_WEIGHT)
+                .init(surnameBNCat, surnameBN);
+
+
         BindingNeuron jacksonForenameBN = forenameBN.instantiateTemplate()
                 .init(m, "jackson (forename)");
 
         BindingNeuron jacksonJCBN = jacksonForenameBN.instantiateTemplate()
                 .init(m, "jackson (jackson cook)");
+
         new InputPatternSynapse()
                 .setWeight(10.0)
                 .init(jacksonIN, jacksonJCBN)
@@ -206,5 +224,6 @@ public class JacksonCookTest {
 
         doc.postProcessing();
         doc.updateModel();
+        doc.disconnect();
     }
 }

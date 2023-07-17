@@ -20,6 +20,7 @@ import network.aika.Model;
 import network.aika.Thought;
 import network.aika.elements.synapses.CategoryInputSynapse;
 import network.aika.elements.synapses.CategorySynapse;
+import network.aika.exceptions.MissingInputCategoryNeuron;
 import network.aika.fields.*;
 import network.aika.elements.activations.Activation;
 import network.aika.elements.Element;
@@ -223,6 +224,9 @@ public abstract class Neuron<A extends Activation> implements Element, Writable 
         );
 
         CategoryInputSynapse cis = templateN.getCategoryInputSynapse();
+        if(cis == null)
+            throw new MissingInputCategoryNeuron(templateN);
+
         createCategorySynapse()
                 .setWeight(10.0)
                 .init(this, cis.getInput());
