@@ -204,7 +204,7 @@ public abstract class Neuron<A extends Activation> implements Element, Writable 
         return acts.getActivations();
     }
 
-    public <N extends Neuron<A>> N  instantiateTemplate() {
+    public <N extends Neuron<A>> N instantiateTemplate() {
         N n;
         try {
             n = (N) getClass().getConstructor().newInstance();

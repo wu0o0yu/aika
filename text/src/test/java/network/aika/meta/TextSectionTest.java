@@ -63,7 +63,7 @@ public class TextSectionTest extends TrainingParser {
 
     @Override
     public boolean check(Activation iAct) {
-        return true; // TODO
+        return iAct.getTokenPos() == 0;
     }
 
     @Test

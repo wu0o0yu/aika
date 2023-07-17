@@ -123,8 +123,6 @@ public abstract class AbstractTemplateModel {
 
         log.info(getPatternType() + " Pattern: netTarget:" + patternNetTarget + " valueTarget:" + patternValueTarget);
 
-        initTemplateBindingNeurons();
-
         new PatternCategoryInputSynapse()
                 .setWeight(PASSIVE_SYNAPSE_WEIGHT)
                 .init(patternCategory.getNeuron(), patternN.getNeuron());
@@ -134,6 +132,8 @@ public abstract class AbstractTemplateModel {
         new InhibitoryCategoryInputSynapse()
                 .setWeight(1.0)
                 .init(inhibCat.getNeuron(), inhibitoryN.getNeuron());
+
+        initTemplateBindingNeurons();
     }
 
     public void initStaticNeurons() {

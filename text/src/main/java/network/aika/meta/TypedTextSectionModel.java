@@ -41,6 +41,10 @@ public class TypedTextSectionModel extends TextSectionModel {
 
     protected NeuronProvider textSectionHeadlineBN;
 
+    protected NeuronProvider textSectionHeadlinePattern;
+
+    protected NeuronProvider textSectionHeadlineCategory;
+
     protected NeuronProvider textSectionHintBN;
 
     protected NeuronProvider textSectionPatternCategory;
@@ -73,8 +77,13 @@ public class TypedTextSectionModel extends TextSectionModel {
 
         log.info("Typed Text-Section");
 
+        textSectionHeadlinePattern = phraseModel.patternN.getNeuron()
+                .instantiateTemplate()
+                .init(model, "Text-Section-Headline")
+                .getProvider(true);
+
         textSectionHintBN = new BindingNeuron()
-                .init(model, "Abstract Text-Section-Hint")
+                .init(model, "Text-Section-Hint")
                 .getProvider(true);
 
         double netTarget = 2.5;
@@ -82,7 +91,7 @@ public class TypedTextSectionModel extends TextSectionModel {
                 .f(netTarget);
 
         textSectionHeadlineBN = new BindingNeuron()
-                .init(model, "Abstract Text-Section-Headline")
+                .init(model, "Text-Section-Headline")
                 .getProvider(true);
 
         phraseModel.abstractNeurons.add(textSectionHeadlineBN);
@@ -90,10 +99,9 @@ public class TypedTextSectionModel extends TextSectionModel {
         headlineInputPatternValueTarget = ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT
                 .f(headlineInputPatternNetTarget);
 
-        //     new BindingCategoryInputSynapse()
         new InputPatternSynapse()
                 .setWeight(10.0)
-                .init(phraseModel.patternCategory.getNeuron(), textSectionHeadlineBN.getNeuron())
+                .init(textSectionHeadlinePattern.getNeuron(), textSectionHeadlineBN.getNeuron())
                 .adjustBias(headlineInputPatternValueTarget);
 
 
