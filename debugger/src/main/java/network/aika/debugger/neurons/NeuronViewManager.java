@@ -23,6 +23,7 @@ import network.aika.debugger.AbstractViewManager;
 import network.aika.debugger.activations.ActivationGraphMouseManager;
 import network.aika.direction.Direction;
 import network.aika.elements.neurons.Neuron;
+import network.aika.elements.neurons.NeuronProvider;
 import network.aika.elements.synapses.Synapse;
 import network.aika.utils.Utils;
 import org.graphstream.graph.Edge;
@@ -33,6 +34,7 @@ import java.awt.*;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static network.aika.debugger.AbstractGraphManager.STANDARD_DISTANCE_X;
 import static network.aika.utils.Utils.doubleToString;
@@ -157,7 +159,11 @@ public class NeuronViewManager extends AbstractViewManager<Neuron, NeuronGraphMa
     }
 
     public void updateGraphNeurons() {
- //       updateGraphNeurons(getNeurons());
+        updateGraphNeurons(
+                getNeurons()
+                        .filter(Neuron::isAbstract)
+                        .toList()
+        );
     }
 
     public void updateGraphNeurons(Collection<Neuron> neurons) {
@@ -174,13 +180,11 @@ public class NeuronViewManager extends AbstractViewManager<Neuron, NeuronGraphMa
         });
     }
 
-    private Collection<Neuron> getNeurons() {
-        Collection<Neuron> neurons = getModel()
+    private Stream<Neuron> getNeurons() {
+        return getModel()
                 .getActiveNeurons()
                 .stream()
-                .<Neuron>map(p -> p.getNeuron())
-                .toList();
-        return neurons;
+                .map(NeuronProvider::getNeuron);
     }
 
     public void dumpNetworkCoordinates() {
