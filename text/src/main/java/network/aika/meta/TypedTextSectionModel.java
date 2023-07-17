@@ -19,6 +19,7 @@ package network.aika.meta;
 import network.aika.Scope;
 import network.aika.elements.neurons.*;
 import network.aika.elements.synapses.InputPatternSynapse;
+import network.aika.elements.synapses.PatternCategoryInputSynapse;
 import network.aika.elements.synapses.RelationInputSynapse;
 import network.aika.elements.synapses.SamePatternSynapse;
 import network.aika.text.Document;
@@ -28,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static network.aika.meta.AbstractTemplateModel.PASSIVE_SYNAPSE_WEIGHT;
 import static network.aika.meta.NetworkUtils.addNegativeFeedbackLoop;
 
 
@@ -46,8 +48,6 @@ public class TypedTextSectionModel extends TextSectionModel {
     protected NeuronProvider textSectionHeadlineCategory;
 
     protected NeuronProvider textSectionHintBN;
-
-    protected NeuronProvider textSectionPatternCategory;
 
     protected NeuronProvider tsBeginInhibitoryN;
 
@@ -81,6 +81,15 @@ public class TypedTextSectionModel extends TextSectionModel {
                 .instantiateTemplate()
                 .init(model, "Text-Section-Headline")
                 .getProvider(true);
+
+        textSectionHeadlineCategory = new PatternCategoryNeuron()
+                .init(model, "Text-Section-Headline-Category")
+                .getProvider(true);
+
+        new PatternCategoryInputSynapse()
+                .setWeight(PASSIVE_SYNAPSE_WEIGHT)
+                .init(textSectionHeadlineCategory.getNeuron(), textSectionHeadlinePattern.getNeuron());
+
 
         textSectionHintBN = new BindingNeuron()
                 .init(model, "Text-Section-Hint")
