@@ -69,10 +69,6 @@ public class TextSectionModel {
         textSectionRelationNT = TokenPositionRelationNeuron.lookupRelation(model, 300, 1)
                 .getProvider(true);
 
-        double netTarget = 2.5;
-        double valueTarget = ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT
-                .f(netTarget);
-
         textSectionPatternN = new PatternNeuron()
                 .init(model, "Abstract Text-Section")
                 .getProvider(true);

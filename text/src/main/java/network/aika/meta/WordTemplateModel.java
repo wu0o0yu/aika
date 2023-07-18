@@ -18,12 +18,16 @@ package network.aika.meta;
 
 import network.aika.Model;
 import network.aika.elements.neurons.BindingNeuron;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author Lukas Molzberger
  */
 public class WordTemplateModel extends AbstractTemplateModel {
+
+    private static final Logger log = LoggerFactory.getLogger(WordTemplateModel.class);
 
     public WordTemplateModel(Model m) {
         super(m);

@@ -19,12 +19,16 @@ package network.aika.meta;
 import network.aika.Model;
 import network.aika.elements.activations.Activation;
 import network.aika.elements.neurons.BindingNeuron;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author Lukas Molzberger
  */
 public class SyllableTemplateModel extends AbstractTemplateModel {
+
+    private static final Logger log = LoggerFactory.getLogger(SyllableTemplateModel.class);
 
     public SyllableTemplateModel(Model m) {
         super(m);

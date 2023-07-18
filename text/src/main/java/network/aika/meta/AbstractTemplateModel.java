@@ -21,7 +21,6 @@ import network.aika.Scope;
 import network.aika.elements.activations.Activation;
 import network.aika.elements.activations.TokenActivation;
 import network.aika.elements.neurons.*;
-import network.aika.elements.synapses.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

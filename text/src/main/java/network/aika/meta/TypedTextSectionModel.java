@@ -18,7 +18,6 @@ package network.aika.meta;
 
 import network.aika.Scope;
 import network.aika.elements.neurons.*;
-import network.aika.elements.synapses.InputPatternSynapse;
 import network.aika.text.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
