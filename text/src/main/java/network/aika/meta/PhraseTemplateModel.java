@@ -49,8 +49,8 @@ public class PhraseTemplateModel extends AbstractTemplateModel {
     }
 
     @Override
-    protected void initInputCategoryNeuron() {
-        super.initInputCategoryNeuron();
+    public void initStaticNeurons() {
+        super.initStaticNeurons();
 
         upperCaseN = new PatternCategoryNeuron()
                 .init(model, "Upper Case")

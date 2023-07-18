@@ -17,16 +17,13 @@
 package network.aika.meta;
 
 import network.aika.Model;
-import network.aika.Scope;
 import network.aika.elements.activations.PatternActivation;
-import network.aika.elements.activations.TokenActivation;
 import network.aika.elements.neurons.*;
-import network.aika.elements.synapses.*;
 import network.aika.text.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static network.aika.meta.NetworkUtils.addNegativeFeedbackLoop;
+import static network.aika.meta.NetworkMotivs.addRelation;
 
 /**
  *
@@ -88,28 +85,16 @@ public class TextSectionModel {
                 .init(model, "Abstract Text-Section-End")
                 .getProvider(true);
 
-        sectionBeginToSectionEndRelation();
+        addRelation(
+                textSectionBeginBN.getNeuron(),
+                textSectionEndBN.getNeuron(),
+                textSectionRelationPT.getNeuron(),
+                5.0,
+                10.0
+        );
     }
 
     public PatternActivation addTextSection(Document doc, int begin, int end) {
-        return new PatternActivation(doc.createActivationId(), doc, (PatternNeuron) textSectionPatternN.getNeuron());
-    }
-
-    protected void sectionBeginToSectionEndRelation() {
-        double prevNetTarget = textSectionBeginBN.getNeuron().getBias().getValue();
-        double prevValueTarget = ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT
-                .f(prevNetTarget);
-
-        new RelationInputSynapse()
-                .setWeight(5.0)
-                .init(textSectionRelationPT.getNeuron(), textSectionEndBN.getNeuron())
-                .adjustBias();
-
-        SamePatternSynapse spSyn = new SamePatternSynapse()
-                .setWeight(10.0)
-                .init(textSectionBeginBN.getNeuron(), textSectionEndBN.getNeuron())
-                .adjustBias(prevValueTarget);
-
-        log.info("  SectionBeginToSectionEndRelation:  " + spSyn + " targetNetContr:" + -spSyn.getSynapseBias().getValue());
+        return new PatternActivation(doc.createActivationId(), doc, textSectionPatternN.getNeuron());
     }
 }

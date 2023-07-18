@@ -19,9 +19,6 @@ package network.aika.meta;
 import network.aika.Scope;
 import network.aika.elements.neurons.*;
 import network.aika.elements.synapses.InputPatternSynapse;
-import network.aika.elements.synapses.PatternCategoryInputSynapse;
-import network.aika.elements.synapses.RelationInputSynapse;
-import network.aika.elements.synapses.SamePatternSynapse;
 import network.aika.text.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,8 +26,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static network.aika.meta.AbstractTemplateModel.PASSIVE_SYNAPSE_WEIGHT;
-import static network.aika.meta.NetworkUtils.addNegativeFeedbackLoop;
+import static network.aika.meta.NetworkMotivs.*;
 
 
 /**
@@ -82,28 +78,17 @@ public class TypedTextSectionModel extends TextSectionModel {
                 .init(model, "Text-Section-Headline")
                 .getProvider(true);
 
-        textSectionHeadlineCategory = new PatternCategoryNeuron()
-                .init(model, "Text-Section-Headline-Category")
-                .getProvider(true);
-
-        new PatternCategoryInputSynapse()
-                .setWeight(PASSIVE_SYNAPSE_WEIGHT)
-                .init(textSectionHeadlineCategory.getNeuron(), textSectionHeadlinePattern.getNeuron());
-
+        makeAbstract((PatternNeuron) textSectionHeadlinePattern.getNeuron());
 
         textSectionHintBN = new BindingNeuron()
                 .init(model, "Text-Section-Hint")
                 .getProvider(true);
 
         double netTarget = 2.5;
-        double valueTarget = ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT
-                .f(netTarget);
 
         textSectionHeadlineBN = new BindingNeuron()
                 .init(model, "Text-Section-Headline")
                 .getProvider(true);
-
-        phraseModel.abstractNeurons.add(textSectionHeadlineBN);
 
         headlineInputPatternValueTarget = ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT
                 .f(headlineInputPatternNetTarget);
@@ -113,9 +98,13 @@ public class TypedTextSectionModel extends TextSectionModel {
                 .init(textSectionHeadlinePattern.getNeuron(), textSectionHeadlineBN.getNeuron())
                 .adjustBias(headlineInputPatternValueTarget);
 
-
-        headlineToSectionBeginRelation();
-
+        addRelation(
+                textSectionHeadlineBN.getNeuron(),
+                textSectionBeginBN.getNeuron(),
+                phraseModel.relPT.getNeuron(),
+                5.0,
+                10.0
+        );
 
         textSectionHintBN = new BindingNeuron()
                 .init(model, "Abstract Text-Section Hint")
@@ -123,7 +112,6 @@ public class TypedTextSectionModel extends TextSectionModel {
 
         sectionHintRelations(textSectionBeginBN.getNeuron(), textSectionRelationPT.getNeuron());
         sectionHintRelations(textSectionEndBN.getNeuron(), textSectionRelationNT.getNeuron());
-
 
 
         tsBeginInhibitoryN = new InhibitoryNeuron(Scope.INPUT)
@@ -170,39 +158,13 @@ public class TypedTextSectionModel extends TextSectionModel {
         );
     }
 
-    private void headlineToSectionBeginRelation() {
-        double prevNetTarget = textSectionHeadlineBN.getNeuron().getBias().getValue();
-        double prevValueTarget = ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT
-                .f(prevNetTarget);
-
-        new RelationInputSynapse()
-                .setWeight(5.0)
-                .init(phraseModel.relPT.getNeuron(), textSectionBeginBN.getNeuron())
-                .adjustBias();
-
-        SamePatternSynapse spSyn = new SamePatternSynapse()
-                .setWeight(10.0)
-                .init(textSectionHeadlineBN.getNeuron(), textSectionBeginBN.getNeuron())
-                .adjustBias(prevValueTarget);
-
-        log.info("  HeadlineToSectionBeginRelation:  " + spSyn + " targetNetContr:" + -spSyn.getSynapseBias().getValue());
-    }
-
     private void sectionHintRelations(BindingNeuron fromBN, LatentRelationNeuron relN) {
-        double prevNetTarget = fromBN.getBias().getValue();
-        double prevValueTarget = ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT
-                .f(prevNetTarget);
-
-        new RelationInputSynapse()
-                .setWeight(5.0)
-                .init(relN, textSectionHintBN.getNeuron())
-                .adjustBias();
-
-        SamePatternSynapse spSyn = new SamePatternSynapse()
-                .setWeight(10.0)
-                .init(fromBN, textSectionHintBN.getNeuron())
-                .adjustBias(prevValueTarget);
-
-        log.info("  SectionHintRelations:  " + spSyn + " targetNetContr:" + -spSyn.getSynapseBias().getValue());
+        addRelation(
+                fromBN,
+                textSectionHintBN.getNeuron(),
+                relN,
+                5.0,
+                10.0
+        );
     }
 }
