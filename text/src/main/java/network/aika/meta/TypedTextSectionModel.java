@@ -18,6 +18,9 @@ package network.aika.meta;
 
 import network.aika.Scope;
 import network.aika.elements.neurons.*;
+import network.aika.elements.synapses.PatternSynapse;
+import network.aika.elements.synapses.PositiveFeedbackSynapse;
+import network.aika.elements.synapses.Synapse;
 import network.aika.text.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,12 +73,8 @@ public class TypedTextSectionModel extends TextSectionModel {
 
         log.info("Typed Text-Section");
 
-        textSectionHeadlinePattern = phraseModel.patternN.getNeuron()
-                .instantiateTemplate()
-                .init(model, "Text-Section-Headline")
+        textSectionHeadlinePattern = instantiatePatternWithBindingNeurons()
                 .getProvider(true);
-
-        makeAbstract((PatternNeuron) textSectionHeadlinePattern.getNeuron());
 
         textSectionHintBN = new BindingNeuron()
                 .init(model, "Text-Section-Hint")
@@ -91,6 +90,16 @@ public class TypedTextSectionModel extends TextSectionModel {
                 netTarget
         ).getProvider(true);
 
+        addPositiveFeedbackLoop(
+                textSectionHeadlineBN.getNeuron(),
+                textSectionPatternN.getNeuron(),
+                2.5,
+                patternNetTarget,
+                bindingNetTarget,
+                0.0,
+                false
+        );
+
         addRelation(
                 textSectionHeadlineBN.getNeuron(),
                 textSectionBeginBN.getNeuron(),
@@ -102,6 +111,16 @@ public class TypedTextSectionModel extends TextSectionModel {
         textSectionHintBN = new BindingNeuron()
                 .init(model, "Abstract Text-Section Hint")
                 .getProvider(true);
+
+        addPositiveFeedbackLoop(
+                textSectionHintBN.getNeuron(),
+                textSectionPatternN.getNeuron(),
+                2.5,
+                patternNetTarget,
+                bindingNetTarget,
+                0.0,
+                false
+        );
 
         sectionHintRelations(textSectionBeginBN.getNeuron(), textSectionRelationPT.getNeuron());
         sectionHintRelations(textSectionEndBN.getNeuron(), textSectionRelationNT.getNeuron());
@@ -149,6 +168,35 @@ public class TypedTextSectionModel extends TextSectionModel {
                 tsInhibitoryN.getNeuron(),
                 NEG_MARGIN_TS * -netTarget
         );
+    }
+
+    private PatternNeuron instantiatePatternWithBindingNeurons() {
+        PatternNeuron pn = (PatternNeuron) phraseModel.patternN.getNeuron()
+                .instantiateTemplate()
+                .init(model, "Text-Section-Headline");
+
+        makeAbstract(pn);
+
+        phraseModel.patternN.getNeuron()
+                .getInputSynapsesByType(PatternSynapse.class)
+                .forEach(s ->
+                    instantiateBindingNeuronWithSynapses((PatternSynapse) s, pn)
+                );
+        return pn;
+    }
+
+    private void instantiateBindingNeuronWithSynapses(PatternSynapse tps, PatternNeuron pn) {
+        BindingNeuron tbn = tps.getInput();
+        BindingNeuron bn = tbn
+                .instantiateTemplate()
+                .init(model, tbn.getLabel() + " TS-Headline");
+
+        makeAbstract(bn);
+
+        tps.instantiateTemplate(bn, pn);
+
+        PositiveFeedbackSynapse pfs = (PositiveFeedbackSynapse) tbn.getInputSynapse(tps.getPOutput());
+        pfs.instantiateTemplate(pn, bn);
     }
 
     private void sectionHintRelations(BindingNeuron fromBN, LatentRelationNeuron relN) {

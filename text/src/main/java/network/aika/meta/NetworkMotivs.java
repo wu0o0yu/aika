@@ -66,13 +66,13 @@ public class NetworkMotivs {
             BindingNeuron bn,
             PatternNeuron pn,
             double weight,
-            double patternValueTarget,
-            double netTarget,
+            double patternNetTarget,
+            double bindingNetTarget,
             double weakInputMargin,
             boolean isOptional
     ) {
         double valueTarget = bn.getActivationFunction()
-                .f(netTarget);
+                .f(bindingNetTarget);
 
         PatternSynapse pSyn = new PatternSynapse()
                 .setWeight(weight)
@@ -82,8 +82,11 @@ public class NetworkMotivs {
 
         log.info("  " + pSyn + " targetNetContr:" + -pSyn.getSynapseBias().getValue());
 
+        double patternValueTarget = pn.getActivationFunction()
+                .f(patternNetTarget);
+
         PositiveFeedbackSynapse posFeedSyn = new PositiveFeedbackSynapse()
-                .setWeight(POS_MARGIN * (netTarget / patternValueTarget))
+                .setWeight(POS_MARGIN * (bindingNetTarget / patternValueTarget))
                 .init(pn, bn)
                 .adjustBias(patternValueTarget);
 

@@ -50,11 +50,7 @@ public abstract class AbstractTemplateModel {
     protected NeuronProvider patternN;
 
     protected double inputPatternNetTarget = 5.0;
-    protected double inputPatternValueTarget;
-
     protected double patternNetTarget = 0.7;
-    protected double patternValueTarget = ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT
-            .f(patternNetTarget);
 
     protected static double POS_MARGIN = 1.0;
     protected static double NEG_MARGIN_LEFT = 1.2;
@@ -125,7 +121,7 @@ public abstract class AbstractTemplateModel {
 
         makeAbstract((InhibitoryNeuron) inhibitoryN.getNeuron());
 
-        log.info(getPatternType() + " Pattern: netTarget:" + patternNetTarget + " valueTarget:" + patternValueTarget);
+        log.info(getPatternType() + " Pattern: netTarget:" + patternNetTarget);
 
         patternN.getNeuron().setBias(patternNetTarget);
 
@@ -139,9 +135,6 @@ public abstract class AbstractTemplateModel {
         relNT = TokenPositionRelationNeuron.lookupRelation(model, 1, 1)
                 .getProvider(true);
 
-        inputPatternValueTarget = ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT
-                .f(inputPatternNetTarget);
-
         inputToken = model.lookupNeuronByLabel("Abstract Input Token", l ->
                 new TokenNeuron()
                         .init(model, l)
@@ -154,13 +147,13 @@ public abstract class AbstractTemplateModel {
                 .getProvider(true);
 
 
-        log.info("Input Token: netTarget:" + inputPatternNetTarget + " valueTarget:" + inputPatternValueTarget);
+        log.info("Input Token: netTarget:" + inputPatternNetTarget);
     }
 
     protected abstract void initTemplateBindingNeurons();
 
     protected void expandContinueBindingNeurons(
-            double patternValueTarget,
+            double patternNetTarget,
             int optionalStart,
             BindingNeuron sylBeginBN,
             int length,
@@ -171,7 +164,7 @@ public abstract class AbstractTemplateModel {
         for(int pos = 1; pos <= length; pos++) {
             if(pos < 2) {
                 lastSylBN = createStrongBindingNeuron(
-                        patternValueTarget,
+                        patternNetTarget,
                         pos >= optionalStart,
                         dir * pos,
                         dir * lastPos,
@@ -179,7 +172,7 @@ public abstract class AbstractTemplateModel {
                 );
             } else {
                 lastSylBN = createWeakBindingNeuron(
-                        patternValueTarget,
+                        patternNetTarget,
                         dir * pos,
                         lastSylBN
                 );
@@ -189,7 +182,7 @@ public abstract class AbstractTemplateModel {
     }
 
     protected BindingNeuron createStrongBindingNeuron(
-            double patternValueTarget,
+            double patternNetTarget,
             boolean isOptional,
             int pos,
             Integer lastPos,
@@ -234,7 +227,7 @@ public abstract class AbstractTemplateModel {
                 bn,
                 patternN.getNeuron(),
                 2.5,
-                patternValueTarget,
+                patternNetTarget,
                 netTarget,
                 0.0,
                 isOptional
@@ -246,7 +239,7 @@ public abstract class AbstractTemplateModel {
     }
 
     protected BindingNeuron createWeakBindingNeuron(
-            double patternValueTarget,
+            double patternNetTarget,
             int pos,
             BindingNeuron lastBN
     ) {
@@ -288,7 +281,7 @@ public abstract class AbstractTemplateModel {
                 bn,
                 patternN.getNeuron(),
                 0.5,
-                patternValueTarget,
+                patternNetTarget,
                 netTarget,
                 weakInputMargin,
                 true

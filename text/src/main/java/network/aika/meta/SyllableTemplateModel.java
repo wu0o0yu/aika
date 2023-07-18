@@ -42,7 +42,7 @@ public class SyllableTemplateModel extends AbstractTemplateModel {
     @Override
     protected void initTemplateBindingNeurons() {
         BindingNeuron primaryBN = createStrongBindingNeuron(
-                patternValueTarget,
+                patternNetTarget,
                 false,
                 0,
                 null,
@@ -50,7 +50,7 @@ public class SyllableTemplateModel extends AbstractTemplateModel {
         );
 
         expandContinueBindingNeurons(
-                patternValueTarget,
+                patternNetTarget,
                 2,
                 primaryBN,
                 4,

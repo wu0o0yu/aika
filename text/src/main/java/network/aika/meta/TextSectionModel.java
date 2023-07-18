@@ -23,6 +23,9 @@ import network.aika.text.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
+
+import static network.aika.meta.NetworkMotivs.addPositiveFeedbackLoop;
 import static network.aika.meta.NetworkMotivs.addRelation;
 
 /**
@@ -52,7 +55,9 @@ public class TextSectionModel {
 
     protected NeuronProvider textSectionEndBN;
 
-    protected NeuronProvider textSectionPatternCategory;
+    protected double bindingNetTarget = 2.5;
+
+    protected double patternNetTarget = 0.7;
 
 
     public TextSectionModel(PhraseTemplateModel phraseModel) {
@@ -87,6 +92,26 @@ public class TextSectionModel {
                 textSectionRelationPT.getNeuron(),
                 5.0,
                 10.0
+        );
+
+        addPositiveFeedbackLoop(
+                textSectionBeginBN.getNeuron(),
+                textSectionPatternN.getNeuron(),
+                2.5,
+                patternNetTarget,
+                bindingNetTarget,
+                0.0,
+                false
+        );
+
+        addPositiveFeedbackLoop(
+                textSectionEndBN.getNeuron(),
+                textSectionPatternN.getNeuron(),
+                2.5,
+                patternNetTarget,
+                bindingNetTarget,
+                0.0,
+                false
         );
     }
 
