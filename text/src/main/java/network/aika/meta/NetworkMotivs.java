@@ -1,3 +1,19 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package network.aika.meta;
 
 import network.aika.Scope;
@@ -8,12 +24,32 @@ import org.slf4j.LoggerFactory;
 
 import static network.aika.meta.AbstractTemplateModel.POS_MARGIN;
 
+/**
+ *
+ * @author Lukas Molzberger
+ */
 public class NetworkMotivs {
     private static final Logger log = LoggerFactory.getLogger(NetworkMotivs.class);
 
     protected static double PASSIVE_SYNAPSE_WEIGHT = 0.0;
 
     private static final String CATEGORY_LABEL = " Category";
+
+    public static BindingNeuron addBindingNeuron(PatternNeuron input, String label, double weight, double inputNetTarget, double netTarget) {
+        BindingNeuron bn = new BindingNeuron()
+                .init(input.getModel(), label);
+
+        double inputValueTarget = input.getActivationFunction()
+                .f(inputNetTarget);
+
+        new InputPatternSynapse()
+                .setWeight(weight)
+                .init(input, bn)
+                .adjustBias(inputValueTarget);
+
+        bn.setBias(netTarget);
+        return bn;
+    }
 
     public static void addNegativeFeedbackLoop(BindingNeuron bn, InhibitoryNeuron in, double weight) {
         new InhibitorySynapse(Scope.INPUT)
@@ -35,7 +71,7 @@ public class NetworkMotivs {
             double weakInputMargin,
             boolean isOptional
     ) {
-        double valueTarget = ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT
+        double valueTarget = bn.getActivationFunction()
                 .f(netTarget);
 
         PatternSynapse pSyn = new PatternSynapse()
@@ -67,7 +103,7 @@ public class NetworkMotivs {
                 .adjustBias();
 
         double prevNetTarget = lastBN.getBias().getValue();
-        double prevValueTarget = ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT
+        double prevValueTarget = lastBN.getActivationFunction()
                 .f(prevNetTarget);
 
         SamePatternSynapse spSyn = new SamePatternSynapse()

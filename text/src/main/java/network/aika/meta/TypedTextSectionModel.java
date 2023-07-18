@@ -53,8 +53,6 @@ public class TypedTextSectionModel extends TextSectionModel {
 
     protected double headlineInputPatternNetTarget = 5.0;
 
-    protected double headlineInputPatternValueTarget;
-
 
     public TypedTextSectionModel(PhraseTemplateModel phraseModel) {
         super(phraseModel);
@@ -86,17 +84,13 @@ public class TypedTextSectionModel extends TextSectionModel {
 
         double netTarget = 2.5;
 
-        textSectionHeadlineBN = new BindingNeuron()
-                .init(model, "Text-Section-Headline")
-                .getProvider(true);
-
-        headlineInputPatternValueTarget = ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT
-                .f(headlineInputPatternNetTarget);
-
-        new InputPatternSynapse()
-                .setWeight(10.0)
-                .init(textSectionHeadlinePattern.getNeuron(), textSectionHeadlineBN.getNeuron())
-                .adjustBias(headlineInputPatternValueTarget);
+        textSectionHeadlineBN = addBindingNeuron(
+                textSectionHeadlinePattern.getNeuron(),
+                "Text-Section-Headline",
+                10.0,
+                headlineInputPatternNetTarget,
+                netTarget
+        ).getProvider(true);
 
         addRelation(
                 textSectionHeadlineBN.getNeuron(),

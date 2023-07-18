@@ -116,7 +116,9 @@ public abstract class AbstractTemplateModel {
         patternN = new PatternNeuron()
                 .init(model, getPatternType())
                 .getProvider(true);
+
         makeAbstract((PatternNeuron) patternN.getNeuron());
+
 
         inhibitoryN = new InhibitoryNeuron(Scope.SAME)
                 .init(model, "I")
@@ -198,8 +200,14 @@ public abstract class AbstractTemplateModel {
 
         log.info("Strong Binding-Neuron: netTarget:" + netTarget);
 
-        BindingNeuron bn = new BindingNeuron()
-                .init(model, "Abstract (S) Pos:" + pos);
+        BindingNeuron bn = addBindingNeuron(
+                inputToken.getNeuron(),
+                "Abstract (S) Pos:" + pos,
+                10.0,
+                inputPatternNetTarget,
+                netTarget
+        );
+        makeAbstract(bn);
 
         addNegativeFeedbackLoop(
                 bn,
@@ -233,15 +241,6 @@ public abstract class AbstractTemplateModel {
                 isOptional
         );
 
-        new InputPatternSynapse()
-                .setWeight(10.0)
-                .init(inputToken.getNeuron(), bn)
-                .adjustBias(inputPatternValueTarget);
-
-        makeAbstract(bn);
-
-        bn.setBias(netTarget);
-
         log.info("");
 
         return bn;
@@ -255,14 +254,18 @@ public abstract class AbstractTemplateModel {
         double weakInputMargin = -0.05;
 
         double netTarget = 0.5;
-        double valueTarget = ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT
-                .f(netTarget);
 
-        log.info("Weak Binding-Neuron: netTarget:" + netTarget + " valueTarget:" + valueTarget);
+        log.info("Weak Binding-Neuron: netTarget:" + netTarget);
 
+        BindingNeuron bn = addBindingNeuron(
+                inputToken.getNeuron(),
+                "Abstract (W) Pos:" + pos,
+                10.0,
+                inputPatternNetTarget,
+                netTarget
+        );
 
-        BindingNeuron bn = new BindingNeuron()
-                .init(model, "Abstract (W) Pos:" + pos);
+        makeAbstract(bn);
 
         addNegativeFeedbackLoop(
                 bn,
@@ -291,15 +294,6 @@ public abstract class AbstractTemplateModel {
                 weakInputMargin,
                 true
         );
-
-        new InputPatternSynapse()
-                .setWeight(10.0)
-                .init(inputToken.getNeuron(), bn)
-                .adjustBias(inputPatternValueTarget);
-
-        makeAbstract(bn);
-
-        bn.setBias(netTarget);
 
         return bn;
     }
