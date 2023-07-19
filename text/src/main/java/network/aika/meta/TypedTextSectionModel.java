@@ -16,22 +16,22 @@
  */
 package network.aika.meta;
 
+import network.aika.elements.synapses.InhibitorySynapse;
+import network.aika.elements.synapses.Synapse;
 import network.aika.enums.Scope;
 import network.aika.elements.neurons.*;
 import network.aika.elements.synapses.PatternSynapse;
-import network.aika.elements.synapses.PositiveFeedbackSynapse;
 import network.aika.text.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static network.aika.meta.NetworkMotivs.*;
-
 
 /**
  *
@@ -40,6 +40,8 @@ import static network.aika.meta.NetworkMotivs.*;
 public class TypedTextSectionModel extends TextSectionModel {
 
     private static final Logger log = LoggerFactory.getLogger(TypedTextSectionModel.class);
+
+    protected NeuronProvider textSectionHeadlinePrimaryInputBN;
 
     protected NeuronProvider textSectionHeadlineBN;
 
@@ -172,54 +174,85 @@ public class TypedTextSectionModel extends TextSectionModel {
 
     private PatternNeuron instantiatePatternWithBindingNeurons() {
         PatternNeuron tpn = phraseModel.patternN.getNeuron();
-        PatternNeuron pn = tpn
-                .instantiateTemplate()
-                .init(model, "Text-Section-Headline");
+        PatternNeuron pn = instantiatePatternNeuron(tpn);
 
-        makeAbstract(pn);
+        InhibitoryNeuron tInhibN = phraseModel.inhibitoryN.getNeuron();
+        InhibitoryNeuron inhibN = instantiateInhibitoryNeuron(tInhibN);
 
-        Map<NeuronProvider, BindingNeuron> bindingNeurons = new TreeMap<>();
-        phraseModel.patternN.getNeuron()
-                .getInputSynapsesByType(PatternSynapse.class)
+        Map<NeuronProvider, Neuron> templateMapping = new TreeMap<>();
+        pn.getInputSynapsesByType(PatternSynapse.class)
                 .forEach(s -> {
-                            BindingNeuron[] bn = instantiateBindingNeuron((PatternSynapse) s, pn);
-                            bindingNeurons.put(bn[0].getProvider(), bn[1]);
+                            BindingNeuron[] bn = instantiateBindingNeuron(s);
+                            templateMapping.put(bn[0].getProvider(), bn[1]);
                         }
                 );
 
-        bindingNeurons.entrySet()
-                .forEach(e -> {
-                            PatternSynapse ps = (PatternSynapse) tpn.getInputSynapse(e.getKey());
-                            ps.instantiateTemplate(e.getValue(), pn);
-                            instantiateBindingNeuronSynapses(bindingNeurons, e.getKey(), e.getValue());
+        pn.getInputSynapsesByType(PatternSynapse.class)
+                .map(Synapse::getInput)
+                .forEach(tbn -> {
+                            BindingNeuron bn = (BindingNeuron) templateMapping.get(tbn.getProvider());
+                            instantiatePatternSynapse(tpn, pn, tbn, bn);
+                            instantiateInhibitorySynapse(tInhibN, inhibN, tbn, bn);
+                            instantiateBindingNeuronSynapses(np -> templateMapping.get(np), tbn.getProvider(), bn);
                         }
                 );
         return pn;
     }
 
-    private static void instantiateBindingNeuronSynapses(Map<NeuronProvider, BindingNeuron> bindingNeurons, NeuronProvider tbn, BindingNeuron bn) {
-        tbn.getInputSynapses()
-                .forEach(ts ->
-                        ts.instantiateTemplate(
-                                bindingNeurons.get(ts.getPInput()),
-                                bn
-                        )
-                );
+    private PatternNeuron instantiatePatternNeuron(PatternNeuron tpn) {
+        PatternNeuron pn;
+        pn = tpn
+                .instantiateTemplate()
+                .init(model, "Text-Section-Headline");
+
+        makeAbstract(pn);
+        return pn;
     }
 
-    private BindingNeuron[] instantiateBindingNeuron(PatternSynapse tps, PatternNeuron pn) {
+    private InhibitoryNeuron instantiateInhibitoryNeuron(InhibitoryNeuron tInhibN) {
+        InhibitoryNeuron inhibN;
+        inhibN = tInhibN
+                .instantiateTemplate()
+                .init(model, "Inhib. TS-Headline");
+
+        makeAbstract(inhibN);
+        return inhibN;
+    }
+
+    private static void instantiatePatternSynapse(PatternNeuron tpn, PatternNeuron pn, BindingNeuron tbn, BindingNeuron bn) {
+        PatternSynapse ps = (PatternSynapse) tpn.getInputSynapse(tbn.getProvider());
+        ps.instantiateTemplate(bn, pn);
+    }
+
+    private static void instantiateInhibitorySynapse(InhibitoryNeuron tInhibN, InhibitoryNeuron inhibN, BindingNeuron tbn, BindingNeuron bn) {
+        InhibitorySynapse inhibS = (InhibitorySynapse) tInhibN.getInputSynapse(tbn.getProvider());
+        inhibS.instantiateTemplate(bn, inhibN);
+    }
+
+    private static void instantiateBindingNeuronSynapses(Function<NeuronProvider, Neuron> resolver, NeuronProvider tbn, BindingNeuron bn) {
+        tbn.getInputSynapses()
+                .forEach(ts -> {
+                    Neuron in = resolver.apply(ts.getPInput());
+                    ts.instantiateTemplate(
+                            in != null ?
+                                in :
+                                ts.getInput(),
+                            bn
+                    );
+                });
+    }
+
+    private BindingNeuron[] instantiateBindingNeuron(PatternSynapse tps) {
         BindingNeuron tbn = tps.getInput();
         BindingNeuron bn = tbn
                 .instantiateTemplate()
                 .init(model, tbn.getLabel() + " TS-Headline");
 
         makeAbstract(bn);
-/*
-        tps.instantiateTemplate(bn, pn);
 
-        PositiveFeedbackSynapse pfs = (PositiveFeedbackSynapse) tbn.getInputSynapse(tps.getPOutput());
-        pfs.instantiateTemplate(pn, bn);
-        */
+        if(tbn.getId().longValue() == phraseModel.primaryBN.getId().longValue())
+            textSectionHeadlinePrimaryInputBN = bn.getProvider(true);
+
         return new BindingNeuron[] {tbn, bn};
     }
 

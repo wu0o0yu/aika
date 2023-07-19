@@ -49,6 +49,8 @@ public abstract class AbstractTemplateModel {
 
     protected NeuronProvider patternN;
 
+    protected NeuronProvider primaryBN;
+
     protected double inputPatternNetTarget = 5.0;
     protected double patternNetTarget = 0.7;
 

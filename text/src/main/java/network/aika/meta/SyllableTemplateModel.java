@@ -41,18 +41,18 @@ public class SyllableTemplateModel extends AbstractTemplateModel {
 
     @Override
     protected void initTemplateBindingNeurons() {
-        BindingNeuron primaryBN = createStrongBindingNeuron(
+        primaryBN = createStrongBindingNeuron(
                 patternNetTarget,
                 false,
                 0,
                 null,
                 null
-        );
+        ).getProvider(true);
 
         expandContinueBindingNeurons(
                 patternNetTarget,
                 2,
-                primaryBN,
+                primaryBN.getNeuron(),
                 4,
                 1
         );

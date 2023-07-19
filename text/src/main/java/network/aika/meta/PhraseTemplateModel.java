@@ -73,18 +73,18 @@ public class PhraseTemplateModel extends AbstractTemplateModel {
 
     @Override
     protected void initTemplateBindingNeurons() {
-        BindingNeuron primaryBN = createStrongBindingNeuron(
+        primaryBN = createStrongBindingNeuron(
                 patternNetTarget,
                 false,
                 0,
                 null,
                 null
-        );
+        ).getProvider(true);
 
         expandContinueBindingNeurons(
                 patternNetTarget,
                 1,
-                primaryBN,
+                primaryBN.getNeuron(),
                 5,
                 1
         );
@@ -92,7 +92,7 @@ public class PhraseTemplateModel extends AbstractTemplateModel {
         expandContinueBindingNeurons(
                 patternNetTarget,
                 1,
-                primaryBN,
+                primaryBN.getNeuron(),
                 5,
                 -1
         );
