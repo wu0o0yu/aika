@@ -144,7 +144,6 @@ public abstract class AbstractTemplateModel {
         inputTokenCategory = makeAbstract((PatternNeuron) inputToken.getNeuron())
                 .getProvider(true);
 
-
         log.info("Input Token: netTarget:" + inputPatternNetTarget);
     }
 

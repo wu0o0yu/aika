@@ -24,7 +24,10 @@ import network.aika.text.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import static network.aika.meta.NetworkMotivs.*;
@@ -168,32 +171,56 @@ public class TypedTextSectionModel extends TextSectionModel {
     }
 
     private PatternNeuron instantiatePatternWithBindingNeurons() {
-        PatternNeuron pn = (PatternNeuron) phraseModel.patternN.getNeuron()
+        PatternNeuron tpn = phraseModel.patternN.getNeuron();
+        PatternNeuron pn = tpn
                 .instantiateTemplate()
                 .init(model, "Text-Section-Headline");
 
         makeAbstract(pn);
 
+        Map<NeuronProvider, BindingNeuron> bindingNeurons = new TreeMap<>();
         phraseModel.patternN.getNeuron()
                 .getInputSynapsesByType(PatternSynapse.class)
-                .forEach(s ->
-                    instantiateBindingNeuronWithSynapses((PatternSynapse) s, pn)
+                .forEach(s -> {
+                            BindingNeuron[] bn = instantiateBindingNeuron((PatternSynapse) s, pn);
+                            bindingNeurons.put(bn[0].getProvider(), bn[1]);
+                        }
+                );
+
+        bindingNeurons.entrySet()
+                .forEach(e -> {
+                            PatternSynapse ps = (PatternSynapse) tpn.getInputSynapse(e.getKey());
+                            ps.instantiateTemplate(e.getValue(), pn);
+                            instantiateBindingNeuronSynapses(bindingNeurons, e.getKey(), e.getValue());
+                        }
                 );
         return pn;
     }
 
-    private void instantiateBindingNeuronWithSynapses(PatternSynapse tps, PatternNeuron pn) {
+    private static void instantiateBindingNeuronSynapses(Map<NeuronProvider, BindingNeuron> bindingNeurons, NeuronProvider tbn, BindingNeuron bn) {
+        tbn.getInputSynapses()
+                .forEach(ts ->
+                        ts.instantiateTemplate(
+                                bindingNeurons.get(ts.getPInput()),
+                                bn
+                        )
+                );
+    }
+
+    private BindingNeuron[] instantiateBindingNeuron(PatternSynapse tps, PatternNeuron pn) {
         BindingNeuron tbn = tps.getInput();
         BindingNeuron bn = tbn
                 .instantiateTemplate()
                 .init(model, tbn.getLabel() + " TS-Headline");
 
         makeAbstract(bn);
-
+/*
         tps.instantiateTemplate(bn, pn);
 
         PositiveFeedbackSynapse pfs = (PositiveFeedbackSynapse) tbn.getInputSynapse(tps.getPOutput());
         pfs.instantiateTemplate(pn, bn);
+        */
+        return new BindingNeuron[] {tbn, bn};
     }
 
     private void sectionHintRelations(BindingNeuron fromBN, LatentRelationNeuron relN) {
