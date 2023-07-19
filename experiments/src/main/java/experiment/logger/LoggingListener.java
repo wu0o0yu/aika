@@ -16,8 +16,8 @@
  */
 package experiment.logger;
 
-import network.aika.callbacks.EventListener;
-import network.aika.callbacks.EventType;
+import network.aika.debugger.EventListener;
+import network.aika.debugger.EventType;
 import network.aika.elements.Element;
 import network.aika.steps.FieldStep;
 import network.aika.steps.Step;

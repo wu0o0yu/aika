@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.direction;
+package network.aika.enums.direction;
 
 import network.aika.elements.activations.Activation;
 import network.aika.elements.links.Link;

@@ -21,7 +21,6 @@ import network.aika.elements.activations.Activation;
 import network.aika.elements.activations.TokenActivation;
 import network.aika.elements.links.Link;
 import network.aika.elements.activations.PatternActivation;
-import network.aika.Scope;
 import network.aika.visitor.operator.Operator;
 import network.aika.visitor.LinkingVisitor;
 

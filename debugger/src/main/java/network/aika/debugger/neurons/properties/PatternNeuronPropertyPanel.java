@@ -18,14 +18,13 @@ package network.aika.debugger.neurons.properties;
 
 import network.aika.elements.activations.Activation;
 import network.aika.elements.neurons.PatternNeuron;
-import network.aika.elements.neurons.Range;
+import network.aika.text.Range;
 import network.aika.elements.neurons.TokenNeuron;
-import network.aika.sign.Sign;
-import network.aika.utils.Utils;
+import network.aika.enums.sign.Sign;
 
 import static network.aika.debugger.AbstractConsole.NOT_SET_STR;
-import static network.aika.sign.Sign.NEG;
-import static network.aika.sign.Sign.POS;
+import static network.aika.enums.sign.Sign.NEG;
+import static network.aika.enums.sign.Sign.POS;
 import static network.aika.utils.Utils.doubleToString;
 
 

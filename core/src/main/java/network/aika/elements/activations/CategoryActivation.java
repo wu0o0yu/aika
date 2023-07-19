@@ -18,7 +18,7 @@ package network.aika.elements.activations;
 
 import network.aika.Thought;
 import network.aika.elements.links.*;
-import network.aika.elements.neurons.Range;
+import network.aika.text.Range;
 import network.aika.elements.neurons.CategoryNeuron;
 
 import java.util.Comparator;

@@ -16,7 +16,7 @@
  */
 package network.aika;
 
-import network.aika.callbacks.FSSuspensionCallback;
+import network.aika.suspension.FSSuspensionCallback;
 import network.aika.text.Document;
 import org.junit.jupiter.api.Test;
 

@@ -14,11 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.elements.neurons;
+package network.aika.elements;
 
 
 import network.aika.Thought;
 import network.aika.elements.activations.Activation;
+import network.aika.elements.neurons.NeuronProvider;
 import network.aika.elements.synapses.Synapse;
 
 import java.util.*;

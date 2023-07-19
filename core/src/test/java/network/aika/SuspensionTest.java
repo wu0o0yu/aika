@@ -18,7 +18,7 @@ package network.aika;
 
 
 
-import network.aika.callbacks.SuspensionCallback;
+import network.aika.suspension.SuspensionCallback;
 import network.aika.elements.neurons.NeuronProvider;
 import network.aika.elements.synapses.InputPatternSynapse;
 import network.aika.elements.synapses.Synapse;
@@ -36,9 +36,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static network.aika.TestUtils.getConfig;
 import static network.aika.TestUtils.setBias;
-import static network.aika.direction.Direction.INPUT;
-import static network.aika.direction.Direction.OUTPUT;
-import static network.aika.elements.neurons.SuspensionMode.SAVE;
+import static network.aika.enums.direction.Direction.INPUT;
+import static network.aika.enums.direction.Direction.OUTPUT;
+import static network.aika.suspension.SuspensionMode.SAVE;
 
 /**
  *

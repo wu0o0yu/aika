@@ -14,33 +14,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.sign;
+package network.aika.enums;
 
-import network.aika.fields.FieldObject;
-import network.aika.fields.FieldOutput;
-import network.aika.fields.Fields;
+import network.aika.enums.direction.Direction;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class Negative implements Sign {
-    @Override
-    public Sign invert() {
-        return POS;
+public enum Scope {
+    INPUT(Direction.OUTPUT),
+    SAME(Direction.INPUT);
+
+    static {
+        INPUT.inverted = SAME;
+        SAME.inverted = INPUT;
     }
 
-    @Override
-    public FieldOutput getValue(FieldObject ref, FieldOutput v) {
-        return Fields.invert(ref, "neg", v);
+    private Direction relationDir;
+
+    private Scope inverted;
+
+    Scope(Direction relationDir) {
+        this.relationDir = relationDir;
     }
 
-    @Override
-    public int index() {
-        return 1;
+    public Direction getRelationDir() {
+        return relationDir;
     }
 
-    public String toString() {
-        return "NEG";
+    public Scope getInverted() {
+        return inverted;
     }
 }

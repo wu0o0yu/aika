@@ -14,40 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.elements.neurons;
+package network.aika.debugger;
+
+import network.aika.elements.Element;
+import network.aika.steps.Step;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public enum ActivationFunction {
+public interface EventListener {
 
-    RECTIFIED_HYPERBOLIC_TANGENT(
-            x -> Math.max(0.0, Math.tanh(x)),
-            x -> x >= 0.0 ? 1.0 - Math.pow(Math.tanh(x), 2.0) : 0.0
-    ),
-    LIMITED_RECTIFIED_LINEAR_UNIT(
-            x -> Math.max(0.0, Math.min(1.0, x)),
-            x -> x >= 0.0 && x <= 1.0 ? 1.0 : 0.0
-    );
+    void onQueueEvent(EventType et, Step s);
 
-    private final Function f;
-    private final Function outerGrad;
-
-    ActivationFunction(Function f, Function outerGrad) {
-        this.f = f;
-        this.outerGrad = outerGrad;
-    }
-
-    public double f(double x) {
-        return f.f(x);
-    }
-
-    public double outerGrad(double x) {
-        return outerGrad.f(x);
-    }
-
-    interface Function {
-        double f(double x);
-    }
+    void onElementEvent(EventType et, Element e);
 }

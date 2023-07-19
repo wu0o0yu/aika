@@ -16,7 +16,7 @@
  */
 package experiment;
 
-import network.aika.direction.Direction;
+import network.aika.enums.direction.Direction;
 import network.aika.elements.activations.*;
 import network.aika.elements.links.Link;
 import network.aika.elements.links.PositiveFeedbackLink;
@@ -29,8 +29,8 @@ import network.aika.text.Document;
 
 import java.util.function.Predicate;
 
-import static network.aika.direction.Direction.INPUT;
-import static network.aika.direction.Direction.OUTPUT;
+import static network.aika.enums.direction.Direction.INPUT;
+import static network.aika.enums.direction.Direction.OUTPUT;
 
 
 /**

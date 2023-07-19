@@ -18,6 +18,7 @@ package network.aika;
 
 import network.aika.elements.neurons.*;
 import network.aika.elements.synapses.*;
+import network.aika.enums.Scope;
 import network.aika.text.Document;
 import org.junit.jupiter.api.Test;
 

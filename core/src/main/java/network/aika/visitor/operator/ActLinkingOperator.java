@@ -16,11 +16,11 @@
  */
 package network.aika.visitor.operator;
 
-import network.aika.direction.Direction;
+import network.aika.enums.direction.Direction;
 import network.aika.elements.synapses.Synapse;
 import network.aika.elements.activations.Activation;
 import network.aika.elements.links.Link;
-import network.aika.Scope;
+import network.aika.enums.Scope;
 import network.aika.visitor.LinkingVisitor;
 
 

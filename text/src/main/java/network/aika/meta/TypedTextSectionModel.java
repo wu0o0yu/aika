@@ -16,11 +16,10 @@
  */
 package network.aika.meta;
 
-import network.aika.Scope;
+import network.aika.enums.Scope;
 import network.aika.elements.neurons.*;
 import network.aika.elements.synapses.PatternSynapse;
 import network.aika.elements.synapses.PositiveFeedbackSynapse;
-import network.aika.elements.synapses.Synapse;
 import network.aika.text.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

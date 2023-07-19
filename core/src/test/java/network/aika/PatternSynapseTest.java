@@ -1,6 +1,6 @@
 package network.aika;
 import network.aika.elements.synapses.PatternSynapse;
-import network.aika.sign.Sign;
+import network.aika.enums.sign.Sign;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

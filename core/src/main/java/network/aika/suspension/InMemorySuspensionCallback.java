@@ -14,9 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.callbacks;
+package network.aika.suspension;
 
 import network.aika.Model;
+import network.aika.suspension.SuspensionCallback;
 import network.aika.utils.Writable;
 
 import java.io.IOException;

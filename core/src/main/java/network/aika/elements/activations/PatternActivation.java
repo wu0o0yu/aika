@@ -18,12 +18,12 @@ package network.aika.elements.activations;
 
 import network.aika.Thought;
 import network.aika.elements.links.Link;
-import network.aika.Scope;
+import network.aika.enums.Scope;
 import network.aika.fields.*;
 import network.aika.elements.neurons.PatternNeuron;
 import network.aika.visitor.binding.BindingVisitor;
 import network.aika.visitor.inhibitory.InhibitoryVisitor;
-import network.aika.sign.Sign;
+import network.aika.enums.sign.Sign;
 import network.aika.visitor.pattern.PatternCategoryVisitor;
 
 import static network.aika.fields.Fields.*;

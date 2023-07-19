@@ -16,8 +16,9 @@
  */
 package network.aika.elements.neurons;
 
+import network.aika.ActivationFunction;
 import network.aika.Model;
-import network.aika.Scope;
+import network.aika.enums.Scope;
 import network.aika.Thought;
 import network.aika.elements.activations.Activation;
 import network.aika.elements.activations.InhibitoryActivation;

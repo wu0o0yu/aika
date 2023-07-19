@@ -16,10 +16,8 @@
  */
 package network.aika.steps.keys;
 
-import network.aika.elements.activations.Timestamp;
+import network.aika.elements.Timestamp;
 import network.aika.steps.Phase;
-
-import static network.aika.utils.Utils.roundToString;
 
 /**
  * @author Lukas Molzberger

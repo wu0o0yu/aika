@@ -16,6 +16,7 @@
  */
 package network.aika.elements.neurons;
 
+import network.aika.ActivationFunction;
 import network.aika.elements.activations.Activation;
 
 

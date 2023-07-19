@@ -16,8 +16,10 @@
  */
 package network.aika.elements.neurons;
 
+import network.aika.ActivationFunction;
 import network.aika.Model;
 import network.aika.Thought;
+import network.aika.elements.PreActivation;
 import network.aika.elements.synapses.CategoryInputSynapse;
 import network.aika.elements.synapses.CategorySynapse;
 import network.aika.exceptions.MissingInputCategoryNeuron;
@@ -25,7 +27,7 @@ import network.aika.fields.*;
 import network.aika.elements.activations.Activation;
 import network.aika.elements.Element;
 import network.aika.elements.links.Link;
-import network.aika.elements.activations.Timestamp;
+import network.aika.elements.Timestamp;
 import network.aika.elements.synapses.Synapse;
 import network.aika.visitor.operator.ActLinkingOperator;
 import network.aika.visitor.operator.LinkLinkingOperator;
@@ -44,11 +46,11 @@ import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-import static network.aika.direction.Direction.INPUT;
-import static network.aika.direction.Direction.OUTPUT;
+import static network.aika.enums.direction.Direction.INPUT;
+import static network.aika.enums.direction.Direction.OUTPUT;
 import static network.aika.elements.synapses.Synapse.getLatentLinkingPreNet;
-import static network.aika.elements.activations.Timestamp.MAX;
-import static network.aika.elements.activations.Timestamp.MIN;
+import static network.aika.elements.Timestamp.MAX;
+import static network.aika.elements.Timestamp.MIN;
 import static network.aika.steps.Phase.TRAINING;
 import static network.aika.utils.Utils.TOLERANCE;
 

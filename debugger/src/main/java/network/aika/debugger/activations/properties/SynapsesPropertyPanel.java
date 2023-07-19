@@ -19,14 +19,13 @@ package network.aika.debugger.activations.properties;
 import network.aika.Thought;
 import network.aika.debugger.neurons.properties.SynapsePropertyPanel;
 import network.aika.debugger.properties.AbstractPropertyPanel;
-import network.aika.direction.Direction;
+import network.aika.enums.direction.Direction;
 import network.aika.elements.Element;
 import network.aika.elements.activations.Activation;
 import network.aika.elements.neurons.Neuron;
-import network.aika.elements.neurons.PreActivation;
+import network.aika.elements.PreActivation;
 import network.aika.elements.synapses.Synapse;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;

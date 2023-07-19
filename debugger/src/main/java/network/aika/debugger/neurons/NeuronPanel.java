@@ -20,7 +20,7 @@ import network.aika.debugger.ElementPanel;
 import network.aika.debugger.activations.properties.ActivationsPropertyPanel;
 import network.aika.debugger.activations.properties.SynapsesPropertyPanel;
 import network.aika.debugger.properties.AbstractPropertyPanel;
-import network.aika.direction.Direction;
+import network.aika.enums.direction.Direction;
 import network.aika.elements.neurons.Neuron;
 
 import javax.swing.*;

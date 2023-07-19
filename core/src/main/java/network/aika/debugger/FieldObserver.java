@@ -14,31 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.elements.activations;
-
-import network.aika.elements.neurons.NeuronProvider;
-
-import java.util.Comparator;
+package network.aika.debugger;
 
 /**
- *
  * @author Lukas Molzberger
  */
-public class OutputKey {
+public interface FieldObserver {
 
-    public static final Comparator<OutputKey> COMPARATOR = Comparator
-            .<OutputKey, NeuronProvider>comparing(ok -> ok.n)
-            .thenComparingInt(ok -> ok.actId);
-
-    private final NeuronProvider n;
-    private final Integer actId;
-
-    public OutputKey(NeuronProvider n, Integer actId) {
-        this.n = n;
-        this.actId = actId;
-    }
-
-    public String toString() {
-        return "[" + n.getId() + "]:" + actId;
-    }
+    void receiveUpdate(double v);
 }

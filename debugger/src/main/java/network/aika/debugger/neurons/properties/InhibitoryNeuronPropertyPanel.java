@@ -14,26 +14,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.elements;
+package network.aika.debugger.neurons.properties;
 
-import network.aika.Config;
-import network.aika.Thought;
-import network.aika.fields.FieldObject;
+import network.aika.elements.activations.Activation;
+import network.aika.elements.neurons.BindingNeuron;
+import network.aika.elements.neurons.InhibitoryNeuron;
+import network.aika.elements.neurons.LatentRelationNeuron;
+
+import static network.aika.utils.Utils.doubleToString;
+
 
 /**
- * An Element is either a node (Activation) or an edge (Link) in the Activation graph.
- *
- *  @author Lukas Molzberger
+ * @author Lukas Molzberger
  */
-public interface Element extends FieldObject {
+public class InhibitoryNeuronPropertyPanel extends NeuronPropertyPanel<InhibitoryNeuron> {
 
-    Timestamp getCreated();
 
-    Timestamp getFired();
+    public InhibitoryNeuronPropertyPanel(InhibitoryNeuron n, Activation ref) {
+        super(n, ref);
 
-    Thought getThought();
+        addConstant("IdentityReference: ", n.getIdentityReference().name());
+    }
 
-    default Config getConfig() {
-        return getThought().getConfig();
+    public static InhibitoryNeuronPropertyPanel create(InhibitoryNeuron n, Activation ref) {
+        return new InhibitoryNeuronPropertyPanel(n, ref);
     }
 }

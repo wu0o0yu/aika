@@ -42,6 +42,7 @@ import network.aika.elements.neurons.InhibitoryNeuron;
 import network.aika.elements.synapses.InhibitorySynapse;
 import network.aika.elements.synapses.InputPatternSynapse;
 import network.aika.elements.synapses.NegativeFeedbackSynapse;
+import network.aika.enums.Scope;
 import network.aika.text.Document;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -50,7 +51,7 @@ import org.slf4j.LoggerFactory;
 import java.util.SortedSet;
 
 import static network.aika.TestUtils.*;
-import static network.aika.Scope.INPUT;
+import static network.aika.enums.Scope.INPUT;
 import static network.aika.steps.Phase.INFERENCE;
 import static network.aika.steps.keys.QueueKey.MAX_ROUND;
 import static org.junit.jupiter.api.Assertions.assertTrue;

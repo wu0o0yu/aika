@@ -16,7 +16,6 @@
  */
 package network.aika.text;
 
-import network.aika.elements.neurons.Range;
 import network.aika.elements.activations.TokenActivation;
 
 /**

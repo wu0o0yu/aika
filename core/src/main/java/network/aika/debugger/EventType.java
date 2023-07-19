@@ -1,4 +1,4 @@
-package network.aika.callbacks;
+package network.aika.debugger;
 
 public enum EventType {
     CREATE,

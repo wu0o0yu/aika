@@ -17,7 +17,7 @@
 package network.aika.meta;
 
 import network.aika.Model;
-import network.aika.Scope;
+import network.aika.enums.Scope;
 import network.aika.elements.activations.Activation;
 import network.aika.elements.activations.TokenActivation;
 import network.aika.elements.neurons.*;

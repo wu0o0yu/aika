@@ -19,7 +19,7 @@ package network.aika.debugger.activations.renderer;
 import network.aika.Thought;
 import network.aika.debugger.ConsoleRenderer;
 import network.aika.debugger.Visible;
-import network.aika.elements.activations.Timestamp;
+import network.aika.elements.Timestamp;
 import network.aika.steps.Step;
 import network.aika.steps.keys.QueueKey;
 import network.aika.utils.Utils;

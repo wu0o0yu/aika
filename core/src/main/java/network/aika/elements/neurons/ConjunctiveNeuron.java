@@ -16,6 +16,7 @@
  */
 package network.aika.elements.neurons;
 
+import network.aika.ActivationFunction;
 import network.aika.Model;
 import network.aika.elements.activations.Activation;
 import network.aika.elements.activations.ConjunctiveActivation;
@@ -23,7 +24,6 @@ import network.aika.elements.synapses.CategorySynapse;
 import network.aika.elements.synapses.CategoryInputSynapse;
 import network.aika.elements.synapses.ConjunctiveSynapse;
 import network.aika.elements.synapses.Synapse;
-import network.aika.fields.QueueSumField;
 import network.aika.fields.MultiInputField;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,9 +34,8 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Comparator;
 
-import static network.aika.direction.Direction.INPUT;
-import static network.aika.direction.Direction.OUTPUT;
-import static network.aika.steps.Phase.TRAINING;
+import static network.aika.enums.direction.Direction.INPUT;
+import static network.aika.enums.direction.Direction.OUTPUT;
 import static network.aika.utils.Utils.TOLERANCE;
 
 /**

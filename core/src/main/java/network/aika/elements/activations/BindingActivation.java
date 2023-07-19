@@ -21,7 +21,7 @@ import network.aika.elements.links.InputPatternLink;
 import network.aika.elements.links.Link;
 import network.aika.elements.links.PositiveFeedbackLink;
 import network.aika.elements.synapses.PositiveFeedbackSynapse;
-import network.aika.Scope;
+import network.aika.enums.Scope;
 import network.aika.fields.*;
 import network.aika.elements.neurons.BindingNeuron;
 import network.aika.visitor.operator.SelfRefOperator;

@@ -17,7 +17,7 @@
 package network.aika.elements.neurons;
 
 import network.aika.Thought;
-import network.aika.direction.Direction;
+import network.aika.enums.direction.Direction;
 import network.aika.fields.QueueSumField;
 import network.aika.fields.MultiInputField;
 import network.aika.elements.activations.LatentRelationActivation;

@@ -17,7 +17,7 @@
 package network.aika.fields;
 
 
-import network.aika.callbacks.FieldObserver;
+import network.aika.debugger.FieldObserver;
 import network.aika.steps.FieldStep;
 
 /**

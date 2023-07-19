@@ -24,6 +24,7 @@ import network.aika.elements.neurons.InhibitoryNeuron;
 import network.aika.elements.synapses.InputPatternSynapse;
 import network.aika.elements.synapses.RelationInputSynapse;
 import network.aika.elements.synapses.SamePatternSynapse;
+import network.aika.enums.Scope;
 
 import static network.aika.TestUtils.*;
 

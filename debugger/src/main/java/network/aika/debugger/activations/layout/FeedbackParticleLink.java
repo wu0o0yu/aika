@@ -18,7 +18,7 @@ package network.aika.debugger.activations.layout;
 
 import network.aika.debugger.activations.ActivationGraphManager;
 import network.aika.debugger.activations.particles.ActivationParticle;
-import network.aika.direction.Direction;
+import network.aika.enums.direction.Direction;
 import network.aika.elements.links.FeedbackLink;
 import org.graphstream.graph.Edge;
 import org.graphstream.ui.geom.Vector3;

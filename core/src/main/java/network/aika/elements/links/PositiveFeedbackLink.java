@@ -25,7 +25,7 @@ import network.aika.visitor.binding.BindingVisitor;
 import network.aika.visitor.inhibitory.InhibitoryVisitor;
 import network.aika.visitor.pattern.PatternVisitor;
 
-import static network.aika.callbacks.EventType.CREATE;
+import static network.aika.debugger.EventType.CREATE;
 import static network.aika.fields.FieldLink.linkAndConnect;
 import static network.aika.fields.Fields.mul;
 import static network.aika.fields.Fields.scale;

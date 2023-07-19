@@ -17,14 +17,14 @@
 package network.aika.elements.synapses;
 
 import network.aika.Model;
-import network.aika.Scope;
+import network.aika.enums.Scope;
 import network.aika.Thought;
 import network.aika.callbacks.ActivationCheckCallback;
 import network.aika.elements.activations.Activation;
 import network.aika.elements.Element;
 import network.aika.elements.links.Link;
-import network.aika.elements.activations.Timestamp;
-import network.aika.direction.Direction;
+import network.aika.elements.Timestamp;
+import network.aika.enums.direction.Direction;
 import network.aika.fields.QueueSumField;
 import network.aika.fields.MultiInputField;
 import network.aika.elements.neurons.Neuron;
@@ -40,9 +40,9 @@ import java.io.IOException;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-import static network.aika.direction.Direction.INPUT;
-import static network.aika.elements.activations.Timestamp.MAX;
-import static network.aika.elements.activations.Timestamp.MIN;
+import static network.aika.enums.direction.Direction.INPUT;
+import static network.aika.elements.Timestamp.MAX;
+import static network.aika.elements.Timestamp.MIN;
 import static network.aika.steps.Phase.TRAINING;
 import static network.aika.utils.Utils.TOLERANCE;
 

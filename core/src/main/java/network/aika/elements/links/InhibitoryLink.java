@@ -19,7 +19,7 @@ package network.aika.elements.links;
 import network.aika.elements.activations.BindingActivation;
 import network.aika.elements.activations.InhibitoryActivation;
 import network.aika.elements.synapses.InhibitorySynapse;
-import network.aika.Scope;
+import network.aika.enums.Scope;
 import network.aika.fields.Field;
 import network.aika.fields.FieldOutput;
 import network.aika.fields.Fields;

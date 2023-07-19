@@ -18,7 +18,7 @@ package network.aika.steps;
 
 import network.aika.Thought;
 import network.aika.elements.Element;
-import network.aika.elements.activations.Timestamp;
+import network.aika.elements.Timestamp;
 import network.aika.steps.keys.FiredQueueKey;
 import network.aika.steps.keys.QueueKey;
 

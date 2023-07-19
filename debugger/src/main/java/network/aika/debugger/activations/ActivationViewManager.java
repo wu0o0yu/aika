@@ -16,8 +16,8 @@
  */
 package network.aika.debugger.activations;
 
-import network.aika.callbacks.EventListener;
-import network.aika.callbacks.EventType;
+import network.aika.debugger.EventListener;
+import network.aika.debugger.EventType;
 import network.aika.debugger.*;
 import network.aika.debugger.activations.layout.ParticleLink;
 import network.aika.debugger.activations.particles.ActivationParticle;
@@ -27,7 +27,6 @@ import network.aika.elements.activations.PatternActivation;
 import network.aika.elements.links.Link;
 import network.aika.steps.Step;
 import network.aika.text.Document;
-import network.aika.utils.Utils;
 import org.graphstream.graph.Edge;
 import org.graphstream.graph.Element;
 import org.graphstream.graph.Node;
@@ -37,8 +36,6 @@ import org.graphstream.ui.graphicGraph.GraphicGraph;
 import org.graphstream.ui.view.camera.DefaultCamera2D;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.awt.*;
 
 import static network.aika.debugger.AbstractGraphManager.STANDARD_DISTANCE_X;
 import static network.aika.debugger.AbstractGraphManager.STANDARD_DISTANCE_Y;

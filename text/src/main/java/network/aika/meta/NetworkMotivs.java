@@ -16,7 +16,7 @@
  */
 package network.aika.meta;
 
-import network.aika.Scope;
+import network.aika.enums.Scope;
 import network.aika.elements.neurons.*;
 import network.aika.elements.synapses.*;
 import org.slf4j.Logger;

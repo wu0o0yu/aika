@@ -19,8 +19,8 @@ package network.aika.elements.links;
 import network.aika.Thought;
 import network.aika.elements.Element;
 import network.aika.elements.activations.Activation;
-import network.aika.elements.activations.Timestamp;
-import network.aika.Scope;
+import network.aika.elements.Timestamp;
+import network.aika.enums.Scope;
 import network.aika.fields.*;
 import network.aika.elements.synapses.Synapse;
 import network.aika.steps.link.LinkingIn;
@@ -29,10 +29,10 @@ import network.aika.visitor.inhibitory.InhibitoryVisitor;
 import network.aika.visitor.pattern.PatternCategoryVisitor;
 import network.aika.visitor.pattern.PatternVisitor;
 
-import static network.aika.callbacks.EventType.CREATE;
+import static network.aika.debugger.EventType.CREATE;
 import static network.aika.fields.FieldLink.linkAndConnect;
 import static network.aika.fields.Fields.*;
-import static network.aika.elements.activations.Timestamp.FIRED_COMPARATOR;
+import static network.aika.elements.Timestamp.FIRED_COMPARATOR;
 import static network.aika.fields.ThresholdOperator.Type.ABOVE;
 
 /**

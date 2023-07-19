@@ -19,7 +19,7 @@ package network.aika.meta;
 import network.aika.Model;
 import network.aika.elements.activations.*;
 import network.aika.elements.neurons.*;
-import network.aika.sign.Sign;
+import network.aika.enums.sign.Sign;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -17,7 +17,7 @@
 package network.aika.elements.neurons;
 
 import network.aika.elements.activations.Activation;
-import network.aika.Scope;
+import network.aika.enums.Scope;
 import network.aika.elements.synapses.Synapse;
 import network.aika.visitor.operator.LinkingOperator;
 import network.aika.visitor.inhibitory.InhibitoryVisitor;

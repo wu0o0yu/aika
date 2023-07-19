@@ -1,4 +1,4 @@
-package network.aika.elements.neurons;
+package network.aika.suspension;
 
 public enum SuspensionMode {
     SAVE,

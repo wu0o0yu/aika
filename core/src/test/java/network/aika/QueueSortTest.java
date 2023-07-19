@@ -16,7 +16,7 @@
  */
 package network.aika;
 
-import network.aika.elements.activations.Timestamp;
+import network.aika.elements.Timestamp;
 import network.aika.steps.keys.FieldQueueKey;
 import network.aika.steps.Phase;
 import network.aika.steps.keys.QueueKey;

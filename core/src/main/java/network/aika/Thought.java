@@ -18,17 +18,17 @@ package network.aika;
 
 
 import network.aika.callbacks.ActivationCheckCallback;
-import network.aika.callbacks.EventListener;
-import network.aika.callbacks.EventType;
+import network.aika.debugger.EventListener;
+import network.aika.debugger.EventType;
 import network.aika.callbacks.InstantiationCallback;
 import network.aika.elements.activations.Activation;
 import network.aika.elements.Element;
-import network.aika.elements.activations.Timestamp;
+import network.aika.elements.Timestamp;
 import network.aika.exceptions.PreviousThoughtNotDisconnected;
 import network.aika.fields.*;
-import network.aika.elements.neurons.PreActivation;
+import network.aika.elements.PreActivation;
 import network.aika.elements.neurons.NeuronProvider;
-import network.aika.elements.neurons.Range;
+import network.aika.text.Range;
 import network.aika.steps.Phase;
 import network.aika.steps.keys.QueueKey;
 import network.aika.steps.Step;
@@ -40,7 +40,7 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import static network.aika.callbacks.EventType.*;
+import static network.aika.debugger.EventType.*;
 import static network.aika.steps.Phase.*;
 import static network.aika.steps.keys.QueueKey.MAX_ROUND;
 

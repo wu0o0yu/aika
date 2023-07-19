@@ -18,8 +18,7 @@ package network.aika.text;
 
 import network.aika.Model;
 import network.aika.Thought;
-import network.aika.elements.activations.Timestamp;
-import network.aika.elements.neurons.Range;
+import network.aika.elements.Timestamp;
 import network.aika.elements.activations.Activation;
 import network.aika.elements.activations.TokenActivation;
 import network.aika.elements.neurons.TokenNeuron;
@@ -27,8 +26,8 @@ import network.aika.elements.neurons.TokenNeuron;
 import java.util.*;
 import java.util.stream.Stream;
 
-import static network.aika.elements.activations.Timestamp.MIN;
-import static network.aika.elements.activations.Timestamp.NOT_SET;
+import static network.aika.elements.Timestamp.MIN;
+import static network.aika.elements.Timestamp.NOT_SET;
 
 
 /**

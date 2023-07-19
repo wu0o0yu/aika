@@ -17,7 +17,7 @@
 package network.aika.debugger.neurons;
 
 
-import network.aika.callbacks.EventType;
+import network.aika.debugger.EventType;
 import network.aika.debugger.AbstractParticle;
 import network.aika.debugger.activations.LayoutState;
 import network.aika.elements.neurons.Neuron;

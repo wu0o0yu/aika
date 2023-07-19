@@ -14,36 +14,45 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika;
+package network.aika.enums.direction;
 
-import network.aika.direction.Direction;
+import network.aika.elements.activations.Activation;
+import network.aika.elements.links.Link;
+import network.aika.elements.neurons.Neuron;
+import network.aika.elements.synapses.Synapse;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public enum Scope {
-    INPUT(Direction.OUTPUT),
-    SAME(Direction.INPUT);
+public class Output implements Direction {
 
-    static {
-        INPUT.inverted = SAME;
-        SAME.inverted = INPUT;
+    @Override
+    public Direction invert() {
+        return INPUT;
     }
 
-    private Direction relationDir;
-
-    private Scope inverted;
-
-    Scope(Direction relationDir) {
-        this.relationDir = relationDir;
+    @Override
+    public <I> I getInput(I from, I to) {
+        return from;
     }
 
-    public Direction getRelationDir() {
-        return relationDir;
+    @Override
+    public <O> O getOutput(O from, O to) {
+        return to;
     }
 
-    public Scope getInverted() {
-        return inverted;
+    @Override
+    public Neuron getNeuron(Synapse s) {
+        return s.getOutput();
+    }
+
+    @Override
+    public Activation getActivation(Link l) {
+        return l.getOutput();
+    }
+
+    public String toString() {
+        return "OUTPUT";
     }
 }

@@ -16,16 +16,15 @@
  */
 package network.aika.debugger.properties;
 
-import network.aika.direction.Direction;
+import network.aika.enums.direction.Direction;
 import network.aika.fields.AbstractFieldLink;
 import network.aika.fields.FieldLink;
 import network.aika.fields.FieldOutput;
-import network.aika.fields.ListenerFieldLink;
 
 import java.awt.*;
 
 import static network.aika.debugger.properties.FieldOutputProperty.createFieldProperty;
-import static network.aika.direction.Direction.INPUT;
+import static network.aika.enums.direction.Direction.INPUT;
 
 
 /**

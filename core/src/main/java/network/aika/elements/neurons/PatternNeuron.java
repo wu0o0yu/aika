@@ -21,7 +21,9 @@ import network.aika.Thought;
 import network.aika.elements.activations.Activation;
 import network.aika.elements.activations.PatternActivation;
 import network.aika.elements.synapses.*;
-import network.aika.sign.Sign;
+import network.aika.enums.sign.Sign;
+import network.aika.statistic.SampleSpace;
+import network.aika.text.Range;
 import network.aika.utils.Bound;
 import network.aika.utils.Utils;
 import network.aika.visitor.operator.LinkingOperator;
@@ -31,7 +33,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import static network.aika.sign.Sign.POS;
+import static network.aika.enums.sign.Sign.POS;
 
 /**
  *

@@ -17,13 +17,12 @@
 package network.aika.steps.keys;
 
 import network.aika.elements.Element;
-import network.aika.elements.activations.Timestamp;
+import network.aika.elements.Timestamp;
 import network.aika.steps.Phase;
 
 import java.util.Comparator;
 
-import static network.aika.elements.activations.Timestamp.NOT_SET;
-import static network.aika.utils.Utils.roundToString;
+import static network.aika.elements.Timestamp.NOT_SET;
 
 /**
  * @author Lukas Molzberger

@@ -14,45 +14,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.direction;
+package network.aika.elements;
 
-import network.aika.elements.activations.Activation;
-import network.aika.elements.links.Link;
-import network.aika.elements.neurons.Neuron;
-import network.aika.elements.synapses.Synapse;
+import network.aika.elements.neurons.NeuronProvider;
+
+import java.util.Comparator;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class Output implements Direction {
+public class OutputKey {
 
-    @Override
-    public Direction invert() {
-        return INPUT;
-    }
+    public static final Comparator<OutputKey> COMPARATOR = Comparator
+            .<OutputKey, NeuronProvider>comparing(ok -> ok.n)
+            .thenComparingInt(ok -> ok.actId);
 
-    @Override
-    public <I> I getInput(I from, I to) {
-        return from;
-    }
+    private final NeuronProvider n;
+    private final Integer actId;
 
-    @Override
-    public <O> O getOutput(O from, O to) {
-        return to;
-    }
-
-    @Override
-    public Neuron getNeuron(Synapse s) {
-        return s.getOutput();
-    }
-
-    @Override
-    public Activation getActivation(Link l) {
-        return l.getOutput();
+    public OutputKey(NeuronProvider n, Integer actId) {
+        this.n = n;
+        this.actId = actId;
     }
 
     public String toString() {
-        return "OUTPUT";
+        return "[" + n.getId() + "]:" + actId;
     }
 }

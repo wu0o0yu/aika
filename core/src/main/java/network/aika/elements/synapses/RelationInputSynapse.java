@@ -16,16 +16,16 @@
  */
 package network.aika.elements.synapses;
 
-import network.aika.Scope;
+import network.aika.enums.Scope;
 import network.aika.Thought;
 import network.aika.elements.activations.BindingActivation;
 import network.aika.elements.activations.LatentRelationActivation;
 import network.aika.elements.links.RelationInputLink;
-import network.aika.direction.Direction;
+import network.aika.enums.direction.Direction;
 import network.aika.elements.activations.TokenActivation;
 import network.aika.elements.neurons.LatentRelationNeuron;
 
-import static network.aika.callbacks.EventType.UPDATE;
+import static network.aika.debugger.EventType.UPDATE;
 
 /**
  *

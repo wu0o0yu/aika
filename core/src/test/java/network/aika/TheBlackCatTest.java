@@ -17,12 +17,11 @@
 package network.aika;
 
 import network.aika.elements.neurons.InhibitoryNeuron;
+import network.aika.enums.Scope;
 import network.aika.text.Document;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
 import static network.aika.TestHelper.initPatternBlackCat;
 import static network.aika.TestHelper.initPatternTheCat;

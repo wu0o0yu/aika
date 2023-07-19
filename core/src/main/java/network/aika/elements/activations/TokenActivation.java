@@ -18,7 +18,7 @@ package network.aika.elements.activations;
 
 import network.aika.Thought;
 import network.aika.elements.links.Link;
-import network.aika.elements.neurons.Range;
+import network.aika.text.Range;
 import network.aika.elements.neurons.LatentRelationNeuron;
 import network.aika.elements.neurons.TokenNeuron;
 import network.aika.visitor.binding.BindingVisitor;

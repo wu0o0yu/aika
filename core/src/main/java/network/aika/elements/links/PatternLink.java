@@ -18,13 +18,13 @@ package network.aika.elements.links;
 
 import network.aika.elements.activations.BindingActivation;
 import network.aika.elements.activations.PatternActivation;
-import network.aika.elements.neurons.Range;
+import network.aika.text.Range;
 import network.aika.elements.synapses.Synapse;
 import network.aika.fields.AbstractFunction;
 import network.aika.elements.synapses.PatternSynapse;
 import network.aika.fields.FieldOutput;
 import network.aika.fields.MultiInputField;
-import network.aika.sign.Sign;
+import network.aika.enums.sign.Sign;
 import network.aika.steps.link.LinkCounting;
 import network.aika.visitor.binding.BindingVisitor;
 import network.aika.visitor.inhibitory.InhibitoryVisitor;

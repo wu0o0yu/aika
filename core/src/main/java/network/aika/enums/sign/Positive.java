@@ -14,45 +14,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.direction;
+package network.aika.enums.sign;
 
-import network.aika.elements.activations.Activation;
-import network.aika.elements.links.Link;
-import network.aika.elements.neurons.Neuron;
-import network.aika.elements.synapses.Synapse;
+import network.aika.fields.FieldObject;
+import network.aika.fields.FieldOutput;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class Input implements Direction {
-
+public class Positive implements Sign {
     @Override
-    public Direction invert() {
-        return OUTPUT;
+    public Sign invert() {
+        return NEG;
     }
 
     @Override
-    public <I> I getInput(I from, I to) {
-        return to;
+    public FieldOutput getValue(FieldObject ref, FieldOutput v) {
+        return v;
     }
 
     @Override
-    public <O> O getOutput(O from, O to) {
-        return from;
-    }
-
-    @Override
-    public Neuron getNeuron(Synapse s) {
-        return s.getInput();
-    }
-
-    @Override
-    public Activation getActivation(Link l) {
-        return l.getInput();
+    public int index() {
+        return 0;
     }
 
     public String toString() {
-        return "INPUT";
+        return "POS";
     }
 }

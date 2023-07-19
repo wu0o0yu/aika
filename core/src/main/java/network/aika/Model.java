@@ -17,19 +17,18 @@
 package network.aika;
 
 
-import network.aika.callbacks.InMemorySuspensionCallback;
+import network.aika.suspension.InMemorySuspensionCallback;
 import network.aika.callbacks.NeuronProducer;
-import network.aika.callbacks.SuspensionCallback;
+import network.aika.suspension.SuspensionCallback;
 import network.aika.elements.neurons.Neuron;
 import network.aika.elements.neurons.NeuronProvider;
-import network.aika.elements.neurons.SuspensionMode;
+import network.aika.suspension.SuspensionMode;
 import network.aika.utils.Writable;
 
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 

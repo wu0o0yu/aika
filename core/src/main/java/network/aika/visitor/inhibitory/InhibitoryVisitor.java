@@ -20,7 +20,7 @@ import network.aika.Thought;
 import network.aika.elements.activations.Activation;
 import network.aika.elements.links.Link;
 import network.aika.elements.activations.PatternActivation;
-import network.aika.Scope;
+import network.aika.enums.Scope;
 import network.aika.visitor.operator.Operator;
 import network.aika.visitor.LinkingVisitor;
 

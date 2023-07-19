@@ -17,9 +17,9 @@
 package network.aika.elements.synapses;
 
 import network.aika.Model;
-import network.aika.Scope;
+import network.aika.enums.Scope;
 import network.aika.Thought;
-import network.aika.direction.Direction;
+import network.aika.enums.direction.Direction;
 import network.aika.elements.neurons.Neuron;
 import network.aika.elements.neurons.ConjunctiveNeuron;
 import network.aika.elements.activations.Activation;
@@ -35,8 +35,8 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.stream.Stream;
 
-import static network.aika.direction.Direction.INPUT;
-import static network.aika.direction.Direction.OUTPUT;
+import static network.aika.enums.direction.Direction.INPUT;
+import static network.aika.enums.direction.Direction.OUTPUT;
 import static network.aika.fields.FieldLink.linkAndConnect;
 import static network.aika.steps.Phase.TRAINING;
 import static network.aika.utils.Utils.TOLERANCE;

@@ -22,7 +22,7 @@ import network.aika.debugger.activations.properties.LinksPropertyPanel;
 import network.aika.debugger.activations.properties.SynapsesPropertyPanel;
 import network.aika.debugger.activations.properties.TemplateInstancesPropertyPanel;
 import network.aika.debugger.properties.AbstractPropertyPanel;
-import network.aika.direction.Direction;
+import network.aika.enums.direction.Direction;
 import network.aika.elements.activations.Activation;
 
 import javax.swing.*;

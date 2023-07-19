@@ -16,7 +16,7 @@
  */
 package network.aika.debugger.properties;
 
-import network.aika.direction.Direction;
+import network.aika.enums.direction.Direction;
 import network.aika.fields.*;
 
 import javax.swing.*;
@@ -30,8 +30,8 @@ import java.util.Collection;
 import static java.awt.GridBagConstraints.HORIZONTAL;
 import static java.awt.GridBagConstraints.WEST;
 import static network.aika.debugger.properties.FieldOutputProperty.createFieldProperty;
-import static network.aika.direction.Direction.INPUT;
-import static network.aika.direction.Direction.OUTPUT;
+import static network.aika.enums.direction.Direction.INPUT;
+import static network.aika.enums.direction.Direction.OUTPUT;
 
 
 /**

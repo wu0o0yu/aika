@@ -18,6 +18,7 @@ package network.aika.elements.neurons;
 
 import network.aika.Model;
 import network.aika.elements.synapses.Synapse;
+import network.aika.suspension.SuspensionMode;
 import network.aika.utils.ReadWriteLock;
 
 import java.io.*;

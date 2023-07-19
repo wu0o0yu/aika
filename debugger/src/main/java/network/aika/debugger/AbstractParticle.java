@@ -16,7 +16,6 @@
  */
 package network.aika.debugger;
 
-import network.aika.callbacks.EventType;
 import network.aika.debugger.activations.LayoutState;
 import network.aika.elements.neurons.*;
 import org.graphstream.graph.Node;

@@ -16,12 +16,12 @@
  */
 package network.aika.debugger.activations.particles;
 
-import network.aika.callbacks.EventType;
+import network.aika.debugger.EventType;
 import network.aika.debugger.AbstractParticle;
 import network.aika.debugger.activations.ActivationGraphManager;
 import network.aika.debugger.activations.LayoutState;
 import network.aika.debugger.activations.layout.ParticleLink;
-import network.aika.direction.Direction;
+import network.aika.enums.direction.Direction;
 import network.aika.elements.activations.Activation;
 import network.aika.elements.activations.BindingActivation;
 import network.aika.elements.activations.PatternActivation;
@@ -35,8 +35,8 @@ import org.graphstream.ui.layout.springbox.implementations.SpringBox;
 
 import java.util.function.Consumer;
 
-import static network.aika.direction.Direction.INPUT;
-import static network.aika.direction.Direction.OUTPUT;
+import static network.aika.enums.direction.Direction.INPUT;
+import static network.aika.enums.direction.Direction.OUTPUT;
 
 /**
  * @author Lukas Molzberger

@@ -17,10 +17,8 @@
 package network.aika.steps.thought;
 
 import network.aika.Thought;
-import network.aika.elements.activations.Timestamp;
-import network.aika.elements.neurons.ActivationFunction;
-import network.aika.fields.AbstractFieldLink;
-import network.aika.fields.FeedbackFunction;
+import network.aika.elements.Timestamp;
+import network.aika.ActivationFunction;
 import network.aika.steps.Phase;
 import network.aika.steps.Step;
 import network.aika.steps.keys.DocQueueKey;
