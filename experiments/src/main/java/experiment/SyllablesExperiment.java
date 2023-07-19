@@ -110,6 +110,8 @@ public class SyllablesExperiment extends TrainingParser {
     }
 
     private void train(List<String> inputs) {
+        syllableModel.initStaticNeurons();
+
         // Counting letters loop
         inputs.forEach(w ->
             super.process(w, null, COUNTING)

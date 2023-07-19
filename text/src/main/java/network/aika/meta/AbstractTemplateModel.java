@@ -105,8 +105,6 @@ public abstract class AbstractTemplateModel {
     public abstract String getPatternType();
 
     public void initTemplates() {
-        initStaticNeurons();
-
         // Abstract
         patternN = new PatternNeuron()
                 .init(model, getPatternType())
