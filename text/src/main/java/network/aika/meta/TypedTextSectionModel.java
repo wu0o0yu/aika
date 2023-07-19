@@ -43,8 +43,6 @@ public class TypedTextSectionModel extends TextSectionModel {
 
     protected NeuronProvider textSectionHeadlinePattern;
 
-    protected NeuronProvider textSectionHeadlineCategory;
-
     protected NeuronProvider textSectionHintBN;
 
     protected NeuronProvider tsBeginInhibitoryN;
