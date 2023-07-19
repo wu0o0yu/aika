@@ -63,7 +63,17 @@ public class TextSectionTest extends TrainingParser {
 
     @Override
     public boolean check(Activation iAct) {
-        return iAct.getTokenPos() == 0;
+        return iAct.getTokenPos() == 0 &&
+                (isHeadlineTarget() == isHeadlinePrimaryInput(iAct));
+    }
+
+    private boolean isHeadlineTarget() {
+        return headlineTargetLabel != null;
+    }
+
+    private boolean isHeadlinePrimaryInput(Activation iAct) {
+        return templateModel.textSectionModel.textSectionHeadlinePrimaryInputBN.getId().longValue() ==
+                iAct.getNeuronProvider().getId().longValue();
     }
 
     @Test
