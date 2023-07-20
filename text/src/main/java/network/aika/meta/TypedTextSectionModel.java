@@ -180,14 +180,14 @@ public class TypedTextSectionModel extends TextSectionModel {
         InhibitoryNeuron inhibN = instantiateInhibitoryNeuron(tInhibN);
 
         Map<NeuronProvider, Neuron> templateMapping = new TreeMap<>();
-        pn.getInputSynapsesByType(PatternSynapse.class)
-                .forEach(s -> {
-                            BindingNeuron[] bn = instantiateBindingNeuron(s);
+        tpn.getInputSynapsesByType(PatternSynapse.class)
+                .forEach(ts -> {
+                            BindingNeuron[] bn = instantiateBindingNeuron(ts);
                             templateMapping.put(bn[0].getProvider(), bn[1]);
                         }
                 );
 
-        pn.getInputSynapsesByType(PatternSynapse.class)
+        tpn.getInputSynapsesByType(PatternSynapse.class)
                 .map(Synapse::getInput)
                 .forEach(tbn -> {
                             BindingNeuron bn = (BindingNeuron) templateMapping.get(tbn.getProvider());
