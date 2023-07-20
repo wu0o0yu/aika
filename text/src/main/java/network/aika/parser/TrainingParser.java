@@ -19,6 +19,7 @@ package network.aika.parser;
 import network.aika.callbacks.ActivationCheckCallback;
 import network.aika.callbacks.InstantiationCallback;
 import network.aika.elements.activations.Activation;
+import network.aika.elements.synapses.Synapse;
 import network.aika.text.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,7 +44,7 @@ public abstract class TrainingParser extends Parser implements ActivationCheckCa
     }
 
     @Override
-    public boolean check(Activation iAct) {
+    public boolean check(Synapse s, Activation iAct) {
         return getTemplateModel().evaluatePrimaryBindingActs(iAct);
     }
 

@@ -2,6 +2,7 @@ package network.aika.meta;
 
 import network.aika.Model;
 import network.aika.elements.activations.Activation;
+import network.aika.elements.synapses.Synapse;
 import network.aika.parser.TrainingParser;
 import network.aika.tokenizer.SimpleWordTokenizer;
 import network.aika.tokenizer.Tokenizer;
@@ -29,7 +30,7 @@ public class TopicTest extends TrainingParser {
     }
 
     @Override
-    public boolean check(Activation iAct) {
+    public boolean check(Synapse s, Activation iAct) {
         return true;
     }
 

@@ -114,7 +114,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
                 iAct != null
         ) {
             ActivationCheckCallback acc = iAct.getThought().getActivationCheckCallBack();
-            if (acc == null || !acc.check(iAct))
+            if (acc == null || !acc.check(this, iAct))
                 return -1000.0;
         }
 

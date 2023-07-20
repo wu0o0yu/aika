@@ -263,6 +263,8 @@ public class TypedTextSectionModel extends TextSectionModel {
                 .instantiateTemplate()
                 .init(model, tbn.getLabel() + " TS-Headline");
 
+        bn.setCallActivationCheckCallback(tbn.isCallActivationCheckCallback());
+
         makeAbstract(bn);
 
         if(tbn.getId().longValue() == phraseModel.primaryBN.getId().longValue())

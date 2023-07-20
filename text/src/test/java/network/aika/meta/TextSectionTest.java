@@ -3,6 +3,7 @@ package network.aika.meta;
 import network.aika.Model;
 import network.aika.debugger.AIKADebugger;
 import network.aika.elements.activations.Activation;
+import network.aika.elements.synapses.Synapse;
 import network.aika.parser.Context;
 import network.aika.parser.ParserPhase;
 import network.aika.parser.TrainingParser;
@@ -62,18 +63,18 @@ public class TextSectionTest extends TrainingParser {
     }
 
     @Override
-    public boolean check(Activation iAct) {
+    public boolean check(Synapse s, Activation iAct) {
         return iAct.getTokenPos() == 0 &&
-                (isHeadlineTarget() == isHeadlinePrimaryInput(iAct));
+                (isHeadlineTarget() == isHeadlinePrimaryInput(s));
     }
 
     private boolean isHeadlineTarget() {
         return headlineTargetLabel != null;
     }
 
-    private boolean isHeadlinePrimaryInput(Activation iAct) {
+    private boolean isHeadlinePrimaryInput(Synapse s) {
         return templateModel.textSectionModel.textSectionHeadlinePrimaryInputBN.getId().longValue() ==
-                iAct.getNeuronProvider().getId().longValue();
+                s.getPOutput().getId().longValue();
     }
 
     @Test

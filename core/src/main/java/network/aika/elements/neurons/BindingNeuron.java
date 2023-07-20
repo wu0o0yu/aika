@@ -77,7 +77,7 @@ public class BindingNeuron extends ConjunctiveNeuron<BindingActivation> {
 
     public double getPreNetUBDummyWeightSum() {
         return getInputSynapsesByType(BindingNeuronSynapse.class)
-                .mapToDouble(s -> s.getPreNetDummyWeight())
+                .mapToDouble(BindingNeuronSynapse::getPreNetDummyWeight)
                 .sum();
     }
 }
