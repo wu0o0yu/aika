@@ -3,6 +3,7 @@ package network.aika.meta;
 import network.aika.Model;
 import network.aika.debugger.AIKADebugger;
 import network.aika.elements.activations.Activation;
+import network.aika.elements.neurons.BindingNeuron;
 import network.aika.elements.synapses.Synapse;
 import network.aika.parser.Context;
 import network.aika.parser.ParserPhase;
@@ -18,13 +19,10 @@ import java.util.Set;
 import static network.aika.parser.ParserPhase.COUNTING;
 import static network.aika.parser.ParserPhase.TRAINING;
 
-public class TextSectionTest extends TrainingParser {
+public class TextSectionTest extends TrainingParser<TestContext> {
 
     String tasksHeadline = "Your Tasks";
     String requirementsHeadline = "Your Profile";
-
-    String headlineTargetString;
-    String headlineTargetLabel;
 
     private PhraseTemplateModel templateModel;
     private Tokenizer tokenizer;
@@ -53,7 +51,7 @@ public class TextSectionTest extends TrainingParser {
     }
 
     @Override
-    protected Document initDocument(String txt, Context context, ParserPhase phase) {
+    protected Document initDocument(String txt, TestContext context, ParserPhase phase) {
         Document doc = super.initDocument(txt, context, phase);
         if(phase == TRAINING) {
             AIKADebugger.createAndShowGUI(doc);
@@ -65,16 +63,7 @@ public class TextSectionTest extends TrainingParser {
     @Override
     public boolean check(Synapse s, Activation iAct) {
         return iAct.getTokenPos() == 0 &&
-                (isHeadlineTarget() == isHeadlinePrimaryInput(s));
-    }
-
-    private boolean isHeadlineTarget() {
-        return headlineTargetLabel != null;
-    }
-
-    private boolean isHeadlinePrimaryInput(Synapse s) {
-        return templateModel.textSectionModel.textSectionHeadlinePrimaryInputBN.getId().longValue() ==
-                s.getPOutput().getId().longValue();
+                ((currentContext != null && currentContext.isHeadlineTarget()) == templateModel.textSectionModel.isHeadlinePrimaryInput((BindingNeuron) s.getOutput()));
     }
 
     @Test
@@ -87,25 +76,18 @@ public class TextSectionTest extends TrainingParser {
 
         templateModel.initTemplates();
 
-        headlineTargetLabel = "Task-HL";
-        headlineTargetString = tasksHeadline;
-        process(tasksHeadline, null, TRAINING);
-
-        headlineTargetLabel = "Requi.-HL";
-        headlineTargetString = requirementsHeadline;
-        process(requirementsHeadline, null, TRAINING);
-
-        headlineTargetString = null;
+        process(tasksHeadline, new TestContext(tasksHeadline, "Task-HL"), TRAINING);
+        process(requirementsHeadline, new TestContext(requirementsHeadline, "Requi.-HL"), TRAINING);
         process(exampleTxt, null, TRAINING);
     }
 
     @Override
-    protected void addTargets(Document doc, Context context) {
-        if(headlineTargetString != null) {
+    protected void addTargets(Document doc, TestContext context) {
+        if(context.getHeadlineTargetString() != null) {
             templateModel.getTextSectionModel()
                     .addTargetTSHeadline(
                             doc,
-                            Set.of(headlineTargetLabel),
+                            Set.of(context.getHeadlineTargetLabel()),
                             0,
                             doc.length()
                     );

@@ -23,8 +23,8 @@ import network.aika.text.Document;
  *
  * @author Lukas Molzberger
  */
-public interface Tokenizer {
+public interface Tokenizer<C extends Context> {
 
-    void tokenize(Document doc, Context context, TokenConsumer tokenConsumer);
+    void tokenize(Document doc, C context, TokenConsumer tokenConsumer);
 
 }

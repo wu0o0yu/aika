@@ -69,6 +69,11 @@ public class TypedTextSectionModel extends TextSectionModel {
         log.info(doc.getContent() + " : " + tsLabels.stream().collect(Collectors.joining(", ")));
     }
 
+    public boolean isHeadlinePrimaryInput(BindingNeuron bn) {
+        return textSectionHeadlinePrimaryInputBN.getId().longValue() ==
+                bn.getId().longValue();
+    }
+
     protected void initTextSectionTemplates() {
         super.initTextSectionTemplates();
 

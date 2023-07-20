@@ -36,13 +36,13 @@ import static network.aika.steps.keys.QueueKey.MAX_ROUND;
  *
  * @author Lukas Molzberger
  */
-public abstract class Parser {
+public abstract class Parser<C extends Context> {
 
     protected static final Logger log = LoggerFactory.getLogger(Parser.class);
 
     public abstract Tokenizer getTokenizer();
 
-    protected Document initDocument(String txt, Context context, ParserPhase phase) {
+    protected Document initDocument(String txt, C context, ParserPhase phase) {
         Document doc = new Document(getTemplateModel().getModel(), txt);
 
         Config conf = new Config()
@@ -61,7 +61,7 @@ public abstract class Parser {
 
     protected AIKADebugger debugger = null;
 
-    public Document process(String txt, Context context, ParserPhase phase) {
+    public Document process(String txt, C context, ParserPhase phase) {
         Document doc = initDocument(txt, context, phase);
 
         try {

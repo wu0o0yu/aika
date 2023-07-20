@@ -47,7 +47,7 @@ import static network.aika.utils.Utils.doubleToString;
 /**
  * @author Lukas Molzberger
  */
-public class SyllablesExperiment extends TrainingParser {
+public class SyllablesExperiment extends TrainingParser<Context> {
 
     Model model;
     AbstractTemplateModel syllableModel;
