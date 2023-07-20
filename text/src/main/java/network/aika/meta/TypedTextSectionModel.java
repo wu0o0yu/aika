@@ -16,15 +16,14 @@
  */
 package network.aika.meta;
 
-import network.aika.elements.synapses.InhibitorySynapse;
-import network.aika.elements.synapses.Synapse;
+import network.aika.elements.synapses.*;
 import network.aika.enums.Scope;
 import network.aika.elements.neurons.*;
-import network.aika.elements.synapses.PatternSynapse;
 import network.aika.text.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -173,29 +172,33 @@ public class TypedTextSectionModel extends TextSectionModel {
     }
 
     private PatternNeuron instantiatePatternWithBindingNeurons() {
+        Map<NeuronProvider, Neuron> templateMapping = new TreeMap<>();
+
         PatternNeuron tpn = phraseModel.patternN.getNeuron();
         PatternNeuron pn = instantiatePatternNeuron(tpn);
+        templateMapping.put(tpn.getProvider(), pn);
 
         InhibitoryNeuron tInhibN = phraseModel.inhibitoryN.getNeuron();
         InhibitoryNeuron inhibN = instantiateInhibitoryNeuron(tInhibN);
+        templateMapping.put(tInhibN.getProvider(), inhibN);
 
-        Map<NeuronProvider, Neuron> templateMapping = new TreeMap<>();
-        tpn.getInputSynapsesByType(PatternSynapse.class)
-                .forEach(ts -> {
-                            BindingNeuron[] bn = instantiateBindingNeuron(ts);
-                            templateMapping.put(bn[0].getProvider(), bn[1]);
-                        }
-                );
-
-        tpn.getInputSynapsesByType(PatternSynapse.class)
+        List<BindingNeuron> templateBindingNeurons = tpn.getInputSynapsesByType(PatternSynapse.class)
                 .map(Synapse::getInput)
-                .forEach(tbn -> {
-                            BindingNeuron bn = (BindingNeuron) templateMapping.get(tbn.getProvider());
-                            instantiatePatternSynapse(tpn, pn, tbn, bn);
-                            instantiateInhibitorySynapse(tInhibN, inhibN, tbn, bn);
-                            instantiateBindingNeuronSynapses(np -> templateMapping.get(np), tbn.getProvider(), bn);
-                        }
-                );
+                .toList();
+
+        templateBindingNeurons.forEach(tn -> {
+                    BindingNeuron[] bn = instantiateBindingNeuron(tn);
+                    templateMapping.put(bn[0].getProvider(), bn[1]);
+                }
+        );
+
+        templateBindingNeurons.forEach(tbn -> {
+                    BindingNeuron bn = (BindingNeuron) templateMapping.get(tbn.getProvider());
+                    instantiatePatternSynapse(tpn, pn, tbn, bn);
+                    instantiateInhibitorySynapse(tInhibN, inhibN, tbn, bn);
+                    instantiateBindingNeuronSynapses(np -> templateMapping.get(np), tbn.getProvider(), bn);
+                }
+        );
         return pn;
     }
 
@@ -231,8 +234,9 @@ public class TypedTextSectionModel extends TextSectionModel {
 
     private static void instantiateBindingNeuronSynapses(Function<NeuronProvider, Neuron> resolver, NeuronProvider tbn, BindingNeuron bn) {
         tbn.getInputSynapses()
+                .filter(ts -> !(ts instanceof BindingCategoryInputSynapse))
                 .forEach(ts -> {
-                    Neuron in = resolver.apply(ts.getPInput());
+                    Neuron<?> in = resolver.apply(ts.getPInput());
                     ts.instantiateTemplate(
                             in != null ?
                                 in :
@@ -240,10 +244,21 @@ public class TypedTextSectionModel extends TextSectionModel {
                             bn
                     );
                 });
+
+        tbn.getOutputSynapses()
+                .filter(ts -> !(ts instanceof BindingCategorySynapse))
+                .forEach(ts -> {
+                    Neuron<?> out = resolver.apply(ts.getPOutput());
+                    ts.instantiateTemplate(
+                            bn,
+                            out != null ?
+                                    out :
+                                    ts.getOutput()
+                    );
+                });
     }
 
-    private BindingNeuron[] instantiateBindingNeuron(PatternSynapse tps) {
-        BindingNeuron tbn = tps.getInput();
+    private BindingNeuron[] instantiateBindingNeuron(BindingNeuron tbn) {
         BindingNeuron bn = tbn
                 .instantiateTemplate()
                 .init(model, tbn.getLabel() + " TS-Headline");

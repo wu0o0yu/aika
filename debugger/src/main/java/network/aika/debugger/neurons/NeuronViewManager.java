@@ -37,6 +37,7 @@ import org.graphstream.ui.view.camera.DefaultCamera2D;
 import java.awt.*;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 import static network.aika.debugger.AbstractGraphManager.STANDARD_DISTANCE_X;
@@ -93,7 +94,7 @@ public class NeuronViewManager extends AbstractViewManager<Neuron, NeuronGraphMa
     }
 
 
-    public void expandNeuron(Neuron<?> n) {
+    public void expandNeuron(Neuron<?> n, boolean synapsesOnly) {
         List<? extends Synapse> outputSyns = n.getOutputSynapsesAsStream()
                 .limit(20)
                 .toList();
@@ -107,7 +108,8 @@ public class NeuronViewManager extends AbstractViewManager<Neuron, NeuronGraphMa
                     s,
                     Direction.OUTPUT,
                     getRelativePosition(i++, count),
-                    STANDARD_DISTANCE_X
+                    STANDARD_DISTANCE_X,
+                    synapsesOnly
             );
         }
 
@@ -124,7 +126,8 @@ public class NeuronViewManager extends AbstractViewManager<Neuron, NeuronGraphMa
                     s,
                     Direction.INPUT,
                     getRelativePosition(i++, count),
-                    -STANDARD_DISTANCE_X
+                    -STANDARD_DISTANCE_X,
+                    synapsesOnly
             );
         }
     }
@@ -134,18 +137,22 @@ public class NeuronViewManager extends AbstractViewManager<Neuron, NeuronGraphMa
         return (pos * stepSize) - (((count - 1) * stepSize) / 2.0);
     }
 
-    private void drawExpandedSynapse(Neuron<?> n, Synapse s, Direction dir, double relX, double relY) {
+    private void drawExpandedSynapse(Neuron<?> n, Synapse s, Direction dir, double relX, double relY, boolean synapsesOnly) {
         Node currentNode = graphManager.getNode(n);
         Neuron<?> relN = dir.getNeuron(s);
         Node relNode = graphManager.getNode(relN);
-        if(relNode != null)
-            return;
+        if(relNode == null) {
+            if(synapsesOnly)
+                return;
 
-        drawNeuron(
-                relN,
-                (Double) currentNode.getAttribute("x") + relX,
-                (Double) currentNode.getAttribute("y") + relY
-        );
+            drawNeuron(
+                    relN,
+                    (Double) currentNode.getAttribute("x") + relX,
+                    (Double) currentNode.getAttribute("y") + relY
+            );
+
+            expandNeuron(relN, true);
+        }
         drawSynapse(s);
     }
 
@@ -158,7 +165,7 @@ public class NeuronViewManager extends AbstractViewManager<Neuron, NeuronGraphMa
             if (n == null)
                 return;
 
-            expandNeuron(n);
+            expandNeuron(n, false);
         }
     }
 
@@ -225,6 +232,7 @@ public class NeuronViewManager extends AbstractViewManager<Neuron, NeuronGraphMa
         n.getInputSynapsesAsStream()
                 .map(Synapse::getInput)
                 .map(in -> getGraphManager().getNode(in))
+                .filter(Objects::nonNull)
                 .map(inode -> (GraphicElement) gg.getNode(inode.getId()))
                 .forEach(inode -> {
                     Point3 p = camera.transformPxToGuSwing(x, y);
