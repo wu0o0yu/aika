@@ -18,6 +18,7 @@ package network.aika.elements.neurons;
 
 import network.aika.Model;
 import network.aika.elements.synapses.Synapse;
+import network.aika.exceptions.NeuronSerializationException;
 import network.aika.suspension.SuspensionMode;
 import network.aika.utils.ReadWriteLock;
 
@@ -153,7 +154,7 @@ public class NeuronProvider implements Comparable<NeuronProvider> {
                     baos.toByteArray()
             );
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new NeuronSerializationException(id, e);
         }
         neuron.resetModified();
     }
@@ -169,7 +170,7 @@ public class NeuronProvider implements Comparable<NeuronProvider> {
         )) {
             n = Neuron.read(dis, model);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new NeuronSerializationException(id, e);
         }
         n.setProvider(this);
         n.reactivate(model);
