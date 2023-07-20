@@ -542,7 +542,6 @@ public abstract class Neuron<A extends Activation> implements Element, Writable 
         addProvider(m);
         setLabel(label);
         setBias(0.0);
-//        connect(INPUT, true, false);
         return (N) this;
     }
 
@@ -552,7 +551,7 @@ public abstract class Neuron<A extends Activation> implements Element, Writable 
     }
 
     public String toKeyString() {
-        return getId() + ":" + (getLabel() != null ? getLabel() : "--");
+        return (provider != null ? getId() : "[no provider]") + ":" + (getLabel() != null ? getLabel() : "--");
     }
 
     public String toString() {

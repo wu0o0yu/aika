@@ -40,6 +40,9 @@ public class InputPatternLink extends BindingNeuronLink<InputPatternSynapse, Pat
 
     @Override
     public void connectGradientFields() {
+        if(input == null)
+            return;
+
         inputEntropy = Fields.scale(this, "-Entropy", -1,
                 input.getEntropy(),
                 output.getGradient()
