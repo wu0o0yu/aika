@@ -129,7 +129,7 @@ public abstract class AbstractViewManager<N, G extends AbstractGraphManager> {
         return graphManager;
     }
 
-    public abstract void reactToCtrlSelection(GraphicElement element);
+    public abstract void reactToAltSelection(GraphicElement element);
 
     public abstract void showElementContext(GraphicElement ge);
 

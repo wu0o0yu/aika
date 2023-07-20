@@ -148,7 +148,7 @@ public class ActivationViewManager extends AbstractViewManager<Activation, Activ
     }
 
     @Override
-    public void reactToCtrlSelection(GraphicElement ge) {
+    public void reactToAltSelection(GraphicElement ge) {
         if (ge instanceof Node) {
             Node n = (Node) ge;
 

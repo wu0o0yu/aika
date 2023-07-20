@@ -16,7 +16,6 @@
  */
 package network.aika.debugger;
 
-import network.aika.debugger.activations.ActivationGraphContextMenu;
 import network.aika.debugger.graphics.CubicCurveShape;
 import org.graphstream.graph.Edge;
 import org.graphstream.graph.Element;
@@ -85,7 +84,7 @@ public abstract class AbstractGraphMouseManager implements MouseInputListener, o
 
         this.view.freezeElement(element, true);
         if(event.isAltDown()) {
-            viewManager.reactToCtrlSelection(element);
+            viewManager.reactToAltSelection(element);
         } else if (event.getButton() == 3) {
             element.setAttribute("ui.selected", new Object[0]);
         } else {

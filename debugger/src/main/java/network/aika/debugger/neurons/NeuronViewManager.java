@@ -20,13 +20,19 @@ import network.aika.Model;
 import network.aika.debugger.AbstractGraphMouseManager;
 import network.aika.debugger.AbstractParticleLink;
 import network.aika.debugger.AbstractViewManager;
+import network.aika.elements.activations.Activation;
+import network.aika.elements.activations.PatternActivation;
+import network.aika.elements.neurons.PatternNeuron;
 import network.aika.enums.direction.Direction;
 import network.aika.elements.neurons.Neuron;
 import network.aika.elements.neurons.NeuronProvider;
 import network.aika.elements.synapses.Synapse;
 import org.graphstream.graph.Edge;
 import org.graphstream.graph.Node;
+import org.graphstream.ui.geom.Point3;
 import org.graphstream.ui.graphicGraph.GraphicElement;
+import org.graphstream.ui.graphicGraph.GraphicGraph;
+import org.graphstream.ui.view.camera.DefaultCamera2D;
 
 import java.awt.*;
 import java.util.Collection;
@@ -130,16 +136,21 @@ public class NeuronViewManager extends AbstractViewManager<Neuron, NeuronGraphMa
 
     private void drawExpandedSynapse(Neuron<?> n, Synapse s, Direction dir, double relX, double relY) {
         Node currentNode = graphManager.getNode(n);
+        Neuron<?> relN = dir.getNeuron(s);
+        Node relNode = graphManager.getNode(relN);
+        if(relNode != null)
+            return;
+
         drawNeuron(
-                dir.getNeuron(s),
+                relN,
                 (Double) currentNode.getAttribute("x") + relX,
-                ((Double) currentNode.getAttribute("y")) + relY
+                (Double) currentNode.getAttribute("y") + relY
         );
         drawSynapse(s);
     }
 
     @Override
-    public void reactToCtrlSelection(GraphicElement ge) {
+    public void reactToAltSelection(GraphicElement ge) {
         if (ge instanceof Node) {
             Node node = (Node) ge;
 
@@ -201,10 +212,25 @@ public class NeuronViewManager extends AbstractViewManager<Neuron, NeuronGraphMa
     }
 
     @Override
-    public void moveNodeGroup(Node n, int x, int y) {
+    public void moveNodeGroup(Node node, int x, int y) {
+        Neuron<?> n = getGraphManager().getAikaNode(node);
+        if(!(n instanceof PatternNeuron))
+            return;
 
+        DefaultCamera2D camera = (DefaultCamera2D) getGraphView().getCamera();
+
+        GraphicGraph gg = viewer.getGraphicGraph();
+        GraphicElement gn = (GraphicElement) node;
+
+        n.getInputSynapsesAsStream()
+                .map(Synapse::getInput)
+                .map(in -> getGraphManager().getNode(in))
+                .map(inode -> (GraphicElement) gg.getNode(inode.getId()))
+                .forEach(inode -> {
+                    Point3 p = camera.transformPxToGuSwing(x, y);
+                    inode.move((inode.getX() - gn.getX()) + p.x, (inode.getY() - gn.getY()) + p.y, inode.getZ());
+                });
     }
-
     @Override
     protected AbstractGraphMouseManager initMouseManager() {
         return new NeuronGraphMouseManager(this);

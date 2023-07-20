@@ -90,20 +90,18 @@ public abstract class AbstractGraphManager<N, L, P extends AbstractParticle> ext
     }
 
     public synchronized P lookupParticle(N key) {
+        Node node = getNode(key);
+
+        return node == null ?
+                createParticle(key) :
+                getParticle(key);
+    }
+
+    public P createParticle(N key) {
         String id = getNodeId(key);
-        Node node = graph.getNode(id);
-
-        P particle;
-
-        if (node == null) {
-            nodeIdToAikaNode.put(id, key);
-            node = graph.addNode(id);
-            particle = createParticle(key, node);
-        } else {
-            particle = getParticle(key);
-        }
-
-        return particle;
+        nodeIdToAikaNode.put(id, key);
+        Node node = graph.addNode(id);
+        return createParticle(key, node);
     }
 
     protected  abstract P createParticle(N key, Node node);
