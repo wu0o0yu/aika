@@ -42,8 +42,8 @@ public class Fields {
         return add;
     }
 
-    public static Addition add(FieldObject ref, String label, FieldOutput in1, FieldOutput in2, FieldInput... out) {
-        Addition add = add(ref, label, in1, in2);
+    public static Addition add(FieldObject ref, String label, FieldOutput[] ins, FieldInput... out) {
+        Addition add = add(ref, label, ins[0], ins[1]);
         linkAndConnectAll(add, out);
         return add;
     }

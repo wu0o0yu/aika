@@ -26,7 +26,7 @@ public class Addition extends AbstractFunction {
     }
 
     @Override
-    protected int getNumberOfFunctionArguments() {
+    protected int getNumFuncArgs() {
         return 2;
     }
 

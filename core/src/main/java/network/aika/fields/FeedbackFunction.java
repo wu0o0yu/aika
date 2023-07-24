@@ -26,7 +26,7 @@ public class FeedbackFunction extends IdentityFunction {
     }
 
     @Override
-    protected int getNumberOfFunctionArguments() {
+    protected int getNumFuncArgs() {
         return 2;
     }
 

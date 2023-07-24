@@ -37,10 +37,10 @@ public abstract class AbstractFunction extends Field implements FieldInput {
     @Override
     protected void initIO() {
         super.initIO();
-        inputs = new FieldLink[getNumberOfFunctionArguments()];
+        inputs = new FieldLink[getNumFuncArgs()];
     }
 
-    protected int getNumberOfFunctionArguments() {
+    protected int getNumFuncArgs() {
         return 1;
     }
 

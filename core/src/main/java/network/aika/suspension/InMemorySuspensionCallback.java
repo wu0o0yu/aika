@@ -49,8 +49,8 @@ public class InMemorySuspensionCallback implements SuspensionCallback {
     }
 
     @Override
-    public void close() throws IOException {
-
+    public void close(Model model) throws IOException {
+        this.saveIndex(model);
     }
 
     @Override
