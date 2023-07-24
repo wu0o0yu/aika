@@ -37,7 +37,7 @@ public interface SuspensionCallback {
 
     void open() throws IOException;
 
-    void close() throws IOException;
+    void close(Model model) throws IOException;
 
     long createId();
 

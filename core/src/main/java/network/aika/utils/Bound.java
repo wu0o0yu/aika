@@ -11,24 +11,18 @@ public enum Bound {
     public double probability(double f, double n) {
         assert n > 0.0;
 
-        BetaDistribution dist;
-
-        if(this == UPPER) {
-            dist = new BetaDistribution(
-                    f + 1,
-                    (n - f) + 1
-            );
-        } else {
-            dist = new BetaDistribution(
-                    (n - f) + 1,
-                    f + 1
-            );
-        }
+        BetaDistribution dist = initDist(f, n);
 
         double p = dist.inverseCumulativeProbability(
                 BETA_THRESHOLD
         );
 
         return this == UPPER ? p : 1.0 - p;
+    }
+
+    private BetaDistribution initDist(double f, double n) {
+        return this == UPPER ?
+                new BetaDistribution(f + 1, (n - f) + 1) :
+                new BetaDistribution((n - f) + 1, f + 1);
     }
 }

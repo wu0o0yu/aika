@@ -202,9 +202,7 @@ public class Model implements Writable {
     }
 
     public void close() throws IOException {
-        suspensionCallback.saveIndex(this);
-
-        suspensionCallback.close();
+        suspensionCallback.close(this);
     }
 
     public Object modelClass(String clazzName) {

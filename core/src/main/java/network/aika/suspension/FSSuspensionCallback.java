@@ -72,7 +72,8 @@ public class FSSuspensionCallback implements SuspensionCallback {
         modelStore = new RandomAccessFile(getFile(MODEL), "rw");
     }
 
-    public void close() throws IOException {
+    public void close(Model model) throws IOException {
+        this.saveIndex(model);
         modelStore.close();
     }
 

@@ -102,7 +102,7 @@ public class SuspensionTest {
         }
 
         @Override
-        public void close() {
+        public void close(Model model) {
         }
 
         @Override

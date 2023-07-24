@@ -240,7 +240,7 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
         return created;
     }
 
-    public void setCreated(Timestamp ts) {
+    protected void setCreated(Timestamp ts) {
         this.created = ts;
     }
 
